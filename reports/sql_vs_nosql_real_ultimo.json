@@ -1,0 +1,99 @@
+{
+  "generado_en": "2026-05-15T18:18:52.964986+00:00",
+  "alcance": [
+    "URY",
+    "BRA",
+    "ARG"
+  ],
+  "postgres": {
+    "focos_por_pais": {
+      "ms_min": 0.566,
+      "ms_promedio": 59.662,
+      "ms_max": 177.667,
+      "repeticiones": 3,
+      "resultado": {
+        "ARG": 1039964,
+        "BRA": 9257301,
+        "URY": 46317
+      }
+    },
+    "focos_por_mes": {
+      "ms_min": 1.399,
+      "ms_promedio": 4.634,
+      "ms_max": 10.493,
+      "repeticiones": 3,
+      "resultado": 255
+    },
+    "ejecuciones_etl": {
+      "ms_min": 0.561,
+      "ms_promedio": 12.835,
+      "ms_max": 37.27,
+      "repeticiones": 3,
+      "resultado": 72
+    },
+    "riesgo_por_pais": {
+      "ms_min": 35.297,
+      "ms_promedio": 53.626,
+      "ms_max": 89.324,
+      "repeticiones": 3,
+      "resultado": {
+        "ARG": 0.3748877568825126,
+        "BRA": 0.4141895385808453,
+        "URY": 0.37446761904761905
+      }
+    }
+  },
+  "mongo": {
+    "focos_por_pais_embebidos": {
+      "ms_min": 3409.895,
+      "ms_promedio": 3426.735,
+      "ms_max": 3435.183,
+      "repeticiones": 3,
+      "resultado": {
+        "ARG": 90054,
+        "BRA": 546788,
+        "URY": 152
+      }
+    },
+    "focos_por_pais_materializado": {
+      "ms_min": 1.865,
+      "ms_promedio": 2.168,
+      "ms_max": 2.659,
+      "repeticiones": 3,
+      "resultado": {
+        "ARG": 90054,
+        "BRA": 546788,
+        "URY": 152
+      }
+    },
+    "snapshots_por_mes": {
+      "ms_min": 24.459,
+      "ms_promedio": 25.414,
+      "ms_max": 26.076,
+      "repeticiones": 3,
+      "resultado": 84
+    },
+    "focos_por_mes_materializado": {
+      "ms_min": 2.164,
+      "ms_promedio": 2.477,
+      "ms_max": 2.924,
+      "repeticiones": 3,
+      "resultado": 179
+    },
+    "ejecuciones_etl": {
+      "ms_min": 1.82,
+      "ms_promedio": 1.981,
+      "ms_max": 2.128,
+      "repeticiones": 3,
+      "resultado": 20
+    },
+    "snapshots_totales": {
+      "ms_min": 10.291,
+      "ms_promedio": 12.822,
+      "ms_max": 14.98,
+      "repeticiones": 3,
+      "resultado": 2520
+    }
+  },
+  "lectura": "PostgreSQL mide hechos normalizados; MongoDB mide documentos/snapshots embebidos y trazabilidad."
+}

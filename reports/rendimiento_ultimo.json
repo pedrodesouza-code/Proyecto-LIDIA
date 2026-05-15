@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-05-15T13:14:42.193597+00:00",
+  "generado_en": "2026-05-15T17:52:30.059539+00:00",
   "entorno": {
     "python": "3.13.5",
     "sistema": "Windows-11-10.0.26200-SP0",
@@ -7,8 +7,8 @@
   },
   "archivos": {
     "cams_nrt_procesado.parquet": {
-      "bytes": 22129,
-      "modificado": "2026-03-29T18:55:51.590331+00:00"
+      "bytes": 35650,
+      "modificado": "2026-05-15T13:27:02.225904+00:00"
     },
     "cams_procesado_todos.parquet": {
       "bytes": 202383,
@@ -18,13 +18,17 @@
       "bytes": 22399,
       "modificado": "2026-05-12T03:25:10.318411+00:00"
     },
+    "firms_nrt_procesado.parquet": {
+      "bytes": 175226,
+      "modificado": "2026-05-15T13:37:51.777356+00:00"
+    },
     "firms_procesado.parquet": {
       "bytes": 42317452,
       "modificado": "2026-05-12T03:24:47.858604+00:00"
     },
     "forecast_riesgo.parquet": {
-      "bytes": 18271,
-      "modificado": "2026-05-12T03:24:52.550382+00:00"
+      "bytes": 19018,
+      "modificado": "2026-05-15T15:38:08.084897+00:00"
     },
     "meteo_procesado_todos.parquet": {
       "bytes": 437514,
@@ -37,86 +41,86 @@
   },
   "metricas": {
     "lectura_firms_procesado": {
-      "ms_min": 750.991,
-      "ms_promedio": 750.991,
-      "ms_max": 750.991,
+      "ms_min": 2106.657,
+      "ms_promedio": 2106.657,
+      "ms_max": 2106.657,
       "repeticiones": 1,
       "resultado": 1836537
     },
     "lectura_meteo_procesado_todos": {
-      "ms_min": 13.945,
-      "ms_promedio": 13.945,
-      "ms_max": 13.945,
+      "ms_min": 33.573,
+      "ms_promedio": 33.573,
+      "ms_max": 33.573,
       "repeticiones": 1,
       "resultado": 23104
     },
     "lectura_cams_procesado_todos": {
-      "ms_min": 9.171,
-      "ms_promedio": 9.171,
-      "ms_max": 9.171,
+      "ms_min": 25.284,
+      "ms_promedio": 25.284,
+      "ms_max": 25.284,
       "repeticiones": 1,
       "resultado": 23199
     },
     "lectura_forecast_riesgo": {
-      "ms_min": 6.371,
-      "ms_promedio": 6.371,
-      "ms_max": 6.371,
+      "ms_min": 19.167,
+      "ms_promedio": 19.167,
+      "ms_max": 19.167,
       "repeticiones": 1,
-      "resultado": 63
+      "resultado": 77
     },
     "lectura_chirps_sa": {
-      "ms_min": 4.861,
-      "ms_promedio": 4.861,
-      "ms_max": 4.861,
+      "ms_min": 15.217,
+      "ms_promedio": 15.217,
+      "ms_max": 15.217,
       "repeticiones": 1,
       "resultado": 858
     },
     "lectura_modis_lc": {
-      "ms_min": 4.31,
-      "ms_promedio": 4.31,
-      "ms_max": 4.31,
+      "ms_min": 15.227,
+      "ms_promedio": 15.227,
+      "ms_max": 15.227,
       "repeticiones": 1,
       "resultado": 63
     },
     "q1_focos_por_mes": {
-      "ms_min": 449.567,
-      "ms_promedio": 490.622,
-      "ms_max": 546.954,
+      "ms_min": 401.764,
+      "ms_promedio": 439.349,
+      "ms_max": 492.156,
       "repeticiones": 3,
       "resultado": 12
     },
     "q2_ranking_dias_focos": {
-      "ms_min": 52.432,
-      "ms_promedio": 54.646,
-      "ms_max": 55.811,
+      "ms_min": 44.444,
+      "ms_promedio": 48.162,
+      "ms_max": 51.604,
       "repeticiones": 3,
       "resultado": 417340
     },
     "q3_riesgo_por_punto": {
-      "ms_min": 2.782,
-      "ms_promedio": 3.533,
-      "ms_max": 4.682,
+      "ms_min": 2.931,
+      "ms_promedio": 4.66,
+      "ms_max": 7.765,
       "repeticiones": 3,
       "resultado": 5748
     },
     "q4_pm10_por_punto": {
-      "ms_min": 2.285,
-      "ms_promedio": 4.515,
-      "ms_max": 8.334,
+      "ms_min": 2.024,
+      "ms_promedio": 2.432,
+      "ms_max": 3.164,
       "repeticiones": 3,
       "resultado": 21.741518188567188
     },
     "incremental_firms_ultimos_7_dias": {
-      "ms_min": 135.225,
-      "ms_promedio": 148.51,
-      "ms_max": 160.979,
+      "ms_min": 124.317,
+      "ms_promedio": 137.274,
+      "ms_max": 144.766,
       "repeticiones": 3,
       "resultado": 12145
     },
     "simulacion_carga_doble_idempotente_firms": {
-      "ms_min": 81.741,
-      "ms_promedio": 87.158,
-      "ms_max": 97.886,
+      "ms_min": 83.428,
+      "ms_promedio": 96.355,
+      "ms_max": 107.974,
       "repeticiones": 3,
       "resultado": 100000
     }

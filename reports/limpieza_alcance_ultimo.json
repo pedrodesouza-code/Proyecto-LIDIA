@@ -1,0 +1,109 @@
+{
+  "generado_en": "2026-05-15T18:17:30.585746+00:00",
+  "alcance_valido": [
+    "URY",
+    "BRA",
+    "ARG"
+  ],
+  "puntos_validos": [
+    "Cuiabá",
+    "Porto_Alegre",
+    "Manaus",
+    "Campo_Grande",
+    "Brasília",
+    "Salta",
+    "Posadas",
+    "Buenos_Aires",
+    "Mendoza",
+    "Rivera",
+    "Montevideo"
+  ],
+  "postgres": {
+    "antes": {
+      "conteos": {
+        "paises_referencia": 3,
+        "puntos_monitoreo": 14,
+        "focos_calor": 10343582,
+        "meteo_diario": 23316,
+        "calidad_aire_diario": 23719,
+        "precipitacion_mensual": 858,
+        "cobertura_vegetal": 63
+      },
+      "puntos_por_pais": {
+        "ARG": 4,
+        "BRA": 5,
+        "URY": 5
+      },
+      "focos_por_pais": {
+        "ARG": 1039964,
+        "BRA": 9257301,
+        "URY": 46317
+      }
+    },
+    "eliminados": {
+      "cobertura_vegetal": 0,
+      "precipitacion_mensual": 0,
+      "calidad_aire_diario": 3,
+      "meteo_diario": 0,
+      "focos_calor": 0,
+      "puntos_monitoreo": 3,
+      "paises_referencia": 0
+    },
+    "despues": {
+      "conteos": {
+        "paises_referencia": 3,
+        "puntos_monitoreo": 11,
+        "focos_calor": 10343582,
+        "meteo_diario": 23316,
+        "calidad_aire_diario": 23716,
+        "precipitacion_mensual": 858,
+        "cobertura_vegetal": 63
+      },
+      "puntos_por_pais": {
+        "ARG": 4,
+        "BRA": 5,
+        "URY": 2
+      },
+      "focos_por_pais": {
+        "ARG": 1039964,
+        "BRA": 9257301,
+        "URY": 46317
+      }
+    }
+  },
+  "mongo": {
+    "antes": {
+      "conteos": {
+        "alertas": 0,
+        "ejecuciones_etl": 20,
+        "focos_resumen_mes": 179,
+        "focos_resumen_pais": 3,
+        "focos_snapshots": 2520
+      },
+      "focos_por_pais": {
+        "BRA": 546788,
+        "ARG": 90054,
+        "URY": 152
+      }
+    },
+    "eliminados": {
+      "alertas": 0,
+      "snapshots_actualizados": 0,
+      "snapshots_vacios": 0
+    },
+    "despues": {
+      "conteos": {
+        "alertas": 0,
+        "ejecuciones_etl": 20,
+        "focos_resumen_mes": 179,
+        "focos_resumen_pais": 3,
+        "focos_snapshots": 2520
+      },
+      "focos_por_pais": {
+        "BRA": 546788,
+        "ARG": 90054,
+        "URY": 152
+      }
+    }
+  }
+}

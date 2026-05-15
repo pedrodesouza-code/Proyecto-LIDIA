@@ -9,7 +9,7 @@
       "filas_evaluadas": 8115
     },
     "mensaje": "0 nulos (0.0%) en pm10_media sobre dias con observacion valida",
-    "ejecutado": "2026-05-15T14:00:48.521519+00:00"
+    "ejecutado": "2026-05-15T18:11:27.141009+00:00"
   },
   {
     "test": "completitud_firms_criticos",
@@ -30,7 +30,7 @@
       }
     },
     "mensaje": "Todos los campos críticos completos",
-    "ejecutado": "2026-05-15T14:00:48.543447+00:00"
+    "ejecutado": "2026-05-15T18:11:27.565764+00:00"
   },
   {
     "test": "completitud_meteo_indice_riesgo",
@@ -42,7 +42,7 @@
       "total": 23104
     },
     "mensaje": "0 nulos (0.0%) en indice_riesgo",
-    "ejecutado": "2026-05-15T14:00:48.552848+00:00"
+    "ejecutado": "2026-05-15T18:11:27.598528+00:00"
   },
   {
     "test": "unicidad_cams",
@@ -52,7 +52,7 @@
       "duplicados": 0
     },
     "mensaje": "0 duplicados (punto, fecha)",
-    "ejecutado": "2026-05-15T14:00:48.566331+00:00"
+    "ejecutado": "2026-05-15T18:11:27.671800+00:00"
   },
   {
     "test": "unicidad_firms",
@@ -69,7 +69,7 @@
       ]
     },
     "mensaje": "0 duplicados por clave natural ['latitud', 'longitud', 'fecha_adq', 'hora_adq_hhmm', 'satelite']",
-    "ejecutado": "2026-05-15T14:00:49.269974+00:00"
+    "ejecutado": "2026-05-15T18:11:29.510572+00:00"
   },
   {
     "test": "unicidad_meteo",
@@ -83,7 +83,7 @@
       ]
     },
     "mensaje": "0 duplicados (punto, fecha)",
-    "ejecutado": "2026-05-15T14:00:49.283057+00:00"
+    "ejecutado": "2026-05-15T18:11:29.549342+00:00"
   },
   {
     "test": "consistencia_cams_pm10_no_negativo",
@@ -93,7 +93,7 @@
       "negativos": 0
     },
     "mensaje": "0 valores negativos en pm10_media",
-    "ejecutado": "2026-05-15T14:00:49.296436+00:00"
+    "ejecutado": "2026-05-15T18:11:29.572643+00:00"
   },
   {
     "test": "consistencia_firms_coordenadas",
@@ -105,7 +105,7 @@
       "total": 1836537
     },
     "mensaje": "0 focos fuera del bbox regional y 0 con país fuera de BRA/ARG/URY",
-    "ejecutado": "2026-05-15T14:00:49.392875+00:00"
+    "ejecutado": "2026-05-15T18:11:29.824744+00:00"
   },
   {
     "test": "consistencia_humedad_rango",
@@ -115,7 +115,7 @@
       "fuera_de_rango": 0
     },
     "mensaje": "0 valores de humedad fuera de [0%, 100%]",
-    "ejecutado": "2026-05-15T14:00:49.404340+00:00"
+    "ejecutado": "2026-05-15T18:11:29.853617+00:00"
   },
   {
     "test": "consistencia_meteo_indice_rango",
@@ -126,7 +126,7 @@
       "rango": "[0, 1]"
     },
     "mensaje": "0 índices de riesgo fuera del rango [0,1]",
-    "ejecutado": "2026-05-15T14:00:49.414937+00:00"
+    "ejecutado": "2026-05-15T18:11:29.888528+00:00"
   },
   {
     "test": "validez_cams_nivel_pm10",
@@ -135,13 +135,13 @@
     "metricas": {
       "invalidos": 0,
       "dominio": [
-        "alerta",
         "normal",
+        "alerta",
         "elevado"
       ]
     },
     "mensaje": "0 valores de nivel_pm10 fuera del dominio",
-    "ejecutado": "2026-05-15T14:00:49.428847+00:00"
+    "ejecutado": "2026-05-15T18:11:29.914918+00:00"
   },
   {
     "test": "validez_firms_confianza",
@@ -151,7 +151,7 @@
       "invalidos": 0
     },
     "mensaje": "0 valores de confianza fuera de l/n/h (puede ser MODIS numerico)",
-    "ejecutado": "2026-05-15T14:00:50.913575+00:00"
+    "ejecutado": "2026-05-15T18:11:35.284602+00:00"
   },
   {
     "test": "validez_meteo_nivel_riesgo",
@@ -160,14 +160,14 @@
     "metricas": {
       "invalidos": 0,
       "dominio": [
-        "moderado",
-        "bajo",
+        "muy_alto",
         "alto",
-        "muy_alto"
+        "bajo",
+        "moderado"
       ]
     },
     "mensaje": "0 valores de nivel_riesgo fuera del dominio permitido",
-    "ejecutado": "2026-05-15T14:00:50.931960+00:00"
+    "ejecutado": "2026-05-15T18:11:35.340083+00:00"
   },
   {
     "test": "idempotencia_firms_doble_carga",
@@ -179,7 +179,7 @@
       "dedup": 1836537
     },
     "mensaje": "Original: 1836537, doble+dedup: 1836537 — deben ser iguales",
-    "ejecutado": "2026-05-15T14:00:53.141234+00:00"
+    "ejecutado": "2026-05-15T18:11:40.186988+00:00"
   },
   {
     "test": "idempotencia_meteo_doble_carga",
@@ -190,7 +190,7 @@
       "dedup": 23104
     },
     "mensaje": "Idempotencia meteo: 23104 -> 23104",
-    "ejecutado": "2026-05-15T14:00:53.312004+00:00"
+    "ejecutado": "2026-05-15T18:11:40.673317+00:00"
   },
   {
     "test": "cdc_detecta_modificacion",
@@ -202,7 +202,7 @@
       "cambio_detectado": true
     },
     "mensaje": "CDC: 0.4111 -> 0.5111, detectado: True",
-    "ejecutado": "2026-05-15T14:00:53.334979+00:00"
+    "ejecutado": "2026-05-15T18:11:40.818069+00:00"
   },
   {
     "test": "cdc_detecta_nuevos",
@@ -212,6 +212,6 @@
       "registro_nuevo_detectado": true
     },
     "mensaje": "CDC detectó correctamente registro nuevo (fecha 2030-01-01)",
-    "ejecutado": "2026-05-15T14:00:53.353419+00:00"
+    "ejecutado": "2026-05-15T18:11:41.064500+00:00"
   }
 ]
