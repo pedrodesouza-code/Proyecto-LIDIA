@@ -66,7 +66,9 @@ Un modelo relacional organiza la informacion en tablas relacionadas mediante
 claves primarias y claves foraneas. Es adecuado cuando los datos tienen estructura
 estable, granularidad clara y necesidad de integridad. En Ingenieria de Datos se
 usa para construir una base analitica confiable: hechos, dimensiones, indices,
-vistas, auditoria y consultas SQL.
+vistas, auditoria y consultas SQL. En PostgreSQL, las restricciones de tabla,
+claves primarias y restricciones unicas forman parte del contrato fisico de una
+tabla y ayudan a preservar unicidad e integridad del dato [R1].
 
 SQL significa Structured Query Language. DDL significa Data Definition Language,
 es decir, las instrucciones que crean la estructura fisica de la base: tablas,
@@ -75,7 +77,8 @@ constraints, indices, vistas, roles y permisos.
 Integridad referencial significa que las relaciones entre tablas se protegen con
 claves foraneas. Por ejemplo, una medicion meteorologica debe referenciar un
 punto de monitoreo existente; no deberia quedar una medicion apuntando a un punto
-inexistente.
+inexistente. Esta idea se implementa con constraints declarativos en el motor,
+no solo con validaciones en codigo de aplicacion [R1].
 
 ### 1.2 Lo que exige la consigna
 
@@ -164,10 +167,12 @@ Resultado UTEC final:
 ### 2.1 Definicion y concepto
 
 NoSQL es una familia de modelos de datos no relacionales. En este proyecto se usa
-MongoDB, que es documental. Un documento MongoDB se parece a un JSON: puede tener
-campos simples, objetos anidados y arrays. Esto es util para datos operacionales,
-logs, snapshots y alertas, donde la estructura puede variar o donde conviene leer
-un documento completo sin joins.
+MongoDB, que es documental. Un documento MongoDB se almacena como BSON, puede
+tener campos simples, objetos anidados y arrays, y pertenece a una coleccion. La
+documentacion de MongoDB define los documentos como las unidades basicas de datos
+de una coleccion e indica que cada documento posee un campo `_id` unico [R2].
+Esto es util para datos operacionales, logs, snapshots y alertas, donde la
+estructura puede variar o donde conviene leer un documento completo sin joins.
 
 MongoDB no reemplaza a PostgreSQL. Se usa como complemento: PostgreSQL guarda la
 verdad analitica estructurada; MongoDB guarda documentos de trazabilidad y
@@ -246,7 +251,9 @@ Archivos clave:
 
 ### 3.1 Definicion y concepto
 
-ETL significa Extract, Transform, Load:
+ETL significa Extract, Transform, Load. AWS lo describe como un proceso para
+combinar datos desde multiples fuentes en un repositorio central, normalmente
+orientado a analisis o data warehousing [R3]:
 
 - Extract: obtener datos desde fuentes externas o archivos.
 - Transform: limpiar, normalizar, tipar, deduplicar y enriquecer datos.
@@ -284,8 +291,10 @@ Parquets procesados en `data/processed/`. Los loaders toman esos Parquets y los
 cargan a PostgreSQL o MongoDB.
 
 El logger JSON registra timestamp, modulo, etapa, fuente, cantidad de filas,
-estado y errores. Ademas, las ejecuciones quedan auditadas en `etl_ejecuciones`
-y `ejecuciones_etl`.
+estado y errores. La libreria estandar `logging` de Python esta pensada para que
+los modulos de una aplicacion registren eventos y los envien mediante handlers a
+destinos apropiados [R4]. En SINIA-UY, ademas del log en archivo, las ejecuciones
+quedan auditadas en `etl_ejecuciones` y `ejecuciones_etl`.
 
 ### 3.5 Por que se hizo asi
 
@@ -310,8 +319,11 @@ pipeline sea defendible y mantenible.
 ### 4.1 Definicion de CDC
 
 CDC significa Change Data Capture. Es el mecanismo por el cual un sistema detecta
-cambios y actualiza los destinos sin recargar todo innecesariamente. En este
-proyecto se aplica con watermarks, claves naturales y upserts.
+cambios y actualiza los destinos sin recargar todo innecesariamente. Debezium,
+una plataforma especializada en CDC, describe el enfoque como la captura de
+cambios a nivel de filas para que otras aplicaciones puedan verlos y reaccionar
+ante ellos en orden [R5]. En este proyecto se aplica con watermarks, claves
+naturales y upserts.
 
 ### 4.2 Definicion de idempotencia
 
@@ -364,6 +376,9 @@ reintentar cargas y absorber cambios sin duplicar ni perder trazabilidad.
 El testing de datos valida la confiabilidad del pipeline y de la informacion
 procesada. No se centra solo en funciones unitarias, sino en propiedades del dato:
 completitud, unicidad, consistencia, validez, idempotencia y respuesta ante cambios.
+Great Expectations define una expectativa como una afirmacion verificable sobre
+los datos y clasifica controles de calidad como completitud, validez y rangos
+esperados [R6].
 
 ### 5.2 Que se implemento
 
@@ -418,7 +433,11 @@ La validacion funcional conecta preguntas, consultas y dashboard:
 
 Seguridad en un pipeline de datos incluye roles, privilegios minimos, vistas,
 variables de entorno, no exposicion de credenciales, validacion de entradas,
-errores controlados, backups y gobernanza.
+errores controlados, backups y gobernanza. El principio de privilegio minimo,
+definido por NIST, indica que usuarios o procesos deben recibir solo los permisos
+necesarios para cumplir sus tareas [R7]. PostgreSQL implementa este control con
+roles y privilegios como `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `CONNECT` y
+otros grants sobre objetos de base de datos [R8].
 
 ### 6.2 Que se implemento
 
@@ -448,7 +467,9 @@ irresponsables.
 
 La capa analitica transforma datos persistidos en metricas, graficos y comparaciones
 interpretables. Se implemento con Streamlit por su integracion directa con Python
-y su velocidad para construir dashboards reproducibles.
+y su velocidad para construir dashboards reproducibles. La documentacion oficial
+de Streamlit lo define como un framework Python open-source para construir apps
+de datos dinamicas con pocas lineas de codigo [R9].
 
 ### 7.2 Que se implemento
 
@@ -479,7 +500,10 @@ Resultado verificado: HTTP `200`.
 
 ### 8.1 Definicion
 
-Un despliegue hibrido combina componentes en distintos entornos. En este proyecto:
+Un despliegue hibrido combina componentes en distintos entornos. Docker Compose
+define y ejecuta aplicaciones multicontenedor mediante un archivo YAML de
+servicios, redes y volumenes, lo que permite reproducir un stack de aplicacion
+con un comando [R10]. En este proyecto:
 
 - PostgreSQL y MongoDB estan en servidor institucional UTEC.
 - El codigo esta en GitHub.
@@ -525,7 +549,10 @@ configuracion del repositorio es correcta; el bloqueo es del runtime local.
 
 La verificacion de rendimiento preliminar mide si el pipeline y las consultas
 responden en tiempos razonables. Incluye tiempos de lectura, consultas analiticas,
-impacto de indices y comparacion entre carga completa e incremental.
+impacto de indices y comparacion entre carga completa e incremental. En una base
+relacional, los indices y restricciones unicas tambien influyen en planes de
+consulta y en la forma en que el motor preserva unicidad, por eso se miden junto
+con las consultas representativas [R1].
 
 ### 9.2 Que se implemento
 
@@ -584,3 +611,18 @@ La idea central para defender EC3 es:
 > carga de forma idempotente en PostgreSQL y MongoDB, registra trazabilidad,
 > valida calidad y CDC con tests, expone resultados en Streamlit y deja evidencia
 > reproducible del despliegue y rendimiento.
+
+## Referencias bibliograficas y tecnicas
+
+| ID | Fuente | Uso en el documento |
+|---|---|---|
+| R1 | PostgreSQL Documentation - `CREATE TABLE`: https://www.postgresql.org/docs/current/sql-createtable.html | Modelo relacional, constraints, primary key, unique e indices asociados |
+| R2 | MongoDB Manual - Documents: https://www.mongodb.com/docs/current/core/document/ | Modelo documental, documentos BSON, colecciones y campo `_id` |
+| R3 | AWS - What is ETL?: https://aws.amazon.com/what-is/etl/ | Definicion de ETL y repositorio central analitico |
+| R4 | Python Documentation - `logging`: https://docs.python.org/3/library/logging.html | Logging estructurado, loggers y handlers |
+| R5 | Debezium Documentation: https://debezium.io/documentation/reference/stable/index.html | Concepto de CDC y captura de cambios de base de datos |
+| R6 | Great Expectations - Expectations overview: https://docs.greatexpectations.io/docs/cloud/expectations/expectations_overview/ | Testing de calidad de datos mediante expectativas verificables |
+| R7 | NIST CSRC - Least Privilege: https://csrc.nist.gov/glossary/term/least_privilege | Principio de privilegio minimo |
+| R8 | PostgreSQL Documentation - Privileges: https://www.postgresql.org/docs/current/ddl-priv.html | Roles, grants y privilegios de base de datos |
+| R9 | Streamlit Documentation: https://docs.streamlit.io/ | Definicion de Streamlit como framework Python para data apps |
+| R10 | Docker Compose Documentation: https://docs.docker.com/compose/ | Definicion de Compose y servicios multicontenedor |
