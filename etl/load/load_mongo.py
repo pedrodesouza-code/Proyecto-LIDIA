@@ -357,6 +357,7 @@ def guardar_snapshot_focos(df_focos: pd.DataFrame, df_meteo: pd.DataFrame | None
             focos_lista = []
             for _, row in grupo.iterrows():
                 focos_lista.append({
+                    "pais":               _safe(row.get("pais")),
                     "latitud":            _safe(row.get("latitud")),
                     "longitud":           _safe(row.get("longitud")),
                     "hora_adq_hhmm":      _safe(row.get("hora_adq_hhmm")),

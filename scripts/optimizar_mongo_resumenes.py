@@ -20,10 +20,22 @@ def main() -> int:
 
     from pymongo import MongoClient, ASCENDING
 
-    client = MongoClient(
-        f"mongodb://{os.getenv('MONGO_HOST', 'localhost')}:{int(os.getenv('MONGO_PORT', '27017'))}/",
-        serverSelectionTimeoutMS=5000,
-    )
+    mongo_uri = os.getenv("MONGO_URI")
+    if mongo_uri:
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+    else:
+        user = os.getenv("MONGO_USER", "")
+        password = os.getenv("MONGO_PASSWORD", "")
+        host = os.getenv("MONGO_HOST", "localhost")
+        port = int(os.getenv("MONGO_PORT", "27017"))
+        database = os.getenv("MONGO_DATABASE", "sinia_uy")
+        auth_source = os.getenv("MONGO_AUTH_SOURCE", database)
+        uri = (
+            f"mongodb://{user}:{password}@{host}:{port}/{database}?authSource={auth_source}"
+            if user and password
+            else f"mongodb://{host}:{port}/"
+        )
+        client = MongoClient(uri, serverSelectionTimeoutMS=5000)
     db = client[os.getenv("MONGO_DATABASE", "sinia_uy")]
 
     pais_pipeline = [

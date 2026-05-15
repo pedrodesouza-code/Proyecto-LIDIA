@@ -37,8 +37,13 @@ def _load_env() -> None:
 def _pg_connect():
     import psycopg2
 
-    user = os.getenv("PG_SUPERUSER") or "postgres"
-    password = os.getenv("PG_SUPERPASS") or os.getenv("PG_SUPER_PASSWORD") or "postgres_super_2026"
+    user = os.getenv("PG_SUPERUSER") or os.getenv("PG_USER") or "postgres"
+    password = (
+        os.getenv("PG_SUPERPASS")
+        or os.getenv("PG_SUPER_PASSWORD")
+        or os.getenv("PG_PASSWORD")
+        or "postgres_super_2026"
+    )
     return psycopg2.connect(
         host=os.getenv("PG_HOST", "localhost"),
         port=int(os.getenv("PG_PORT", "5432")),
@@ -166,16 +171,31 @@ def _mongo_distribution(db) -> dict[str, Any]:
 def limpiar_mongo() -> dict[str, Any]:
     from pymongo import MongoClient
 
-    client = MongoClient(
-        f"mongodb://{os.getenv('MONGO_HOST', 'localhost')}:{int(os.getenv('MONGO_PORT', '27017'))}/",
-        serverSelectionTimeoutMS=5000,
-    )
+    mongo_uri = os.getenv("MONGO_URI")
+    if mongo_uri:
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+    else:
+        user = os.getenv("MONGO_USER", "")
+        password = os.getenv("MONGO_PASSWORD", "")
+        host = os.getenv("MONGO_HOST", "localhost")
+        port = int(os.getenv("MONGO_PORT", "27017"))
+        database = os.getenv("MONGO_DATABASE", "sinia_uy")
+        auth_source = os.getenv("MONGO_AUTH_SOURCE", database)
+        uri = (
+            f"mongodb://{user}:{password}@{host}:{port}/{database}?authSource={auth_source}"
+            if user and password
+            else f"mongodb://{host}:{port}/"
+        )
+        client = MongoClient(uri, serverSelectionTimeoutMS=5000)
     db = client[os.getenv("MONGO_DATABASE", "sinia_uy")]
     result: dict[str, Any] = {"antes": _mongo_distribution(db)}
     res_alertas = db.alertas.delete_many({"pais": {"$exists": True, "$nin": list(VALIDOS)}})
     res_pull = db.focos_snapshots.update_many(
         {},
-        {"$pull": {"focos": {"pais": {"$nin": list(VALIDOS)}}}},
+        {"$pull": {"focos": {"pais": {"$exists": True, "$nin": list(VALIDOS)}}}},
+    )
+    res_sin_pais = db.focos_snapshots.delete_many(
+        {"focos.0": {"$exists": True}, "focos.pais": {"$exists": False}}
     )
     res_vacios = db.focos_snapshots.delete_many(
         {"$or": [{"focos": {"$size": 0}}, {"focos": {"$exists": False}}]}
@@ -183,6 +203,7 @@ def limpiar_mongo() -> dict[str, Any]:
     result["eliminados"] = {
         "alertas": int(res_alertas.deleted_count),
         "snapshots_actualizados": int(res_pull.modified_count),
+        "snapshots_sin_pais": int(res_sin_pais.deleted_count),
         "snapshots_vacios": int(res_vacios.deleted_count),
     }
     result["despues"] = _mongo_distribution(db)
