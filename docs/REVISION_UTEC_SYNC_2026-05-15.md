@@ -2,32 +2,35 @@
 
 ## Objetivo
 
-Verificar si las bases de datos del servidor UTEC estaban actualizadas y sincronizar los datos operativos recientes del sistema SINIA-UY.
+Verificar las bases de datos del servidor UTEC y dejarlas alineadas con el
+alcance final real del sistema SINIA-UY: Uruguay, Brasil y Argentina.
 
 ## Estado inicial encontrado
 
-Antes de la sincronizacion, PostgreSQL UTEC estaba accesible, pero los datos operativos no estaban al dia:
+Antes del cierre final, PostgreSQL UTEC estaba accesible pero contenia datos del
+alcance regional anterior y MongoDB tenia snapshots sin el campo `pais` embebido.
 
-- `focos_calor`: ultimo dato historico en `2024-12-31`.
-- `meteo_diario` forecast actual: `0` filas desde la fecha corriente.
-- `calidad_aire_diario`: ultimo dato en `2026-03-29`.
-- MongoDB tenia snapshots historicos, pero no snapshots NRT de mayo 2026.
+- PostgreSQL tenia `3.836.386` focos, incluyendo `BOL`, `CHL`, `PER`, `PRY` y `OTR`.
+- MongoDB tenia `352` snapshots, pero los documentos no servian para resumenes por pais.
+- Las vistas materializadas finales no estaban creadas.
 
 ## Acciones ejecutadas
 
-Se realizo una sincronizacion controlada contra UTEC, sin eliminar tablas ni tocar tablas ajenas al proyecto como `clientes`, `productos` o `ventas`.
+Se realizo una sincronizacion controlada contra UTEC, preservando colecciones
+ajenas como `eventos` y sin guardar credenciales en el repositorio.
 
-Datos cargados en PostgreSQL UTEC:
+Acciones PostgreSQL UTEC:
 
-- `forecast_riesgo.parquet`: `77` filas de pronostico, desde `2026-05-15` hasta `2026-05-21`.
-- `cams_nrt_procesado.parquet`: `828` filas procesadas; `517` insertadas y `311` ya existentes.
-- `firms_nrt_procesado.parquet`: `5283` focos NRT insertados, desde `2026-05-11` hasta `2026-05-15`.
+- Aplicacion de DDL, indices, vistas y seed de puntos.
+- Limpieza de alcance a `URY`, `BRA`, `ARG`.
+- Creacion de `mv_focos_por_pais` y `mv_focos_por_pais_mes`.
 
-Datos cargados en MongoDB UTEC:
+Acciones MongoDB UTEC:
 
-- `5` snapshots diarios NRT en `focos_snapshots`.
-- `5283` focos embebidos en snapshots.
-- `1` registro nuevo en `ejecuciones_etl` para la carga Mongo NRT.
+- Actualizacion de validadores e indices.
+- Eliminacion de snapshots sin `pais`.
+- Carga de `347` snapshots historicos y `5` snapshots NRT con `pais` embebido.
+- Creacion de resumenes materializados `focos_resumen_pais` y `focos_resumen_mes`.
 
 ## Verificacion final UTEC
 
@@ -35,30 +38,34 @@ PostgreSQL UTEC:
 
 | Control | Resultado |
 |---|---:|
-| `focos_calor` total | `3836386` |
+| `focos_calor` total | `1841820` |
 | `focos_calor` rango total | `2024-01-01` a `2026-05-15` |
-| focos NRT ultimos 5 dias | `5283` |
-| rango focos NRT | `2026-05-11` a `2026-05-15` |
-| focos ultimas 24 horas | `303` |
-| forecast vigente | `77` |
-| rango forecast | `2026-05-15` a `2026-05-21` |
-| CAMS ultimos 5 dias | `66` |
-| rango CAMS reciente | `2026-05-10` a `2026-05-15` |
-| `etl_ejecuciones` | `34` |
-| ultima finalizacion ETL PostgreSQL | `2026-05-15 13:48:11 UTC` |
+| focos ultimos 7 dias | `5283` |
+| paises presentes | `ARG`, `BRA`, `URY` |
+| `puntos_monitoreo` | `11` |
+| `meteo_diario` | `11564` |
+| `calidad_aire_diario` | `3997` |
+| `precipitacion_mensual` | `702` |
+| `cobertura_vegetal` | `63` |
+| `mv_focos_por_pais` | `3` |
+| `mv_focos_por_pais_mes` | `39` |
 
 MongoDB UTEC:
 
 | Control | Resultado |
 |---|---:|
-| colecciones | `alertas`, `ejecuciones_etl`, `eventos`, `focos_snapshots` |
+| colecciones | `alertas`, `ejecuciones_etl`, `eventos`, `focos_resumen_mes`, `focos_resumen_pais`, `focos_snapshots` |
 | `focos_snapshots` | `352` |
-| `ejecuciones_etl` | `2` |
+| `snapshots_con_pais` | `352` |
+| `snapshots_sin_pais` | `0` |
+| `focos_resumen_pais` | `3` |
+| `focos_resumen_mes` | `39` |
+| `ejecuciones_etl` | `3` |
 | `alertas` | `0` |
 | `eventos` | `2` |
 | ultimo snapshot | `2026-05-15` |
 | focos en ultimo snapshot | `303` |
-| ultima ejecucion Mongo | `firms_nrt/load_mongo`, estado `ok` |
+| ultima ejecucion Mongo | `firms_nrt/load`, estado `ok` |
 
 ## Actualizacion de permisos MongoDB
 
@@ -73,20 +80,22 @@ Resultado de la verificacion:
 | `alertas` | aplicado | `_id_`, `idx_activas`, `idx_fecha_gen`, `idx_tipo_nivel` |
 | `focos_snapshots` | aplicado | `_id_`, `idx_fecha_unico` |
 
-Conteos al momento de la verificacion:
+Conteos al momento de la verificacion final:
 
 | Coleccion | Documentos |
 |---|---:|
-| `ejecuciones_etl` | `2` |
+| `ejecuciones_etl` | `3` |
 | `alertas` | `0` |
 | `focos_snapshots` | `352` |
 
 ## Observaciones
 
-- Las bases del servidor UTEC quedaron actualizadas con datos operativos recientes al `2026-05-15`.
+- Las bases del servidor UTEC quedaron actualizadas con alcance real al `2026-05-15`.
 - MongoDB UTEC ya permite actualizar validadores JSON Schema con `collMod`.
-- La sincronizacion realizada fue incremental y segura. No se recargo el historico completo para evitar una operacion pesada sobre una base compartida.
+- MongoDB fue recargado con historico y NRT reales para que los resumenes por pais sean correctos.
+- La evidencia reproducible quedo en `reports/utec_verificacion_ultimo.json` y `reports/utec_sync_ultimo.json`.
 
 ## Conclusion
 
-El sistema local esta operativo en tiempo real y las bases UTEC quedaron sincronizadas con los datos recientes necesarios para el dashboard y las consultas operativas.
+El sistema local esta operativo y las bases UTEC quedaron sincronizadas con datos
+reales, alcance correcto y agregados SQL/NoSQL listos para dashboard y consultas.

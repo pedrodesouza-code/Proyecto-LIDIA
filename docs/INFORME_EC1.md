@@ -32,7 +32,7 @@
    - 4.3 Copernicus Atmosphere Monitoring Service
    - 4.4 CHIRPS
    - 4.5 MODIS (Cobertura vegetal)
-   - 4.6 INUMET (pendiente)
+   - 4.6 INUMET (fuente evaluada fuera de alcance)
 5. Exploración preliminar de datos
    - 5.1 Acceso real a los datos
    - 5.2 Evidencias
@@ -324,19 +324,19 @@ final_df.to_parquet("uruguay_air_quality.parquet")
 | **Limitaciones** | Baja variabilidad temporal |
 | **Riesgos técnicos** | Clasificación discreta; procesamiento geoespacial |
 
-### 4.6 INUMET (pendiente)
+### 4.6 INUMET (fuente evaluada fuera de alcance)
 
 | Campo | Detalle |
 |---|---|
 | **Nombre y origen** | Instituto Uruguayo de Meteorología (INUMET) |
-| **Enlace oficial** | [Completar] |
-| **Tipo de acceso** | [API / descarga / solicitud] |
-| **Formato** | [CSV / Excel / JSON] |
-| **Volumen aproximado** | [Completar] |
-| **Frecuencia de actualización** | [Completar] |
+| **Enlace oficial** | https://www.inumet.gub.uy/ |
+| **Tipo de acceso** | Portal institucional y servicios publicados |
+| **Formato** | Web/descargas segun producto |
+| **Volumen aproximado** | Variable por estacion/producto |
+| **Frecuencia de actualización** | Variable |
 | **Granularidad** | Alta (estaciones meteorológicas) |
 | **Variables relevantes** | Temperatura, Precipitación, Humedad, Viento |
-| **Limitaciones** | [Completar] |
+| **Limitaciones** | Se descarta para el pipeline final para mantener fuentes abiertas transnacionales y comparables en Uruguay, Brasil y Argentina |
 | **Riesgos técnicos** | Datos faltantes; inconsistencias entre estaciones |
 
 ---

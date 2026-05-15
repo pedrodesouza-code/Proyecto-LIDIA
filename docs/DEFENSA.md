@@ -233,7 +233,7 @@ de datos de incendios confirmados de los países SA."
 
 **P: ¿Validaron el modelo contra datos reales?**
 
-"Parcialmente. Usamos los focos FIRMS como proxy de incendios reales.
+"No como confirmacion administrativa de incendios. Usamos los focos FIRMS como proxy de incendios reales.
 La correlación entre el índice de riesgo y los focos diarios muestra que la dirección
 es correcta: días de riesgo MUY ALTO tienen 2,6 veces más focos que días MODERADO.
 Una validación completa requeriría cruzar con registros del MGAP, IBAMA o INAB,

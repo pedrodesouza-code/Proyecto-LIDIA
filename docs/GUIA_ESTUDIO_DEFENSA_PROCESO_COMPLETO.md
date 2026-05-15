@@ -501,57 +501,60 @@ Servidor:
 - MongoDB UTEC: `10.200.245.40:27023`
 - Base: `grp03db`
 
-### 11.1 Estado inicial UTEC
+### 11.1 Estado inicial UTEC corregido
 
-Antes de sincronizar:
+Antes del cierre final, UTEC estaba accesible pero mezclaba el alcance historico
+anterior con el alcance actual del proyecto:
 
-- PostgreSQL estaba accesible.
-- `focos_calor` llegaba solo hasta `2024-12-31`.
-- Forecast actual tenia `0` filas.
-- CAMS llegaba hasta `2026-03-29`.
-- MongoDB no tenia snapshots NRT de mayo 2026.
+- PostgreSQL tenia datos de paises fuera del alcance final (`BOL`, `CHL`, `PER`, `PRY`, `OTR`).
+- MongoDB tenia snapshots sin `pais` embebido, por lo que no servian para resumenes reales por pais.
+- Las vistas materializadas finales aun no existian.
 
 Conclusion inicial:
 
-> El servidor estaba disponible, pero no actualizado con datos operativos
-> recientes.
+> El servidor estaba disponible, pero necesitaba limpieza de alcance,
+> recarga documental real y materializacion de agregados.
 
 ### 11.2 Que se cargo en UTEC
 
 En PostgreSQL UTEC:
 
-- `forecast_riesgo.parquet`: 77 filas.
-- `cams_nrt_procesado.parquet`: 828 filas procesadas.
-- `firms_nrt_procesado.parquet`: 5283 focos NRT.
+- Limpieza de alcance a `URY`, `BRA`, `ARG`.
+- Conservacion de datos historicos validos y NRT hasta `2026-05-15`.
+- Creacion de `mv_focos_por_pais` y `mv_focos_por_pais_mes`.
 
 En MongoDB UTEC:
 
-- 5 snapshots diarios NRT.
-- 5283 focos embebidos.
-- 1 ejecucion ETL registrada.
+- Eliminacion de snapshots viejos sin `pais` embebido.
+- Recarga de `347` snapshots historicos y `5` snapshots NRT.
+- Materializacion de `focos_resumen_pais` y `focos_resumen_mes`.
+- 1 ejecucion ETL registrada para la carga final.
 
 ### 11.3 Estado final UTEC
 
 PostgreSQL UTEC:
 
-- `focos_calor`: datos hasta `2026-05-15`.
+- `focos_calor`: `1.841.820`, datos hasta `2026-05-15`.
 - FIRMS NRT ultimos 5 dias: `5283`.
-- Focos ultimas 24 horas: `303`.
-- Forecast vigente: `77`, hasta `2026-05-21`.
-- CAMS reciente: hasta `2026-05-15`.
+- `mv_focos_por_pais`: `3`.
+- `mv_focos_por_pais_mes`: `39`.
 
 MongoDB UTEC:
 
 - `focos_snapshots`: `352`.
+- `snapshots_con_pais`: `352`.
+- `snapshots_sin_pais`: `0`.
+- `focos_resumen_pais`: `3`.
+- `focos_resumen_mes`: `39`.
 - Ultimo snapshot: `2026-05-15`.
 - Focos en ultimo snapshot: `303`.
-- Ultima ejecucion Mongo: `firms_nrt/load_mongo`, estado `ok`.
+- Ultima ejecucion Mongo: `firms_nrt/load`, estado `ok`.
 
 Decision importante:
 
-- No se recargo todo el historico completo en UTEC.
-- Se hizo una sincronizacion incremental y segura.
-- Esto evita operaciones pesadas sobre una base compartida.
+- Se corrigio el alcance real del servidor.
+- Se recargo MongoDB con documentos reales y consultables por pais.
+- La evidencia quedo versionada en `reports/utec_verificacion_ultimo.json` y `reports/utec_sync_ultimo.json`.
 
 ## 12. Pruebas de calidad
 
@@ -739,20 +742,22 @@ Solucion:
 
 - Se levanto `mongod.exe` como proceso local.
 
-Pendiente:
+Estado final:
 
-- Dejarlo como servicio persistente o usar Docker cuando este disponible.
+- Docker Compose esta configurado y validado.
+- En este host Windows la ejecucion de Docker depende de habilitar `WSLService` y `com.docker.service`.
 
-### Problema 5: MongoDB UTEC no permite `collMod`
+### Problema 5: Permisos MongoDB UTEC
 
 Causa:
 
-- Falta permiso administrativo sobre la base.
+- El usuario de UTEC necesitaba permisos suficientes para actualizar validadores.
 
-Solucion temporal:
+Solucion:
 
-- Se cargaron datos igual.
-- Se solicito permiso `dbAdmin` sobre `grp03db`.
+- Se verifico acceso a MongoDB UTEC con el usuario `grp03`.
+- `crear_bases_datos.py --base-existente` actualizo validadores e indices.
+- MongoDB quedo con `352` snapshots reales, todos con `pais` embebido.
 
 ## 18. Estado final del sistema
 
@@ -768,8 +773,8 @@ Local:
 UTEC:
 
 - PostgreSQL actualizado con datos recientes al `2026-05-15`.
-- MongoDB actualizado con snapshots NRT al `2026-05-15`.
-- Falta solo permiso `collMod` para actualizar validadores existentes.
+- MongoDB actualizado con historico y NRT al `2026-05-15`.
+- Validadores, indices y resumenes materializados verificados.
 
 ## 19. Como explicarlo en la defensa
 
@@ -804,9 +809,9 @@ Si preguntan por calidad:
 Si preguntan por UTEC:
 
 > Se verifico que el servidor estaba accesible pero no actualizado. Luego se
-> hizo una sincronizacion incremental segura: se cargaron focos NRT, forecast y
-> CAMS recientes en PostgreSQL, y snapshots recientes en MongoDB. Al final UTEC
-> quedo con datos hasta el 15 de mayo de 2026.
+> corrigio el alcance a Uruguay, Brasil y Argentina, se materializaron resumenes
+> SQL y se recargo MongoDB con snapshots historicos y NRT reales. Al final UTEC
+> quedo con datos hasta el 15 de mayo de 2026 y evidencia en reportes versionados.
 
 ## 20. Preguntas probables y respuestas cortas
 
@@ -843,11 +848,11 @@ estructura variable.
 Significa actualizacion periodica e incremental con datos NRT, no streaming puro
 segundo a segundo. FIRMS NRT, forecast y CAMS se actualizan automaticamente.
 
-### Que quedo pendiente?
+### Que limitacion operativa queda?
 
-Solo permisos `collMod` en MongoDB UTEC para actualizar validadores de
-colecciones ya existentes, y convertir MongoDB local en servicio persistente.
-El funcionamiento de datos y dashboard ya esta operativo.
+Docker Desktop no puede iniciar en este host Windows porque `WSLService` y
+`com.docker.service` estan deshabilitados por permisos del sistema. El repositorio
+tiene Compose validado; los datos, dashboard, UTEC y tests ya estan operativos.
 
 ## 21. Orden recomendado para estudiar
 

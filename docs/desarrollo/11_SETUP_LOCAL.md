@@ -37,10 +37,10 @@ PG_SUPERPASS=postgres_super_2026          ← cambiar
 PG_PASSWORD=sinia_etl_2026                ← cambiar
 MONGO_ROOT_PASS=mongo_admin_2026          ← cambiar
 MONGO_PASSWORD=sinia_etl_2026             ← cambiar
-FIRMS_MAP_KEY=c01f4f73e206550fae98dc239a5fb403   ← tu API key de NASA FIRMS
+FIRMS_MAP_KEY=tu_api_key_aqui              ← tu API key de NASA FIRMS
 ```
 
-> Nota sobre la `FIRMS_MAP_KEY`: ya tiene un valor. Si en algún momento esta clave queda expuesta públicamente (por accidente en un commit), regenerala en `https://firms.modaps.eosdis.nasa.gov/api/map_key/` — la API key vieja queda revocada.
+> Nota sobre la `FIRMS_MAP_KEY`: no se versiona una clave real. Si en algún momento una clave queda expuesta públicamente, regenerala en `https://firms.modaps.eosdis.nasa.gov/api/map_key/`.
 
 ## Paso 2 — Levantar Postgres y Mongo con Docker
 
@@ -176,7 +176,7 @@ MONGO_DATABASE=sinia_uy
 MONGO_USER=sinia_etl_user
 MONGO_PASSWORD=sinia_etl_2026
 
-FIRMS_MAP_KEY=c01f4f73e206550fae98dc239a5fb403
+FIRMS_MAP_KEY=tu_api_key_aqui
 LOG_LEVEL=INFO
 ```
 

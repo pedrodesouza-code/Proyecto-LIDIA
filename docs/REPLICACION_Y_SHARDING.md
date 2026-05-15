@@ -36,7 +36,7 @@ Evidencia actual:
 - Roles en `sql/ddl/01_roles.sql`.
 - Docker local en `docker/docker-compose.yml`.
 
-Pendiente si se exige replica real:
+Blueprint operativo para replica real:
 
 ```text
 postgres_primary  -> puerto 5432
@@ -68,7 +68,7 @@ Evidencia actual:
 - Consultas representativas en `nosql/queries/01_consultas.js`.
 - Carga documental en `etl/load/load_mongo.py`.
 
-Pendiente si se exige replica real:
+Blueprint operativo para replica real:
 
 ```text
 mongo1 -> rs0 primary

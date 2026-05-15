@@ -117,6 +117,7 @@ python tests/test_calidad_datos.py
 ## Conclusion
 
 El sistema queda operativo en tiempo real en el entorno local actual: dashboard,
-PostgreSQL, MongoDB local, scheduler y tests estan funcionando. La principal mejora
-pendiente es convertir MongoDB/Docker en servicios persistentes para que sobrevivan
-a reinicios sin pasos manuales.
+PostgreSQL, MongoDB local, scheduler y tests estan funcionando. La persistencia
+final tambien quedo validada en UTEC mediante `reports/utec_verificacion_ultimo.json`.
+Docker Compose esta configurado y validado; la ejecucion de contenedores depende de
+que Windows habilite `WSLService` y `com.docker.service`.

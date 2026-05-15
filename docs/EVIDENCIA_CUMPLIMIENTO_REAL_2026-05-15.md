@@ -146,22 +146,27 @@ Resultado:
 
 ## Docker
 
-Comando validado:
+Comando validado el 2026-05-15:
 
 ```bash
-docker compose config
+docker compose -f docker/docker-compose.yml --env-file docker/.env.example config
 ```
 
 Resultado:
 
 - Compose renderiza correctamente los servicios `postgres`, `mongo` y `streamlit`.
+- No hay warning de `version` obsoleto.
+- MongoDB tiene healthcheck autenticado con usuario root del contenedor.
+- Los usuarios Mongo de aplicacion y dashboard se parametrizan desde `.env`.
 
 Bloqueo del host:
 
-- `docker compose ps` y `docker version` no pueden conectar al engine.
+- `docker version` no puede conectar al engine.
 - `com.docker.service` esta detenido.
-- `wsl -l -v` devuelve `Wsl/0x80070422`.
-- `sc.exe start com.docker.service` devuelve `Access denied`.
+- `WSLService` esta detenido.
+- Ambos servicios figuran `Disabled`.
+- El intento de habilitar/iniciar servicios devuelve `Access denied`.
+- `wsl --status` devuelve `Wsl/0x80070422`.
 
 Conclusion:
 

@@ -21,43 +21,43 @@ un componente en entorno cloud.
 - `docker/docker-compose.yml`
 - Dashboard verificado localmente en `http://localhost:8501` el 2026-05-15.
 
-## Pasos de cierre para evidencia final
+## Evidencia final ejecutada
 
-1. Levantar PostgreSQL y MongoDB en UTEC o confirmar bases existentes.
-2. Ejecutar DDL:
+El 2026-05-15 se verificaron y sincronizaron las bases asignadas por UTEC:
 
-```bash
-psql -h <host-utec> -p <puerto> -d grp03db -f sql/ddl/01_roles.sql
-psql -h <host-utec> -p <puerto> -d grp03db -f sql/ddl/02_schema.sql
-psql -h <host-utec> -p <puerto> -d grp03db -f sql/ddl/03_indices.sql
-psql -h <host-utec> -p <puerto> -d grp03db -f sql/ddl/04_vistas.sql
-```
+- PostgreSQL `grp03db` en `10.200.245.40:15434`.
+- MongoDB `grp03db` en `10.200.245.40:27023`.
+- Reportes versionados:
+  - `reports/utec_verificacion_ultimo.json`
+  - `reports/utec_sync_ultimo.json`
+  - `reports/limpieza_alcance_ultimo.json`
 
-3. Cargar datos:
-
-```bash
-python etl/load/load_postgres.py
-python etl/load/load_mongo.py
-```
-
-4. Levantar dashboard apuntando a UTEC:
+Comandos reproducibles:
 
 ```bash
-streamlit run dashboard/app.py
+python scripts/verificar_utec.py
+python scripts/limpiar_alcance_real.py
+python scripts/sincronizar_utec_real.py --fase materializadas
+python scripts/sincronizar_utec_real.py --fase mongo
 ```
 
-5. Registrar evidencia:
+Resultado PostgreSQL:
 
-- conteo de tablas PostgreSQL;
-- conteo de colecciones MongoDB;
-- captura del dashboard;
-- salida de `python tests/test_calidad_datos.py`;
-- URL o captura del componente cloud si se despliega Streamlit fuera de la maquina local.
+- `focos_calor`: `1.841.820`.
+- Paises presentes: `ARG`, `BRA`, `URY`.
+- Vistas materializadas: `mv_focos_por_pais` = `3`, `mv_focos_por_pais_mes` = `39`.
+
+Resultado MongoDB:
+
+- `focos_snapshots`: `352`.
+- `snapshots_con_pais`: `352`.
+- `snapshots_sin_pais`: `0`.
+- `focos_resumen_pais`: `3`.
+- `focos_resumen_mes`: `39`.
+- Coleccion institucional `eventos` preservada.
 
 ## Estado actual
 
-El proyecto tiene los archivos para un despliegue hibrido, pero la evidencia final depende
-de ejecutar la carga en UTEC y publicar o mostrar el dashboard desde un entorno separado.
-Para defensa local, se puede presentar Docker local + servidor UTEC como plan de despliegue,
-pero para cumplir estrictamente la consigna final conviene guardar pruebas de conectividad
-real.
+El despliegue hibrido queda cumplido: persistencia SQL/NoSQL en servidor
+institucional UTEC, codigo versionado en GitHub y dashboard ejecutable localmente
+o en contenedor cuando el host tenga Docker/WSL habilitado.

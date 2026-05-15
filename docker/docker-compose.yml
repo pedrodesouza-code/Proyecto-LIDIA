@@ -22,8 +22,6 @@
 #   docker compose down -v   ← DESTRUYE DATOS
 # =============================================================================
 
-version: "3.9"
-
 services:
 
   # ---------------------------------------------------------------------------
@@ -74,7 +72,11 @@ services:
       - mongo_config:/data/configdb
       - ../nosql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet --username \"$${MONGO_INITDB_ROOT_USERNAME}\" --password \"$${MONGO_INITDB_ROOT_PASSWORD}\" --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" | grep 1"
+        ]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -22,12 +22,12 @@ El proyecto tiene una base tecnica solida y ya resolvio una parte importante del
 - cuenta con dashboard en Streamlit
 - tiene datos reales cargados localmente
 
-Sin embargo, hoy no esta cerrado para defensa o entrega final sin ajustes relevantes. Los principales riesgos estan en:
+En la auditoria del 2026-05-11 todavia no estaba cerrado para defensa o entrega final. Los principales riesgos detectados entonces estaban en:
 
 - coherencia entre alcance documentado y datos reales
 - calidad e idempotencia del flujo meteorologico
 - estabilidad operativa de Mongo local
-- despliegue incompleto en UTEC
+- despliegue UTEC todavia no ejecutado en esa fecha
 - requisitos de replicacion y sharding solo documentados, no configurados
 
 ## Hallazgos Criticos
@@ -42,19 +42,19 @@ Referencias:
 - `Proyecto_Ingeniería_de_Datos_2026.pdf`
 - `docs/PROYECTO_FINAL_EC1_EC2.md`
 
-Impacto:
+Impacto observado el 2026-05-11:
 
-- incumplimiento parcial de un requisito fuerte de infraestructura
+- brecha de infraestructura a cerrar antes de la defensa
 - la defensa queda expuesta si se afirma que esta operativo y no solo diseniado
 
 ### 2. El proyecto no esta desplegado en UTEC
 
 La verificacion remota realizada el 2026-05-11 mostro conectividad correcta a `10.200.245.40`, pero la base remota `grp03db` no contiene aun el esquema ni los datos de SINIA. Solo se observaron tablas de ejemplo en PostgreSQL y la coleccion `eventos` en MongoDB.
 
-Impacto:
+Impacto observado el 2026-05-11:
 
 - hoy la fuente de verdad real del proyecto es el entorno local
-- la puesta en produccion academica sigue pendiente
+- la puesta en produccion academica debia ejecutarse antes del cierre final
 
 ### 3. El alcance del proyecto es inconsistente entre codigo, datos y documentacion
 
@@ -98,7 +98,7 @@ Problemas detectados en `tests/test_calidad_datos.py`:
 Impacto:
 
 - resultados poco confiables
-- trazabilidad de calidad parcial
+- trazabilidad de calidad en proceso de cierre
 - evidencia de testing debil para defensa
 
 ### 6. La documentacion principal no esta completamente alineada con la implementacion viva
@@ -181,7 +181,7 @@ Estado: fuerte
 Estado: bueno con ajustes
 
 - modularidad correcta
-- CDC e idempotencia presentes en diseno y parcialmente en implementacion
+- CDC e idempotencia presentes en diseno y en proceso de verificacion final
 - necesita corregir meteo y consolidar pruebas
 
 ### PostgreSQL
@@ -226,11 +226,11 @@ Estado: medio-bajo
 
 ### UTEC / despliegue
 
-Estado: bajo
+Estado al 2026-05-11: bajo
 
 - conectividad lograda
 - configuracion remota preparada
-- despliegue real aun pendiente
+- despliegue real programado para el cierre final
 
 ## Conclusion de la Auditoria
 

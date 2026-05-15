@@ -482,7 +482,7 @@ El scheduler implementa un watermark basado en `MAX(fecha)` de cada tabla. Al re
 | L-02 | CAMS provee estimaciones satelitales, no mediciones físicas directas |
 | L-03 | Índice de riesgo no calibrado con registros oficiales de incendios confirmados |
 | L-04 | Docker no disponible (WSL2 deshabilitado) — infraestructura corre como procesos locales |
-| L-05 | 2024 parcialmente completo en algunas tablas |
+| L-05 | Ventanas temporales distintas por fuente segun disponibilidad real |
 
 ### Riesgos técnicos
 
