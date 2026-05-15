@@ -29,6 +29,7 @@ PROCESSED = PROJECT_ROOT / "data" / "processed"
 RAW_METEO = PROJECT_ROOT / "data" / "raw" / "meteo"
 
 from dashboard.db import (
+    contar_focos,
     cargar_focos,
     cargar_focos_nrt,
     cargar_meteo,
@@ -95,6 +96,7 @@ pais_sel = PAISES_DISP[pais_sel_label]
 
 # ── Carga de datos (con filtros ya seleccionados) ─────────────────────────────
 firms  = cargar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
+total_focos_periodo = contar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
 nrt    = cargar_focos_nrt()
 meteo  = cargar_meteo("historico")
 fc     = cargar_forecast()
@@ -113,6 +115,7 @@ if not firms.empty and pagina != "Tiempo Real":
     )
     if isinstance(rango, (list, tuple)) and len(rango) == 2:
         firms = firms[firms["fecha_adq"].dt.date.between(rango[0], rango[1])]
+        total_focos_periodo = contar_focos(str(rango[0]), str(rango[1]), pais_sel)
 
 # Aplicar filtro de país a meteo/forecast/cams (focos ya vienen filtrados de PG)
 if pais_sel:
@@ -253,7 +256,7 @@ if pagina == "Resumen General":
 
     c1, c2, c3, c4 = st.columns(4)
 
-    total_focos = len(firms)
+    total_focos = total_focos_periodo
     frp_max = firms["potencia_radiativa"].max() if not firms.empty and "potencia_radiativa" in firms.columns else 0
     dias_alto = meteo["nivel_riesgo"].isin(["alto", "muy_alto"]).sum() if not meteo.empty and "nivel_riesgo" in meteo.columns else 0
     nivel_actual = str(meteo.sort_values("fecha").iloc[-1]["nivel_riesgo"]).upper() \
@@ -263,7 +266,8 @@ if pagina == "Resumen General":
         "Focos de calor detectados",
         f"{total_focos:,}",
         help="Puntos donde el satélite VIIRS detectó temperatura anormalmente alta. "
-             "Cada punto representa un posible foco de incendio.",
+             "Cada punto representa un posible foco de incendio. La tarjeta muestra el conteo real; "
+             "mapas y graficos usan una muestra maxima de 100.000 puntos por rendimiento visual.",
     )
     c2.metric(
         "FRP máximo registrado",

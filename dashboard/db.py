@@ -72,6 +72,49 @@ def _filtrar_fechas(df: pd.DataFrame, fecha_inicio: str | None, fecha_fin: str |
 # ─────────────────────────────────────────────────────────────────────────────
 
 @st.cache_data(ttl=300)
+def contar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, pais: str | None = None) -> int:
+    """
+    Cuenta real de focos para KPIs.
+    cargar_focos() limita la muestra a 100.000 filas para mapas/graficos; esta
+    funcion usa COUNT(*) para que las tarjetas muestren el total real.
+    """
+    if _pg_disponible():
+        try:
+            where_clauses = []
+            params: list = []
+            if fecha_inicio:
+                where_clauses.append("fecha_adq >= %s")
+                params.append(fecha_inicio)
+            if fecha_fin:
+                where_clauses.append("fecha_adq <= %s")
+                params.append(fecha_fin)
+            if pais:
+                where_clauses.append("pais = %s")
+                params.append(pais)
+
+            df = _query_pg(f"""
+                SELECT COUNT(*) AS total
+                FROM focos_calor
+                WHERE pais IN ({SQL_SCOPE_PAISES})
+                {"AND " + " AND ".join(where_clauses) if where_clauses else ""}
+            """, tuple(params))
+            return int(df.iloc[0]["total"]) if not df.empty else 0
+        except Exception:
+            pass
+
+    p = DIR_PROCESADO / "firms_procesado.parquet"
+    if p.exists():
+        df = pd.read_parquet(p, columns=["fecha_adq", "pais"])
+        df["fecha_adq"] = pd.to_datetime(df["fecha_adq"])
+        df = df[df["pais"].isin(PAISES_ALCANCE)].copy()
+        if pais:
+            df = df[df["pais"] == pais].copy()
+        df = _filtrar_fechas(df, fecha_inicio, fecha_fin, "fecha_adq")
+        return int(len(df))
+    return 0
+
+
+@st.cache_data(ttl=300)
 def cargar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, pais: str | None = None) -> pd.DataFrame:
     """
     Focos de calor históricos filtrados por fecha y/o país.
