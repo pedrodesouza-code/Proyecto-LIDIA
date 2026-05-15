@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from argparse import ArgumentParser
 from pathlib import Path
 
 from docx import Document
@@ -13,8 +14,8 @@ from docx.shared import Inches, Pt, RGBColor
 
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE = ROOT / "docs" / "ENTREGA_EC3_IMPLEMENTACION.md"
-OUT = ROOT / "docs" / "Entrega_EC3_Implementacion.docx"
+DEFAULT_SOURCE = ROOT / "docs" / "ENTREGA_EC3_IMPLEMENTACION.md"
+DEFAULT_OUT = ROOT / "docs" / "Entrega_EC3_Implementacion.docx"
 
 
 ACCENT = "1F4D78"
@@ -157,7 +158,7 @@ def add_header_footer(doc: Document) -> None:
         fp.runs[0].font.color.rgb = RGBColor.from_string(MUTED)
 
 
-def add_cover(doc: Document) -> None:
+def add_cover(doc: Document, source: Path) -> None:
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_before = Pt(30)
@@ -184,7 +185,7 @@ def add_cover(doc: Document) -> None:
         ("Estado", "Cumplido con evidencia versionada."),
         ("Fecha de cierre operativo", "2026-05-15"),
         ("Rama Git", "codex-flujo-local-utec"),
-        ("Documento fuente", "docs/ENTREGA_EC3_IMPLEMENTACION.md"),
+        ("Documento fuente", str(source.relative_to(ROOT)).replace("\\", "/")),
     ]
     for i, (label, value) in enumerate(rows):
         set_cell_shading(meta.rows[i].cells[0], LIGHT_FILL)
@@ -247,14 +248,14 @@ def add_markdown_table(doc: Document, rows: list[list[str]]) -> None:
     doc.add_paragraph()
 
 
-def build_doc() -> None:
-    md = SOURCE.read_text(encoding="utf-8")
+def build_doc(source: Path, out: Path) -> None:
+    md = source.read_text(encoding="utf-8")
     lines = md.splitlines()
 
     doc = Document()
     setup_styles(doc)
     add_header_footer(doc)
-    add_cover(doc)
+    add_cover(doc, source)
 
     i = 0
     skip_first_title = True
@@ -324,9 +325,19 @@ def build_doc() -> None:
         p = doc.add_paragraph(style="List Bullet")
         p.add_run(item)
 
-    doc.save(OUT)
+    doc.save(out)
 
 
 if __name__ == "__main__":
-    build_doc()
-    print(OUT)
+    parser = ArgumentParser(description="Genera documento Word EC3 desde Markdown.")
+    parser.add_argument("--source", default=str(DEFAULT_SOURCE), help="Markdown fuente.")
+    parser.add_argument("--out", default=str(DEFAULT_OUT), help="DOCX destino.")
+    args = parser.parse_args()
+    source = Path(args.source)
+    out = Path(args.out)
+    if not source.is_absolute():
+        source = ROOT / source
+    if not out.is_absolute():
+        out = ROOT / out
+    build_doc(source, out)
+    print(out)
