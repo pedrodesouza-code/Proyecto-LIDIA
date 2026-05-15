@@ -133,6 +133,15 @@ Categorías de tests:
 
 ---
 
+## Entrega EC3
+
+La evidencia de la etapa 3 esta consolidada en
+[`docs/ENTREGA_EC3_IMPLEMENTACION.md`](docs/ENTREGA_EC3_IMPLEMENTACION.md):
+modelo SQL, modelo NoSQL, ETL, CDC, testing, seguridad, dashboard, despliegue
+hibrido, Docker y rendimiento preliminar.
+
+---
+
 ## Backup y recuperación
 
 ```bash
