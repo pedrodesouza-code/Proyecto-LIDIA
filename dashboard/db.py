@@ -30,6 +30,7 @@ from config.settings import PG_CONFIG, DIR_PROCESADO, PAISES_SA, PUNTOS_METEO_SA
 PAISES_ALCANCE = tuple(sorted(PAISES_SA.keys()))
 PUNTOS_ALCANCE = tuple(PUNTOS_METEO_SA.keys())
 SQL_SCOPE_PAISES = ", ".join(f"'{pais}'" for pais in PAISES_ALCANCE)
+MAX_FOCOS_MAPA = 25000
 
 # ---------------------------------------------------------------------------
 # CONEXION
@@ -117,7 +118,7 @@ def obtener_rango_focos() -> dict[str, object]:
 def contar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, pais: str | None = None) -> int:
     """
     Cuenta real de focos para KPIs.
-    cargar_focos() limita la muestra a 100.000 filas para mapas/graficos; esta
+    cargar_focos() limita la muestra visual para mapas/graficos; esta
     funcion usa COUNT(*) para que las tarjetas muestren el total real.
     """
     if _pg_disponible():
@@ -263,7 +264,7 @@ def calcular_estadisticas_focos(fecha_inicio: str | None = None, fecha_fin: str 
 def cargar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, pais: str | None = None) -> pd.DataFrame:
     """
     Focos de calor históricos filtrados por fecha y/o país.
-    Devuelve hasta 100 000 focos ordenados por FRP descendente (los más intensos primero).
+    Devuelve una muestra visual ordenada por FRP descendente (los mas intensos primero).
     Fuente: tabla focos_calor (PostgreSQL) o firms_procesado.parquet (fallback).
     """
     if _pg_disponible():
@@ -296,7 +297,7 @@ def cargar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, 
                 WHERE pais IN ({SQL_SCOPE_PAISES})
                 {"AND " + " AND ".join(where_clauses) if where_clauses else ""}
                 ORDER BY potencia_radiativa DESC NULLS LAST
-                LIMIT 100000
+                LIMIT {MAX_FOCOS_MAPA}
             """, tuple(params))
             df["fecha_adq"] = pd.to_datetime(df["fecha_adq"])
             df.attrs["fuente"] = "postgresql"
@@ -314,6 +315,7 @@ def cargar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, 
         if pais and "pais" in df.columns:
             df = df[df["pais"] == pais].copy()
         df = _filtrar_fechas(df, fecha_inicio, fecha_fin, "fecha_adq")
+        df = df.sort_values("potencia_radiativa", ascending=False, na_position="last").head(MAX_FOCOS_MAPA)
         df.attrs["fuente"] = "parquet"
         return df
     return pd.DataFrame()

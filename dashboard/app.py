@@ -329,7 +329,7 @@ if pagina == "Resumen General":
         f"{total_focos:,}",
         help="Puntos donde el satélite VIIRS detectó temperatura anormalmente alta. "
              "Cada punto representa un posible foco de incendio. La tarjeta muestra el conteo real; "
-             "mapas y graficos usan una muestra maxima de 100.000 puntos por rendimiento visual.",
+             "mapas y graficos usan una muestra acotada por rendimiento visual.",
     )
     c2.metric(
         "FRP máximo registrado",
@@ -375,7 +375,7 @@ if pagina == "Resumen General":
             color_por_confianza = True
             st.caption(
                 f"Focos del período {periodo_label} en {alcance_nrt_label}. "
-                "El mapa usa una muestra máxima de 100.000 puntos para mantener la navegación ágil."
+                "El mapa usa una muestra acotada para mantener la navegacion agil."
             )
 
         if not datos_mapa.empty and "latitud" in datos_mapa.columns:
@@ -488,7 +488,7 @@ elif pagina == "Focos de Calor":
         )
         st.caption(
             "Totales, FRP y evolución temporal usan agregaciones reales de PostgreSQL. "
-            "Mapa, tabla y gráficos de detalle usan una muestra máxima de 100.000 focos para mantener el dashboard ágil."
+            "Mapa, tabla y graficos de detalle usan una muestra acotada para mantener el dashboard agil."
         )
 
         st.subheader("Mapa de focos")
@@ -510,7 +510,7 @@ elif pagina == "Focos de Calor":
             color_por_confianza = True
             st.caption(
                 f"Focos del período {periodo_label} en {alcance_nrt_label}. "
-                "Para el período completo se visualiza una muestra de hasta 100.000 focos, priorizada por intensidad FRP."
+                "Para el periodo completo se visualiza una muestra priorizada por intensidad FRP."
             )
 
         if not datos_mapa.empty and "latitud" in datos_mapa.columns:
