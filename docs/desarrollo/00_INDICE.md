@@ -12,6 +12,8 @@ Leer en este orden:
 3. `03_GUIA_MODELO_ER_TABLAS.md`
 4. `04_GUIA_DASHBOARD_SEPARADA.md`
 5. `05_GUIA_PRUEBAS_TRIBUNAL.md`
+6. `06_EVIDENCIA_CDC_EC3.md`
+7. `07_AUDITORIA_EC3_Y_TERCERA_ENTREGA.md`
 
 ## Indice
 
@@ -22,6 +24,8 @@ Leer en este orden:
 | `03_GUIA_MODELO_ER_TABLAS.md` | Entender ER, tablas, claves y tipos | Para defender base de datos |
 | `04_GUIA_DASHBOARD_SEPARADA.md` | Explicar cada seccion del dashboard | Para defender la interfaz |
 | `05_GUIA_PRUEBAS_TRIBUNAL.md` | Pruebas seguras si modifican datos | Para practicar con el profesor |
+| `06_EVIDENCIA_CDC_EC3.md` | Script y lectura de evidencia CDC reproducible | Para cerrar EC3 |
+| `07_AUDITORIA_EC3_Y_TERCERA_ENTREGA.md` | Auditoria de cumplimiento, riesgos y pendientes | Para preparar la tercera entrega |
 | `10_EXPLICACION_PROYECTO_PASO_A_PASO.md` | Explicacion amplia del proyecto | Para entender el todo |
 | `11_SETUP_LOCAL.md` | Levantar el sistema local | Antes de correr dashboard o ETL |
 | `12_WORKFLOW_GIT.md` | Flujo de Git | Para versionar cambios |
