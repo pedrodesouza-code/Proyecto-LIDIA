@@ -35,6 +35,7 @@ Las contraseñas que aparecen en `docker/.env`:
 ```
 PG_SUPERPASS=postgres_super_2026          ← cambiar
 PG_PASSWORD=sinia_etl_2026                ← cambiar
+PG_DASH_PASSWORD=sinia_dash_2026          ← cambiar
 MONGO_ROOT_PASS=mongo_admin_2026          ← cambiar
 MONGO_PASSWORD=sinia_etl_2026             ← cambiar
 FIRMS_MAP_KEY=tu_api_key_aqui              ← tu API key de NASA FIRMS
@@ -76,11 +77,12 @@ docker compose logs postgres
 
 Cuando Postgres arrancó por primera vez, Docker leyó los archivos del directorio `sql/ddl/` y `sql/dml/` (montados como volumen en `/docker-entrypoint-initdb.d/`) y los ejecutó en orden:
 
-1. `01_roles.sql` — creó `sinia_readonly`, `sinia_etl`, `sinia_admin` + usuarios.
-2. `02_schema.sql` — creó las 8 tablas con CHECK constraints y triggers.
-3. `03_indices.sql` — creó índices para queries analíticas.
-4. `04_vistas.sql` — creó vistas (seguras y analíticas).
-5. `05_seed.sql` (= `dml/01_seed_puntos.sql`) — insertó los 19 puntos de monitoreo.
+1. `01_roles.sql` — creó `sinia_readonly`, `sinia_etl`, `sinia_admin` + usuarios sin password versionado.
+2. `02_set_app_passwords.sh` — asignó passwords desde variables de entorno (`PG_PASSWORD`, `PG_DASH_PASSWORD`).
+3. `02_schema.sql` — creó las 8 tablas con CHECK constraints y triggers.
+4. `03_indices.sql` — creó índices para queries analíticas.
+5. `04_vistas.sql` — creó vistas (seguras y analíticas).
+6. `05_seed.sql` (= `dml/01_seed_puntos.sql`) — insertó los 19 puntos de monitoreo.
 
 Mongo también ejecutó `nosql/init/01_setup_mongo.js`.
 

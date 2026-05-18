@@ -35,7 +35,7 @@ entrega conviene reforzar especialmente:
 | ETL modular con errores, logging y config | Alto | `config/settings.py`, `etl/utils/logger.py` | Que pidan donde se manejan errores | Mostrar config, logs y try/except por etapa |
 | CDC funcional | Medio/alto | `scripts/evidenciar_cdc_ec3.py`, `reports/cdc_ec3_ultimo.json` | Mongo local no conectado en ultima prueba | Reejecutar con Mongo activo si se quiere evidencia completa |
 | Testing e idempotencia | Alto | 17 tests automaticos | Que pidan prueba en vivo | Ejecutar pytest y explicar cada familia de test |
-| Seguridad, roles y privilegio minimo | Medio/alto | `sql/ddl/01_roles.sql`, `sql/ddl/04_vistas.sql` | Passwords demo hardcodeados pueden ser criticados | Aclarar entorno demo o mover credenciales a variables |
+| Seguridad, roles y privilegio minimo | Alto | `sql/ddl/01_roles.sql`, `sql/ddl/04_vistas.sql` | Que pregunten como se asignan passwords reales | Explicar que se asignan fuera del repo |
 | Backup y recuperacion | Alto | `scripts/backup_restore_real.py`, `reports/backup_restore_ultimo.json` | Preguntas sobre restauracion real | Mostrar manifest y procedimiento |
 | Dashboard con KPIs y visualizaciones | Alto | `dashboard/app.py`, `docs/desarrollo/18_DEFENSA_DASHBOARD_SECCIONES.md` | Falta captura formal reciente | Capturar pantallas y relacionarlas con preguntas |
 | Docker | Medio/alto | `docker/docker-compose.yml`, `docker/Dockerfile.streamlit` | Docker engine puede fallar en Windows | Mostrar `docker compose config --quiet` |
@@ -238,10 +238,12 @@ El proyecto incluye:
 - documentacion de seguridad;
 - backup y restore.
 
-### Riesgo actual
+### Estado actual
 
-`sql/ddl/01_roles.sql` contiene passwords de demostracion. En defensa hay que
-evitar decir que esas son credenciales productivas.
+`sql/ddl/01_roles.sql` ya no versiona passwords de aplicacion. El script crea
+roles y usuarios, pero indica que las contrasenas reales se asignan fuera del
+repositorio mediante `ALTER USER`, `docker/.env`, `config/.env` o un gestor de
+secretos del ambiente.
 
 ### Como defenderlo
 
@@ -252,8 +254,8 @@ Frase recomendada:
 
 ### Accion recomendada
 
-Mejorar el archivo de roles para que use placeholders o documentar claramente
-que son claves demo.
+Antes de una instalacion real, asignar contrasenas fuertes fuera de Git y
+mantener `.env` excluido del repositorio.
 
 ## 9. Auditoria de rendimiento
 
@@ -293,7 +295,7 @@ Prioridad alta:
    MongoDB activo.
 3. Abrir dashboard y generar evidencia visual.
 4. Regenerar reportes de rendimiento.
-5. Revisar el tema de passwords demo en `sql/ddl/01_roles.sql`.
+5. Verificar que las contrasenas reales esten fuera de Git.
 
 Prioridad media:
 
