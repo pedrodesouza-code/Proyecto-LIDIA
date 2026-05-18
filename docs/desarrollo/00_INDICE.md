@@ -15,6 +15,7 @@ Leer en este orden:
 6. `06_EVIDENCIA_CDC_EC3.md`
 7. `07_AUDITORIA_EC3_Y_TERCERA_ENTREGA.md`
 8. `08_EVIDENCIA_DASHBOARD_EC3.md`
+9. `09_EVIDENCIA_RENDIMIENTO_Y_MONGO.md`
 
 ## Indice
 
@@ -28,6 +29,7 @@ Leer en este orden:
 | `06_EVIDENCIA_CDC_EC3.md` | Script y lectura de evidencia CDC reproducible | Para cerrar EC3 |
 | `07_AUDITORIA_EC3_Y_TERCERA_ENTREGA.md` | Auditoria de cumplimiento, riesgos y pendientes | Para preparar la tercera entrega |
 | `08_EVIDENCIA_DASHBOARD_EC3.md` | Verificacion tecnica del dashboard | Para defender la demo Streamlit |
+| `09_EVIDENCIA_RENDIMIENTO_Y_MONGO.md` | Reportes de rendimiento y estado MongoDB | Para defender performance y NoSQL |
 | `10_EXPLICACION_PROYECTO_PASO_A_PASO.md` | Explicacion amplia del proyecto | Para entender el todo |
 | `11_SETUP_LOCAL.md` | Levantar el sistema local | Antes de correr dashboard o ETL |
 | `12_WORKFLOW_GIT.md` | Flujo de Git | Para versionar cambios |

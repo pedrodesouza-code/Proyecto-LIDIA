@@ -144,12 +144,27 @@ def medir_mongo() -> dict[str, Any]:
 def main() -> int:
     _load_env()
     REPORTS.mkdir(exist_ok=True)
+    postgres: dict[str, Any] = {"estado": "error"}
+    mongo: dict[str, Any] = {"estado": "error"}
+
+    try:
+        postgres = {"estado": "ok", "metricas": medir_postgres()}
+    except Exception as exc:
+        postgres = {"estado": "error", "error": f"{type(exc).__name__}: {exc}"}
+
+    try:
+        mongo = {"estado": "ok", "metricas": medir_mongo()}
+    except Exception as exc:
+        mongo = {"estado": "error", "error": f"{type(exc).__name__}: {exc}"}
+
     report = {
         "generado_en": datetime.now(timezone.utc).isoformat(),
         "alcance": ["URY", "BRA", "ARG"],
-        "postgres": medir_postgres(),
-        "mongo": medir_mongo(),
+        "postgres": postgres,
+        "mongo": mongo,
+        "estado_general": "ok" if postgres["estado"] == "ok" or mongo["estado"] == "ok" else "error",
         "lectura": "PostgreSQL mide hechos normalizados; MongoDB mide documentos/snapshots embebidos y trazabilidad.",
+        "nota": "Si MongoDB local no esta activo, la seccion Mongo queda como pendiente sin invalidar las metricas PostgreSQL.",
     }
     text = json.dumps(report, ensure_ascii=False, indent=2)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -159,10 +174,12 @@ def main() -> int:
     latest.write_text(text, encoding="utf-8")
     print(f"Reporte generado: {path}")
     print(json.dumps({
-        "postgres_metricas": len(report["postgres"]),
-        "mongo_metricas": len(report["mongo"]),
+        "postgres_estado": report["postgres"]["estado"],
+        "postgres_metricas": len(report["postgres"].get("metricas", {})),
+        "mongo_estado": report["mongo"]["estado"],
+        "mongo_metricas": len(report["mongo"].get("metricas", {})),
     }, ensure_ascii=False))
-    return 0
+    return 0 if report["estado_general"] == "ok" else 1
 
 
 if __name__ == "__main__":
