@@ -62,12 +62,12 @@ Resultado:
 ```text
 postgres_estado = ok
 postgres_metricas = 4
-mongo_estado = error
-mongo_metricas = 0
+mongo_estado = ok
+mongo_metricas = 6
 ```
 
-Esto no invalida el proyecto: significa que PostgreSQL local estaba activo y
-MongoDB local no estaba escuchando en `localhost:27017` durante la prueba.
+MongoDB local quedo activo usando `mongod.exe` nativo de Windows, sin depender
+de Docker Desktop.
 
 ## 5. Evidencia PostgreSQL medida
 
@@ -75,10 +75,10 @@ Del reporte `reports/sql_vs_nosql_real_ultimo.json`:
 
 | Consulta PostgreSQL | Tiempo promedio | Resultado |
 |---|---:|---|
-| Focos por pais | `3.030 ms` | ARG, BRA, URY |
-| Focos por mes | `2.389 ms` | `255` filas |
-| Ejecuciones ETL | `3.438 ms` | `72` ejecuciones |
-| Riesgo por pais | `26.090 ms` | promedio por pais |
+| Focos por pais | `3.252 ms` | ARG, BRA, URY |
+| Focos por mes | `2.920 ms` | `255` filas |
+| Ejecuciones ETL | `2.620 ms` | `72` ejecuciones |
+| Riesgo por pais | `65.374 ms` | promedio por pais |
 
 Lectura para defensa:
 
@@ -87,39 +87,62 @@ Lectura para defensa:
 
 ## 6. Estado MongoDB local
 
-Prueba de puerto:
+Estado final:
 
 ```text
-localhost:27017 -> False
+localhost:27017 -> True
+MongoDB local conectado: sinia_uy
+colecciones: alertas, ejecuciones_etl, focos_snapshots
 ```
 
-Docker Desktop tampoco estaba activo:
+MongoDB se levanto con el binario nativo:
 
 ```text
-dockerDesktopLinuxEngine no disponible
+C:\Program Files\MongoDB\Server\6.0\bin\mongod.exe
 ```
 
-Al intentar abrir Docker Desktop, Windows informo:
+Se cargo MongoDB local con:
+
+```bash
+python etl/load/load_mongo.py
+python scripts/optimizar_mongo_resumenes.py
+```
+
+Resultado local:
 
 ```text
-Wsl/0x80070422
-No se puede iniciar el servicio, porque esta deshabilitado
-o porque no tiene dispositivos habilitados asociados a el.
+focos_snapshots = 347
+focos_resumen_pais = 3
+focos_resumen_mes = 36
+ejecuciones_etl = 1
 ```
 
-La consulta del servicio `LxssManager` devolvio:
+Lectura para defensa actualizada:
 
-```text
-ERROR 1060: El servicio especificado no existe como servicio instalado.
-```
+> MongoDB local esta operativo sin Docker. Se cargaron snapshots reales desde
+> Parquet, se crearon resumenes materializados y se valido CDC documental con
+> insercion y limpieza controlada.
 
-Lectura para defensa:
+## 7. Comparacion Mongo embebido vs materializado
 
-> MongoDB no fallo por estructura de datos ni por schema. El servicio local no
-> estaba levantado. La evidencia documental de MongoDB real queda respaldada por
-> los reportes UTEC ya generados.
+Del reporte `reports/sql_vs_nosql_real_ultimo.json`:
 
-## 7. Evidencia MongoDB UTEC disponible
+| Consulta MongoDB | Tiempo promedio | Resultado |
+|---|---:|---|
+| Focos por pais embebidos | `9630.797 ms` | ARG, BRA, URY |
+| Focos por pais materializado | `4.472 ms` | ARG, BRA, URY |
+| Snapshots por mes | `4.783 ms` | `12` |
+| Focos por mes materializado | `1.759 ms` | `36` |
+| Ejecuciones ETL | `1.740 ms` | `1` |
+| Snapshots totales | `2.482 ms` | `347` |
+
+Frase de defensa:
+
+> La comparacion demuestra por que materializamos resumenes en MongoDB. Recorrer
+> arrays embebidos completos es mucho mas costoso; consultar resumenes
+> materializados responde en milisegundos.
+
+## 8. Evidencia MongoDB UTEC disponible
 
 Usar:
 
@@ -144,7 +167,28 @@ Frase de defensa:
 > snapshots reales, resumenes materializados y validacion de que los documentos
 > conservan el pais dentro de los focos embebidos.
 
-## 8. Como completar demo Mongo local
+## 9. Como levantar demo Mongo local
+
+Opcion recomendada sin Docker:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/levantar_mongo_nativo.ps1
+python etl/load/load_mongo.py
+python scripts/optimizar_mongo_resumenes.py
+python scripts/comparar_sql_nosql_real.py
+python scripts/evidenciar_cdc_ec3.py
+```
+
+El script usa:
+
+```text
+tmp/mongo-local-db
+tmp/mongo-local-log/mongod.log
+```
+
+Estos directorios son temporales locales y no se versionan.
+
+Opcion Docker, si WSL esta funcionando:
 
 Si se quiere hacer demo local completa:
 
@@ -167,19 +211,17 @@ wsl --shutdown
 Si sigue fallando, habilitar o reinstalar WSL/Docker Desktop desde Windows.
 Ese paso es de sistema operativo, no de codigo del proyecto.
 
-## 9. Como explicarlo al profesor
+## 10. Como explicarlo al profesor
 
-Si pregunta por el `mongo_estado = error`:
+Si pregunta por el bloqueo Docker/WSL:
 
-> Ese error no corresponde al modelo NoSQL. Corresponde a conectividad local: el
-> puerto `27017` no estaba activo. Por eso el script ahora deja el estado de
-> Mongo explicitado y no mezcla un problema de servicio con un problema de
-> diseno. La evidencia real de Mongo en UTEC esta en
-> `reports/utec_verificacion_ultimo.json`.
+> Docker dependia de WSL y Windows devolvia `Wsl/0x80070422`. Para no depender
+> de ese servicio, levantamos MongoDB nativo con `mongod.exe`. El resultado final
+> es Mongo local operativo en `localhost:27017`.
 
-## 10. Cierre
+## 11. Cierre
 
-Con estos reportes queda cubierta la evidencia de rendimiento actualizada y una
-comparacion SQL/NoSQL robusta ante fallos de servicio local. PostgreSQL queda
-medido en vivo; MongoDB queda documentado con evidencia UTEC y con pasos claros
-para completar demo local cuando el servicio este levantado.
+Con estos reportes queda cubierta la evidencia de rendimiento actualizada y la
+comparacion SQL/NoSQL local completa. PostgreSQL queda medido en vivo; MongoDB
+queda cargado con snapshots reales, resumenes materializados y prueba CDC
+documental.

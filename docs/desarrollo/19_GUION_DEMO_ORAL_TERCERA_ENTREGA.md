@@ -106,9 +106,9 @@ Frase:
 
 Si preguntan por Mongo local:
 
-> En esta maquina Mongo local depende de Docker Desktop. Docker fallo por WSL
-> con codigo `Wsl/0x80070422`. Por eso la evidencia local queda pendiente, pero
-> MongoDB real esta verificado en UTEC con snapshots, resumenes y documentos.
+> Docker fallo por WSL con codigo `Wsl/0x80070422`, pero resolvimos la demo
+> usando MongoDB nativo de Windows. Mongo local esta activo en `localhost:27017`
+> con snapshots, resumenes materializados y ejecuciones ETL.
 
 ## 6. Demo CDC
 
@@ -264,12 +264,12 @@ Respuesta:
 > Lo frenan las transformaciones, los tests o las constraints de base segun el
 > caso. No dependemos de una sola capa.
 
-Pregunta: Por que Mongo local dio error?
+Pregunta: Por que Docker dio error?
 
 Respuesta:
 
-> Porque Docker/WSL no estaba activo en Windows. No fue error de modelo. La
-> evidencia Mongo real esta en UTEC.
+> Porque Windows/WSL devolvio `Wsl/0x80070422`. No fue error del modelo NoSQL.
+> Para la demo local usamos `mongod.exe` nativo y Mongo quedo funcionando.
 
 Pregunta: Por que el mapa no muestra todos los millones de puntos?
 

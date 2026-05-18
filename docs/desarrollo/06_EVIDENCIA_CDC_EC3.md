@@ -24,6 +24,8 @@ En MongoDB:
 1. Inserta una ejecucion ETL temporal en `ejecuciones_etl`.
 2. Verifica que el documento exista.
 3. Lo elimina para no ensuciar la coleccion.
+4. Deja `mongo.estado = ok` cuando MongoDB local esta escuchando en
+   `localhost:27017`.
 
 ## Como ejecutarlo
 
@@ -65,4 +67,5 @@ Lectura:
 - si `insert_inicial_rowcount = 1`, se inserto un nuevo registro;
 - si `repeticion_idempotente_rowcount = 0`, no se duplico;
 - si `modificacion_cdc_rowcount = 1`, se detecto y aplico cambio;
-- si `despues_rollback` vuelve al valor inicial, la prueba fue segura.
+- si `despues_rollback` vuelve al valor inicial, la prueba fue segura;
+- si `mongo.estado = ok`, tambien se demostro insercion y limpieza documental.

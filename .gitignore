@@ -56,6 +56,7 @@ Thumbs.db
 pytest-cache-files-*/
 
 # Archivos temporales
+tmp/
 *.tmp
 *.bak
 ~$*.docx

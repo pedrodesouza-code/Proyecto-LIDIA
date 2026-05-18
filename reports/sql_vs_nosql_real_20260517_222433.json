@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-05-18T01:29:56.567087+00:00",
+  "generado_en": "2026-05-18T01:24:33.761977+00:00",
   "alcance": [
     "URY",
     "BRA",
@@ -9,9 +9,9 @@
     "estado": "ok",
     "metricas": {
       "focos_por_pais": {
-        "ms_min": 0.718,
-        "ms_promedio": 3.252,
-        "ms_max": 8.262,
+        "ms_min": 0.306,
+        "ms_promedio": 1.964,
+        "ms_max": 5.277,
         "repeticiones": 3,
         "resultado": {
           "ARG": 1039964,
@@ -20,23 +20,23 @@
         }
       },
       "focos_por_mes": {
-        "ms_min": 1.694,
-        "ms_promedio": 2.92,
-        "ms_max": 5.179,
+        "ms_min": 0.527,
+        "ms_promedio": 1.448,
+        "ms_max": 3.091,
         "repeticiones": 3,
         "resultado": 255
       },
       "ejecuciones_etl": {
-        "ms_min": 0.653,
-        "ms_promedio": 2.62,
-        "ms_max": 6.551,
+        "ms_min": 0.253,
+        "ms_promedio": 1.869,
+        "ms_max": 5.046,
         "repeticiones": 3,
         "resultado": 72
       },
       "riesgo_por_pais": {
-        "ms_min": 52.666,
-        "ms_promedio": 65.374,
-        "ms_max": 90.265,
+        "ms_min": 13.717,
+        "ms_promedio": 19.88,
+        "ms_max": 28.321,
         "repeticiones": 3,
         "resultado": {
           "ARG": 0.3748877568825126,
@@ -50,54 +50,46 @@
     "estado": "ok",
     "metricas": {
       "focos_por_pais_embebidos": {
-        "ms_min": 9216.278,
-        "ms_promedio": 9630.797,
-        "ms_max": 10081.484,
+        "ms_min": 0.871,
+        "ms_promedio": 12.887,
+        "ms_max": 36.626,
         "repeticiones": 3,
-        "resultado": {
-          "ARG": 96232,
-          "BRA": 1737010,
-          "URY": 3295
-        }
+        "resultado": {}
       },
       "focos_por_pais_materializado": {
-        "ms_min": 1.515,
-        "ms_promedio": 4.472,
-        "ms_max": 9.943,
+        "ms_min": 0.554,
+        "ms_promedio": 0.661,
+        "ms_max": 0.732,
         "repeticiones": 3,
-        "resultado": {
-          "ARG": 96232,
-          "BRA": 1737010,
-          "URY": 3295
-        }
+        "resultado": {}
       },
       "snapshots_por_mes": {
-        "ms_min": 3.912,
-        "ms_promedio": 4.783,
-        "ms_max": 5.808,
+        "ms_min": 0.795,
+        "ms_promedio": 1.261,
+        "ms_max": 2.119,
         "repeticiones": 3,
-        "resultado": 12
+        "resultado": 0
       },
       "focos_por_mes_materializado": {
-        "ms_min": 1.64,
-        "ms_promedio": 1.759,
-        "ms_max": 1.88,
+        "ms_min": 0.509,
+        "ms_promedio": 0.664,
+        "ms_max": 0.826,
         "repeticiones": 3,
-        "resultado": 36
+        "resultado": 0
       },
       "ejecuciones_etl": {
-        "ms_min": 1.56,
-        "ms_promedio": 1.74,
-        "ms_max": 1.844,
+        "ms_min": 0.578,
+        "ms_promedio": 0.628,
+        "ms_max": 0.667,
         "repeticiones": 3,
-        "resultado": 1
+        "resultado": 0
       },
       "snapshots_totales": {
-        "ms_min": 2.325,
-        "ms_promedio": 2.482,
-        "ms_max": 2.588,
+        "ms_min": 0.366,
+        "ms_promedio": 0.425,
+        "ms_max": 0.483,
         "repeticiones": 3,
-        "resultado": 347
+        "resultado": 0
       }
     }
   },
