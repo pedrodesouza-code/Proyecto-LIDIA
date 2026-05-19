@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent
 REPORTS = ROOT / "reports"
 PROCESSED = ROOT / "data" / "processed"
+PAISES_ALCANCE = ("CHL", "URY", "BRA", "ARG")
 
 sys.path.insert(0, str(ROOT))
 
@@ -46,7 +47,7 @@ def _materializar_postgres() -> dict[str, int]:
         max(potencia_radiativa)::numeric(12, 3) AS frp_maximo,
         count(*) FILTER (WHERE confianza_num = 3)::bigint AS focos_alta_confianza
     FROM focos_calor
-    WHERE pais IN ('URY', 'BRA', 'ARG')
+    WHERE pais IN ('CHL', 'URY', 'BRA', 'ARG')
     GROUP BY pais;
 
     CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_focos_por_pais_pais
@@ -60,7 +61,7 @@ def _materializar_postgres() -> dict[str, int]:
         avg(potencia_radiativa)::numeric(12, 3) AS frp_promedio,
         max(potencia_radiativa)::numeric(12, 3) AS frp_maximo
     FROM focos_calor
-    WHERE pais IN ('URY', 'BRA', 'ARG')
+    WHERE pais IN ('CHL', 'URY', 'BRA', 'ARG')
     GROUP BY pais, date_trunc('month', fecha_adq)::date;
 
     CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_focos_por_pais_mes_pk

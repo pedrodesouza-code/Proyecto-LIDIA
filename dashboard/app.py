@@ -193,10 +193,10 @@ else:
 # Filtro de país
 PAISES_DISP = {
     "Todos": None,
+    "Chile (CHL)":     "CHL",
+    "Uruguay (URY)":   "URY",
     "Brasil (BRA)":    "BRA",
     "Argentina (ARG)": "ARG",
-    "Uruguay (URY)":   "URY",
-    "Chile (CHL)":     "CHL",
 }
 pais_sel_label = st.sidebar.selectbox("País", list(PAISES_DISP.keys()))
 pais_sel = PAISES_DISP[pais_sel_label]

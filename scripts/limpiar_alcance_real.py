@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORTS = ROOT / "reports"
-VALIDOS = ("URY", "BRA", "ARG")
+VALIDOS = ("CHL", "URY", "BRA", "ARG")
 PUNTOS_VALIDOS = (
     "Cuiabá",
     "Porto_Alegre",
@@ -26,6 +26,16 @@ PUNTOS_VALIDOS = (
     "Rivera",
     "Montevideo",
 )
+PUNTOS_VALIDOS = (
+    "Santiago",
+    "Temuco",
+    "Valdivia",
+    "Osorno",
+    "Puerto_Montt",
+    "Coyhaique",
+    "Puyehue_Cordon_Caulle",
+    "Calbuco",
+) + PUNTOS_VALIDOS
 
 
 def _load_env() -> None:
@@ -138,7 +148,8 @@ def limpiar_postgres() -> dict[str, Any]:
                 INSERT INTO paises_referencia (codigo_iso3, codigo_iso2, nombre) VALUES
                     ('URY', 'UY', 'Uruguay'),
                     ('BRA', 'BR', 'Brasil'),
-                    ('ARG', 'AR', 'Argentina')
+                    ('ARG', 'AR', 'Argentina'),
+                    ('CHL', 'CL', 'Chile')
                 ON CONFLICT (codigo_iso3) DO NOTHING
                 """
             )

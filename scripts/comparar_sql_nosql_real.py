@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORTS = ROOT / "reports"
+PAISES_ALCANCE = ("CHL", "URY", "BRA", "ARG")
 
 
 def _load_env() -> None:
@@ -87,7 +88,7 @@ def medir_postgres() -> dict[str, Any]:
                 SELECT p.pais, AVG(m.indice_riesgo)::float
                 FROM meteo_diario m
                 JOIN puntos_monitoreo p ON p.id = m.id_punto
-                WHERE p.pais IN ('URY','BRA','ARG')
+                WHERE p.pais IN ('CHL','URY','BRA','ARG')
                 GROUP BY p.pais
                 ORDER BY p.pais
                 """
@@ -110,7 +111,7 @@ def medir_mongo() -> dict[str, Any]:
     def focos_por_pais() -> dict[str, int]:
         rows = db.focos_snapshots.aggregate([
             {"$unwind": "$focos"},
-            {"$match": {"focos.pais": {"$in": ["URY", "BRA", "ARG"]}}},
+            {"$match": {"focos.pais": {"$in": list(PAISES_ALCANCE)}}},
             {"$group": {"_id": "$focos.pais", "total": {"$sum": 1}}},
             {"$sort": {"_id": 1}},
         ])
@@ -159,7 +160,7 @@ def main() -> int:
 
     report = {
         "generado_en": datetime.now(timezone.utc).isoformat(),
-        "alcance": ["URY", "BRA", "ARG"],
+        "alcance": list(PAISES_ALCANCE),
         "postgres": postgres,
         "mongo": mongo,
         "estado_general": "ok" if postgres["estado"] == "ok" or mongo["estado"] == "ok" else "error",

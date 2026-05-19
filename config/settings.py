@@ -120,7 +120,7 @@ PAISES_SA = {
 # Se mantiene amplio por compatibilidad con la extracción; el filtro definitivo
 # a BRA/ARG/URY/CHL ocurre en la transformación.
 # Formato: "lon_min,lat_min,lon_max,lat_max"
-SA_BBOX = "-74.0,-56.0,-34.0,6.0"
+SA_BBOX = "-76.0,-56.0,-34.0,6.0"
 
 # Puntos de monitoreo meteorologico — alcance final de 36 puntos:
 # - Uruguay: los 19 departamentos, representados por su capital/departamental.

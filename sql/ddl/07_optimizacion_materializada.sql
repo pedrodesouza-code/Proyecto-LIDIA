@@ -23,7 +23,7 @@ SELECT
     ROUND(MAX(potencia_radiativa)::NUMERIC, 2) AS frp_maximo,
     SUM(CASE WHEN confianza_num = 3 THEN 1 ELSE 0 END) AS focos_alta_confianza
 FROM focos_calor
-WHERE pais IN ('ARG', 'BRA', 'URY')
+WHERE pais IN ('ARG', 'BRA', 'CHL', 'URY')
 GROUP BY pais;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_focos_por_pais_pais
@@ -38,7 +38,7 @@ SELECT
     ROUND(MAX(potencia_radiativa)::NUMERIC, 2) AS frp_maximo,
     SUM(CASE WHEN confianza_num = 3 THEN 1 ELSE 0 END) AS focos_alta_confianza
 FROM focos_calor
-WHERE pais IN ('ARG', 'BRA', 'URY')
+WHERE pais IN ('ARG', 'BRA', 'CHL', 'URY')
 GROUP BY pais, DATE_TRUNC('month', fecha_adq)::DATE;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_focos_por_pais_mes_pk

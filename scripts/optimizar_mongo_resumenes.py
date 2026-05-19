@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORTS = ROOT / "reports"
+PAISES_ALCANCE = ["CHL", "URY", "BRA", "ARG"]
 
 
 def main() -> int:
@@ -40,7 +41,7 @@ def main() -> int:
 
     pais_pipeline = [
         {"$unwind": "$focos"},
-        {"$match": {"focos.pais": {"$in": ["URY", "BRA", "ARG"]}}},
+        {"$match": {"focos.pais": {"$in": PAISES_ALCANCE}}},
         {
             "$group": {
                 "_id": "$focos.pais",
@@ -58,7 +59,7 @@ def main() -> int:
 
     mes_pipeline = [
         {"$unwind": "$focos"},
-        {"$match": {"focos.pais": {"$in": ["URY", "BRA", "ARG"]}}},
+        {"$match": {"focos.pais": {"$in": PAISES_ALCANCE}}},
         {
             "$group": {
                 "_id": {
@@ -92,7 +93,7 @@ def main() -> int:
             "focos_resumen_pais": db.focos_resumen_pais.count_documents({}),
             "focos_resumen_mes": db.focos_resumen_mes.count_documents({}),
         },
-        "alcance": ["URY", "BRA", "ARG"],
+        "alcance": PAISES_ALCANCE,
     }
     REPORTS.mkdir(exist_ok=True)
     text = json.dumps(report, ensure_ascii=False, indent=2)
