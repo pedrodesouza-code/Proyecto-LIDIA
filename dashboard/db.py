@@ -32,6 +32,57 @@ PUNTOS_ALCANCE = tuple(PUNTOS_METEO_SA.keys())
 SQL_SCOPE_PAISES = ", ".join(f"'{pais}'" for pais in PAISES_ALCANCE)
 MAX_FOCOS_MAPA = 25000
 
+
+def _filtro_espacial_sql(ciudades: tuple[str, ...] | None, radio_km: int) -> tuple[str, list]:
+    """Devuelve cláusula SQL/params para focos cercanos a puntos de monitoreo."""
+    if not ciudades:
+        return "", []
+    partes = []
+    params: list = []
+    for ciudad in ciudades:
+        info = PUNTOS_METEO_SA.get(ciudad)
+        if not info:
+            continue
+        partes.append(
+            """
+            (
+                6371 * 2 * asin(sqrt(
+                    power(sin(radians(%s - latitud) / 2), 2)
+                    + cos(radians(latitud)) * cos(radians(%s))
+                    * power(sin(radians(%s - longitud) / 2), 2)
+                ))
+            ) <= %s
+            """
+        )
+        params.extend([info["lat"], info["lat"], info["lon"], radio_km])
+    if not partes:
+        return "", []
+    return "(" + " OR ".join(partes) + ")", params
+
+
+def _filtrar_focos_cercanos_parquet(df: pd.DataFrame, ciudades: tuple[str, ...] | None, radio_km: int) -> pd.DataFrame:
+    if df.empty or not ciudades or not {"latitud", "longitud"}.issubset(df.columns):
+        return df
+    import numpy as np
+
+    mask = pd.Series(False, index=df.index)
+    lat = df["latitud"].astype(float)
+    lon = df["longitud"].astype(float)
+    for ciudad in ciudades:
+        info = PUNTOS_METEO_SA.get(ciudad)
+        if not info:
+            continue
+        dlat = np.radians(info["lat"] - lat)
+        dlon = np.radians(info["lon"] - lon)
+        a = (
+            np.sin(dlat / 2) ** 2
+            + np.cos(np.radians(lat)) * np.cos(np.radians(info["lat"]))
+            * np.sin(dlon / 2) ** 2
+        )
+        distancia = 6371 * 2 * np.arcsin(np.sqrt(a))
+        mask = mask | (distancia <= radio_km)
+    return df[mask].copy()
+
 # ---------------------------------------------------------------------------
 # CONEXION
 # ---------------------------------------------------------------------------
@@ -261,7 +312,13 @@ def calcular_estadisticas_focos(fecha_inicio: str | None = None, fecha_fin: str 
 
 
 @st.cache_data(ttl=300)
-def cargar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, pais: str | None = None) -> pd.DataFrame:
+def cargar_focos(
+    fecha_inicio: str | None = None,
+    fecha_fin: str | None = None,
+    pais: str | None = None,
+    ciudades: tuple[str, ...] | None = None,
+    radio_km: int = 100,
+) -> pd.DataFrame:
     """
     Focos de calor históricos filtrados por fecha y/o país.
     Devuelve una muestra visual ordenada por FRP descendente (los mas intensos primero).
@@ -280,6 +337,10 @@ def cargar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, 
             if pais:
                 where_clauses.append("pais = %s")
                 params.append(pais)
+            filtro_ciudades, params_ciudades = _filtro_espacial_sql(ciudades, radio_km)
+            if filtro_ciudades:
+                where_clauses.append(filtro_ciudades)
+                params.extend(params_ciudades)
 
             df = _query_pg(f"""
                 SELECT
@@ -315,6 +376,7 @@ def cargar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, 
         if pais and "pais" in df.columns:
             df = df[df["pais"] == pais].copy()
         df = _filtrar_fechas(df, fecha_inicio, fecha_fin, "fecha_adq")
+        df = _filtrar_focos_cercanos_parquet(df, ciudades, radio_km)
         df = df.sort_values("potencia_radiativa", ascending=False, na_position="last").head(MAX_FOCOS_MAPA)
         df.attrs["fuente"] = "parquet"
         return df
@@ -326,9 +388,10 @@ def cargar_focos(fecha_inicio: str | None = None, fecha_fin: str | None = None, 
 # ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=180)
-def cargar_focos_nrt() -> pd.DataFrame:
+def cargar_focos_nrt(ciudades: tuple[str, ...] | None = None, radio_km: int = 100) -> pd.DataFrame:
     if _pg_disponible():
         try:
+            filtro_ciudades, params_ciudades = _filtro_espacial_sql(ciudades, radio_km)
             df = _query_pg(f"""
                 SELECT
                     fecha_adq,
@@ -344,9 +407,10 @@ def cargar_focos_nrt() -> pd.DataFrame:
                 FROM focos_calor
                 WHERE pais IN ({SQL_SCOPE_PAISES})
                   AND fecha_adq >= CURRENT_DATE - INTERVAL '1 day'
+                  {"AND " + filtro_ciudades if filtro_ciudades else ""}
                 ORDER BY fecha_adq DESC, potencia_radiativa DESC NULLS LAST
                 LIMIT 5000
-            """)
+            """, tuple(params_ciudades))
             df["fecha_adq"] = pd.to_datetime(df["fecha_adq"])
             df.attrs["fuente"] = "postgresql"
             return df
@@ -358,6 +422,7 @@ def cargar_focos_nrt() -> pd.DataFrame:
         return pd.DataFrame()
     df = pd.read_parquet(p)
     df["fecha_adq"] = pd.to_datetime(df["fecha_adq"])
+    df = _filtrar_focos_cercanos_parquet(df, ciudades, radio_km)
     df.attrs["fuente"] = "parquet"
     return df
 

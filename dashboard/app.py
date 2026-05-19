@@ -18,6 +18,8 @@ import streamlit as st
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from config.settings import PUNTOS_METEO_SA
+
 st.set_page_config(
     page_title="SINIA-UY | Monitor de Incendios Regional",
     page_icon="🔥",
@@ -64,12 +66,18 @@ MAPA_FOCOS = {
 }
 
 
-def _render_mapa_focos(df: pd.DataFrame, pais: str | None, color_por_confianza: bool, height: int = 460):
+def _render_mapa_focos(
+    df: pd.DataFrame,
+    pais: str | None,
+    color_por_confianza: bool,
+    height: int = 460,
+    centro_override: dict[str, float] | None = None,
+):
     """Mapa reutilizable para focos historicos y NRT."""
     df_map = df.dropna(subset=["latitud", "longitud"]) if not df.empty else df
     if df_map.empty:
         return None
-    centro = MAPA_FOCOS.get(pais, MAPA_FOCOS[None])
+    centro = centro_override or MAPA_FOCOS.get(pais, MAPA_FOCOS[None])
     columna_color = "confianza_num" if color_por_confianza and "confianza_num" in df_map.columns else "potencia_radiativa"
     fig = px.scatter_mapbox(
         df_map,
@@ -96,6 +104,50 @@ def _render_mapa_focos(df: pd.DataFrame, pais: str | None, color_por_confianza: 
         coloraxis_colorbar_title="Confianza" if columna_color == "confianza_num" else "FRP",
     )
     return fig
+
+
+def _distancia_km(lat1: pd.Series, lon1: pd.Series, lat2: float, lon2: float) -> pd.Series:
+    """Distancia haversine entre una serie de coordenadas y un punto."""
+    import numpy as np
+
+    radio_tierra = 6371.0
+    lat1_rad = np.radians(lat1.astype(float))
+    lon1_rad = np.radians(lon1.astype(float))
+    lat2_rad = np.radians(lat2)
+    lon2_rad = np.radians(lon2)
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlon / 2) ** 2
+    return 2 * radio_tierra * np.arcsin(np.sqrt(a))
+
+
+def _filtrar_focos_por_ciudades(df: pd.DataFrame, ciudades: list[str], radio_km: int) -> pd.DataFrame:
+    if df.empty or not ciudades or not {"latitud", "longitud"}.issubset(df.columns):
+        return df
+    masks = []
+    for ciudad in ciudades:
+        info = PUNTOS_METEO_SA.get(ciudad)
+        if not info:
+            continue
+        masks.append(_distancia_km(df["latitud"], df["longitud"], info["lat"], info["lon"]) <= radio_km)
+    if not masks:
+        return df.iloc[0:0].copy()
+    mask = masks[0]
+    for extra in masks[1:]:
+        mask = mask | extra
+    return df[mask].copy()
+
+
+def _centro_ciudades(ciudades: list[str], pais: str | None) -> dict[str, float] | None:
+    infos = [PUNTOS_METEO_SA[c] for c in ciudades if c in PUNTOS_METEO_SA]
+    if not infos:
+        return None
+    zoom = 7.0 if len(infos) == 1 else MAPA_FOCOS.get(pais, MAPA_FOCOS[None])["zoom"]
+    return {
+        "lat": sum(i["lat"] for i in infos) / len(infos),
+        "lon": sum(i["lon"] for i in infos) / len(infos),
+        "zoom": zoom,
+    }
 
 # ── Sidebar — filtros (se definen ANTES de cargar datos) ─────────────────────
 st.sidebar.title("SINIA-UY")
@@ -150,12 +202,35 @@ pais_sel_label = st.sidebar.selectbox("País", list(PAISES_DISP.keys()))
 pais_sel = PAISES_DISP[pais_sel_label]
 alcance_nrt_label = "ARG/BRA/URY/CHL" if pais_sel is None else pais_sel
 
+ciudades_disponibles = [
+    nombre for nombre, info in PUNTOS_METEO_SA.items()
+    if pais_sel is None or info["pais"] == pais_sel
+]
+ciudades_disponibles = sorted(ciudades_disponibles)
+ciudades_sel = st.sidebar.multiselect(
+    "Ciudades / puntos",
+    ciudades_disponibles,
+    default=[],
+    help="Filtra meteorología, calidad del aire y focos cercanos a los puntos seleccionados.",
+)
+radio_focos_km = st.sidebar.slider(
+    "Radio focos por ciudad (km)",
+    min_value=25,
+    max_value=300,
+    value=100,
+    step=25,
+    help="Los focos FIRMS no vienen asociados a una ciudad; se muestran los que caen dentro de este radio.",
+)
+alcance_ciudades_label = ", ".join(ciudades_sel) if ciudades_sel else alcance_nrt_label
+centro_ciudades = _centro_ciudades(ciudades_sel, pais_sel)
+
 # ── Carga de datos (con filtros ya seleccionados) ─────────────────────────────
-firms  = cargar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
+ciudades_tuple = tuple(ciudades_sel)
+firms  = cargar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel, ciudades_tuple, radio_focos_km)
 focos_diarios = cargar_focos_por_dia(fecha_inicio_sel, fecha_fin_sel, pais_sel)
 total_focos_periodo = contar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
 stats_focos = calcular_estadisticas_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
-nrt    = cargar_focos_nrt()
+nrt    = cargar_focos_nrt(ciudades_tuple, radio_focos_km)
 meteo  = cargar_meteo("historico")
 fc     = cargar_forecast()
 cams   = cargar_cams()
@@ -181,6 +256,8 @@ if pagina != "Tiempo Real":
 
 # Aplicar filtro de país a meteo/forecast/cams (focos ya vienen filtrados de PG)
 if pais_sel:
+    if not firms.empty and "pais" in firms.columns:
+        firms = firms[firms["pais"] == pais_sel]
     if not nrt.empty and "pais" in nrt.columns:
         nrt = nrt[nrt["pais"] == pais_sel]
     if not meteo.empty and "pais" in meteo.columns:
@@ -189,6 +266,33 @@ if pais_sel:
         fc = fc[fc["pais"] == pais_sel]
     if not cams.empty and "pais" in cams.columns:
         cams = cams[cams["pais"] == pais_sel]
+
+if ciudades_sel:
+    firms = _filtrar_focos_por_ciudades(firms, ciudades_sel, radio_focos_km)
+    nrt = _filtrar_focos_por_ciudades(nrt, ciudades_sel, radio_focos_km)
+    if not meteo.empty and "punto" in meteo.columns:
+        meteo = meteo[meteo["punto"].isin(ciudades_sel)]
+    if not fc.empty and "punto" in fc.columns:
+        fc = fc[fc["punto"].isin(ciudades_sel)]
+    if not cams.empty and "punto" in cams.columns:
+        cams = cams[cams["punto"].isin(ciudades_sel)]
+
+    total_focos_periodo = int(len(firms))
+    if not firms.empty and "fecha_adq" in firms.columns:
+        focos_diarios = (
+            firms.groupby(firms["fecha_adq"].dt.date)
+            .size()
+            .reset_index(name="focos")
+            .rename(columns={"fecha_adq": "fecha"})
+        )
+        focos_diarios["fecha"] = pd.to_datetime(focos_diarios["fecha"])
+    else:
+        focos_diarios = pd.DataFrame(columns=["fecha", "focos"])
+    stats_focos = {
+        "total": total_focos_periodo,
+        "frp_promedio": float(firms["potencia_radiativa"].mean()) if not firms.empty and "potencia_radiativa" in firms.columns else 0,
+        "frp_maximo": float(firms["potencia_radiativa"].max()) if not firms.empty and "potencia_radiativa" in firms.columns else 0,
+    }
 
 # Auto-refresh
 st.sidebar.divider()
@@ -371,19 +475,25 @@ if pagina == "Resumen General":
             datos_mapa = nrt
             color_por_confianza = False
             st.caption(
-                f"Focos recientes NRT de las últimas 24 horas en {alcance_nrt_label}. "
-                "Respeta el país seleccionado en el sidebar."
+                f"Focos recientes NRT de las últimas 24 horas en {alcance_ciudades_label}. "
+                "Respeta el país y las ciudades seleccionadas en el sidebar."
             )
         else:
             datos_mapa = firms
             color_por_confianza = True
             st.caption(
-                f"Focos del período {periodo_label} en {alcance_nrt_label}. "
+                f"Focos del período {periodo_label} en {alcance_ciudades_label}. "
                 "El mapa usa una muestra acotada para mantener la navegacion agil."
             )
 
         if not datos_mapa.empty and "latitud" in datos_mapa.columns:
-            fig_map = _render_mapa_focos(datos_mapa, pais_sel, color_por_confianza, height=460)
+            fig_map = _render_mapa_focos(
+                datos_mapa,
+                pais_sel,
+                color_por_confianza,
+                height=460,
+                centro_override=centro_ciudades,
+            )
             if fig_map is not None:
                 st.plotly_chart(fig_map, use_container_width=True)
             else:
@@ -506,19 +616,25 @@ elif pagina == "Focos de Calor":
             datos_mapa = nrt
             color_por_confianza = False
             st.caption(
-                f"Focos recientes NRT de las últimas 24 horas en {alcance_nrt_label}. "
-                "Cambia el país en el sidebar para ver Brasil, Argentina, Uruguay, Chile o todo el alcance."
+                f"Focos recientes NRT de las últimas 24 horas en {alcance_ciudades_label}. "
+                "Cambia el país o las ciudades en el sidebar para ajustar el mapa."
             )
         else:
             datos_mapa = firms
             color_por_confianza = True
             st.caption(
-                f"Focos del período {periodo_label} en {alcance_nrt_label}. "
+                f"Focos del período {periodo_label} en {alcance_ciudades_label}. "
                 "Para el periodo completo se visualiza una muestra priorizada por intensidad FRP."
             )
 
         if not datos_mapa.empty and "latitud" in datos_mapa.columns:
-            fig_map_focos = _render_mapa_focos(datos_mapa, pais_sel, color_por_confianza, height=430)
+            fig_map_focos = _render_mapa_focos(
+                datos_mapa,
+                pais_sel,
+                color_por_confianza,
+                height=430,
+                centro_override=centro_ciudades,
+            )
             if fig_map_focos is not None:
                 st.plotly_chart(fig_map_focos, use_container_width=True)
             else:
@@ -1013,8 +1129,14 @@ elif pagina == "Tiempo Real":
     if nrt.empty:
         st.info("Sin focos NRT disponibles. El scheduler los actualiza cada 3 horas.")
     else:
-        st.caption(f"Vista NRT filtrada por el país seleccionado: {alcance_nrt_label}.")
-        fig_nrt = _render_mapa_focos(nrt, pais_sel, color_por_confianza=False, height=400)
+        st.caption(f"Vista NRT filtrada por país/ciudad: {alcance_ciudades_label}.")
+        fig_nrt = _render_mapa_focos(
+            nrt,
+            pais_sel,
+            color_por_confianza=False,
+            height=400,
+            centro_override=centro_ciudades,
+        )
         if fig_nrt is not None:
             st.plotly_chart(fig_nrt, use_container_width=True)
         else:
