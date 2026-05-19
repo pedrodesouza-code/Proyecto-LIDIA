@@ -1,8 +1,8 @@
 # =============================================================================
 # SINIA-SA — Extractor Meteorológico (Open-Meteo)
 # =============================================================================
-# Este módulo descarga datos meteorológicos históricos para los 18 puntos
-# de monitoreo de Sudamérica desde la API gratuita de Open-Meteo.
+# Este módulo descarga datos meteorológicos históricos para los 36 puntos
+# del alcance final desde la API gratuita de Open-Meteo.
 #
 # Open-Meteo es una API meteorológica de código abierto que no requiere
 # registro ni API key. Provee datos desde 1940 hasta el presente.
@@ -12,7 +12,7 @@
 #
 # Modos de descarga:
 #   - Histórico: datos pasados desde el archivo (archive API)
-#   - Todos los puntos: descarga secuencial para los 18 puntos SA
+#   - Todos los puntos: descarga secuencial para los 36 puntos del alcance
 # =============================================================================
 
 import time   # Para agregar pausas entre requests y respetar el rate limiting
@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from config.settings import (
     OPENMETEO_BASE_URL,      # URL base para forecast (pronóstico)
     OPENMETEO_ARCHIVE_URL,   # URL para datos históricos de archivo
-    PUNTOS_METEO,            # Diccionario con los 5 puntos de Uruguay y sus coordenadas
+    PUNTOS_METEO,            # Diccionario con los 36 puntos del alcance y sus coordenadas
     DIR_CRUDO,               # Carpeta data/raw/ para guardar los CSVs descargados
 )
 from etl.utils.logger import setup_logger
@@ -81,7 +81,7 @@ def extraer_meteo_historico(
 
     Args:
         punto:        Nombre del departamento/ciudad. Debe estar en PUNTOS_METEO.
-                      Opciones: "Rivera", "Artigas", "Tacuarembó", "Paysandú", "Montevideo"
+                      Opciones disponibles en config.settings.PUNTOS_METEO.
         fecha_inicio: Fecha de inicio del período histórico (formato YYYY-MM-DD)
         fecha_fin:    Fecha de fin del período (formato YYYY-MM-DD)
         granularidad: "daily" para análisis de riesgo (recomendado)
@@ -188,7 +188,7 @@ def extraer_meteo_todos_los_puntos(
     pausa: float = 0.5,                  # Segundos de pausa entre requests
 ) -> pd.DataFrame:
     """
-    Descarga datos meteorológicos para los 18 puntos de monitoreo de Sudamérica.
+    Descarga datos meteorológicos para los 36 puntos del alcance final.
 
     Llama a extraer_meteo_historico() en secuencia para cada punto y agrega
     una pausa entre requests para respetar el rate limiting de la API.

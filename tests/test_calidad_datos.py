@@ -37,6 +37,57 @@ RESULTADOS_PATH = Path(__file__).resolve().parent / "resultados_tests.json"
 PAISES_ALCANCE = set(PAISES_SA.keys())
 PUNTOS_ALCANCE = set(PUNTOS_METEO_SA.keys())
 LON_MIN, LAT_MIN, LON_MAX, LAT_MAX = [float(v) for v in SA_BBOX.split(",")]
+CAPITALES_DEPARTAMENTALES_UY = {
+    "Artigas",
+    "Canelones",
+    "Melo",
+    "Colonia_del_Sacramento",
+    "Durazno",
+    "Trinidad",
+    "Florida",
+    "Minas",
+    "Maldonado",
+    "Montevideo",
+    "Paysandu",
+    "Fray_Bentos",
+    "Rivera",
+    "Rocha",
+    "Salto",
+    "San_Jose_de_Mayo",
+    "Mercedes",
+    "Tacuarembo",
+    "Treinta_y_Tres",
+}
+
+
+class TestAlcanceConfiguracion:
+    """El alcance final del proyecto debe ser estable y verificable."""
+
+    def test_alcance_final_4_paises_36_puntos(self):
+        conteo = {
+            pais: sum(1 for info in PUNTOS_METEO_SA.values() if info["pais"] == pais)
+            for pais in PAISES_ALCANCE
+        }
+        metricas = {"paises": sorted(PAISES_ALCANCE), "puntos_por_pais": conteo}
+        esperado = {"ARG": 4, "BRA": 5, "CHL": 8, "URY": 19}
+        estado = "PASS" if conteo == esperado and len(PUNTOS_METEO_SA) == 36 else "FAIL"
+        msg = "Alcance final: Uruguay 19 departamentos, Brasil 5 puntos, Argentina 4 puntos, Chile 8 puntos"
+        _guardar_resultado("alcance_final_4_paises_36_puntos", "alcance", estado, metricas, msg)
+        assert PAISES_ALCANCE == {"ARG", "BRA", "CHL", "URY"}
+        assert conteo == esperado
+        assert len(PUNTOS_METEO_SA) == 36
+
+    def test_uruguay_todos_los_departamentos(self):
+        puntos_uy = {nombre for nombre, info in PUNTOS_METEO_SA.items() if info["pais"] == "URY"}
+        faltantes = sorted(CAPITALES_DEPARTAMENTALES_UY - puntos_uy)
+        extras = sorted(puntos_uy - CAPITALES_DEPARTAMENTALES_UY)
+        metricas = {"faltantes": faltantes, "extras": extras, "total_uy": len(puntos_uy)}
+        estado = "PASS" if not faltantes and not extras and len(puntos_uy) == 19 else "FAIL"
+        msg = "Uruguay cubre los 19 departamentos por capital/departamental"
+        _guardar_resultado("alcance_uruguay_19_departamentos", "alcance", estado, metricas, msg)
+        assert not faltantes
+        assert not extras
+        assert len(puntos_uy) == 19
 
 
 # =============================================================================
@@ -230,7 +281,7 @@ class TestConsistencia:
         estado = "PASS" if fuera_bbox == 0 and paises_invalidos == 0 else "FAIL"
         msg = (
             f"{fuera_bbox} focos fuera del bbox regional y "
-            f"{paises_invalidos} con país fuera de BRA/ARG/URY"
+            f"{paises_invalidos} con país fuera de BRA/ARG/URY/CHL"
         )
         _guardar_resultado("consistencia_firms_coordenadas", "calidad", estado, metricas, msg)
         assert fuera_bbox == 0 and paises_invalidos == 0, msg

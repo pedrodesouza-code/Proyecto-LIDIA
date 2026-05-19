@@ -74,7 +74,7 @@ def _filtrar_fechas(df: pd.DataFrame, fecha_inicio: str | None, fecha_fin: str |
 
 @st.cache_data(ttl=600)
 def obtener_rango_focos() -> dict[str, object]:
-    """Rango temporal real de focos dentro del alcance ARG/BRA/URY."""
+    """Rango temporal real de focos dentro del alcance ARG/BRA/URY/CHL."""
     if _pg_disponible():
         try:
             df = _query_pg(f"""

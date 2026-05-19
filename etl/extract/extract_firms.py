@@ -46,7 +46,7 @@ logger = setup_logger("sinia.extract.firms")
 
 # Bounding box de Sudamérica importado desde settings.
 # Formato requerido por la API de FIRMS: "lon_min,lat_min,lon_max,lat_max"
-# Cubre los 6 países núcleo: Brasil, Bolivia, Paraguay, Argentina, Chile, Perú.
+# Cubre el alcance final: Uruguay, Brasil, Argentina y Chile.
 FIRMS_BBOX = SA_BBOX   # "-82.0,-56.0,-34.0,13.0"
 
 # Máximo de días por request que acepta el endpoint de archivo de FIRMS
@@ -93,7 +93,7 @@ def extraer_firms_nrt(
         )
 
     # Construimos la URL de la API para descarga NRT por bounding box (Sudamérica).
-    # Usamos bbox en lugar de código de país porque cubrimos 6 países simultáneamente.
+    # Usamos bbox en lugar de código de país porque cubrimos el alcance regional completo.
     # Formato: /area/csv/{key}/{sensor}/{bbox}/{días_hacia_atrás}
     url = f"{FIRMS_BASE_URL}/{FIRMS_MAP_KEY}/{sensor}/{FIRMS_BBOX}/{dias}"
 

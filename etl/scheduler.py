@@ -271,7 +271,7 @@ def job_cams():
 
 def job_chirps_mensual():
     """
-    Descarga precipitación mensual CHIRPS para los 18 puntos SA y
+    Descarga precipitación mensual CHIRPS para los 36 puntos del alcance final y
     la carga en precipitacion_mensual (PostgreSQL).
 
     Se ejecuta mensualmente porque CHIRPS tiene latencia de ~1 mes.

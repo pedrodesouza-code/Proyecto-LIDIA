@@ -60,6 +60,7 @@ MAPA_FOCOS = {
     "BRA": {"lat": -14.0, "lon": -52.0, "zoom": 3.2},
     "ARG": {"lat": -38.0, "lon": -64.0, "zoom": 3.5},
     "URY": {"lat": -32.7, "lon": -56.0, "zoom": 6.2},
+    "CHL": {"lat": -38.8, "lon": -72.2, "zoom": 4.2},
 }
 
 
@@ -98,8 +99,8 @@ def _render_mapa_focos(df: pd.DataFrame, pais: str | None, color_por_confianza: 
 
 # ── Sidebar — filtros (se definen ANTES de cargar datos) ─────────────────────
 st.sidebar.title("SINIA-UY")
-st.sidebar.caption("Sistema de Monitoreo de Incendios Forestales · UY / BRA / ARG")
-st.sidebar.caption("3 países · 11 puntos · rango real disponible")
+st.sidebar.caption("Sistema de Monitoreo de Incendios Forestales · UY / BRA / ARG / CHL")
+st.sidebar.caption("4 países · 36 puntos · Uruguay completo + Chile volcánico")
 st.sidebar.caption("UTEC · Ingeniería de Datos · 2026")
 st.sidebar.divider()
 
@@ -143,10 +144,11 @@ PAISES_DISP = {
     "Brasil (BRA)":    "BRA",
     "Argentina (ARG)": "ARG",
     "Uruguay (URY)":   "URY",
+    "Chile (CHL)":     "CHL",
 }
 pais_sel_label = st.sidebar.selectbox("País", list(PAISES_DISP.keys()))
 pais_sel = PAISES_DISP[pais_sel_label]
-alcance_nrt_label = "ARG/BRA/URY" if pais_sel is None else pais_sel
+alcance_nrt_label = "ARG/BRA/URY/CHL" if pais_sel is None else pais_sel
 
 # ── Carga de datos (con filtros ya seleccionados) ─────────────────────────────
 firms  = cargar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
@@ -227,15 +229,17 @@ if auto_refresh:
 if pagina == "Resumen General":
 
     st.title("SINIA-UY — Sistema de Monitoreo de Incendios Forestales")
-    st.caption("Uruguay, Brasil y Argentina · 11 puntos de monitoreo · 2018–2025 · Fuentes: NASA FIRMS · Open-Meteo · CAMS · CHIRPS · MODIS")
+    st.caption("Uruguay completo por departamentos + Brasil/Argentina estratégicos + Chile volcánico · 36 puntos · 2018–2025 · Fuentes: NASA FIRMS · Open-Meteo · CAMS · CHIRPS · MODIS")
 
     # ── Explicación del sistema ───────────────────────────────────────────────
     st.info(
         "**¿Qué hace este sistema?**  \n"
         "SINIA-UY integra cinco fuentes de datos satelitales y meteorológicas para responder "
-        "una pregunta central: **¿cuándo, dónde y por qué ocurren incendios forestales en Uruguay, Brasil y Argentina?**  \n\n"
+        "una pregunta central: **¿cuándo, dónde y por qué ocurren incendios forestales y eventos atmosféricos "
+        "transfronterizos que pueden afectar a Uruguay?**  \n\n"
         "El alcance regional se concentra en **Uruguay como país núcleo**, más **Brasil y Argentina** "
-        "como fuentes principales de humo e incendios transfronterizos. Cada fuente aporta una capa de "
+        "como fuentes principales de humo e incendios transfronterizos, y **Chile** como fuente de ceniza "
+        "volcánica y aerosoles de eventos reales como Puyehue-Cordón Caulle y Calbuco. Cada fuente aporta una capa de "
         "información distinta. Combinadas, permiten detectar incendios activos, anticipar condiciones de "
         "riesgo, medir impacto en calidad del aire y correlacionar con precipitación y tipo de cobertura vegetal."
     )
@@ -258,7 +262,7 @@ if pagina == "Resumen General":
 
             **Responde:** ¿Hubo un incendio? ¿Dónde? ¿Qué tan intenso?
 
-            → *3 países analizados en el modelo final*
+            → *4 países analizados en el modelo final*
             """
         )
 
@@ -268,7 +272,7 @@ if pagina == "Resumen General":
             **Open-Meteo + CAMS**
             🌡️ *Clima y calidad del aire*
 
-            API meteorológica open-source para 11 puntos de monitoreo.
+            API meteorológica open-source para 36 puntos de monitoreo.
             Temperatura, humedad, viento y sequía calculan el
             **Índice de Riesgo de Incendio**.
 
@@ -342,7 +346,7 @@ if pagina == "Resumen General":
         "Días de riesgo ALTO o MUY ALTO",
         f"{dias_alto}",
         help="Días en que el Índice de Riesgo superó 0.50. "
-             "Se calculó combinando temperatura, humedad, viento y sequía de los 11 puntos del alcance regional.",
+             "Se calculó combinando temperatura, humedad, viento y sequía de los 36 puntos del alcance regional.",
     )
     c4.metric(
         "Último nivel de riesgo registrado",
@@ -407,7 +411,7 @@ if pagina == "Resumen General":
 
         st.subheader("¿Cuántos días hubo riesgo alto?")
         st.caption(
-            "Distribución del índice de riesgo calculado con datos meteorológicos de los 11 puntos del alcance regional."
+            "Distribución del índice de riesgo calculado con datos meteorológicos de los 36 puntos del alcance regional."
         )
         if not meteo.empty and "nivel_riesgo" in meteo.columns:
             dist = meteo["nivel_riesgo"].value_counts().reset_index()
@@ -452,7 +456,7 @@ if pagina == "Resumen General":
 elif pagina == "Focos de Calor":
 
     st.title("Focos de Calor — NASA FIRMS VIIRS")
-    st.caption(f"Satélite: VIIRS Suomi NPP (Standard Processing) · Período: {periodo_label} · Uruguay, Brasil y Argentina")
+    st.caption(f"Satélite: VIIRS Suomi NPP (Standard Processing) · Período: {periodo_label} · Uruguay, Brasil, Argentina y Chile")
 
     st.info(
         "**¿Qué es un foco de calor?**  \n"
@@ -503,7 +507,7 @@ elif pagina == "Focos de Calor":
             color_por_confianza = False
             st.caption(
                 f"Focos recientes NRT de las últimas 24 horas en {alcance_nrt_label}. "
-                "Cambia el país en el sidebar para ver Brasil, Argentina, Uruguay o todo el alcance."
+                "Cambia el país en el sidebar para ver Brasil, Argentina, Uruguay, Chile o todo el alcance."
             )
         else:
             datos_mapa = firms
@@ -1367,15 +1371,15 @@ elif pagina == "Análisis de Riesgo":
 elif pagina == "Comparativo por País":
 
     st.title("Comparativo por País")
-    st.caption("Análisis comparativo del índice de riesgo y actividad de incendios entre Uruguay, Brasil y Argentina")
+    st.caption("Análisis comparativo del índice de riesgo y actividad de incendios entre Uruguay, Brasil, Argentina y Chile")
 
     st.info(
         "**¿Para qué sirve esta página?**  \n"
         "Permite comparar la evolución del riesgo de incendio y la cantidad de focos detectados "
-        "entre Uruguay, Brasil y Argentina.  \n"
+        "entre Uruguay, Brasil, Argentina y Chile.  \n"
         "Los datos se agregan mensualmente promediando los puntos de monitoreo de cada país. "
         "Esto permite identificar **qué países tienen mayor riesgo estacional** y en qué períodos.  \n\n"
-        "Nota: esta vista requiere datos históricos cargados para los 11 puntos del alcance regional."
+        "Nota: esta vista requiere datos históricos cargados para los 36 puntos del alcance regional."
     )
 
     df_riesgo_pais  = cargar_riesgo_por_pais()
@@ -1419,7 +1423,7 @@ elif pagina == "Comparativo por País":
         else:
             st.warning(
                 "Sin datos de riesgo por país disponibles. "
-                "Ejecuta el ETL para los 11 puntos del alcance regional para ver esta comparación."
+                "Ejecuta el ETL para los 36 puntos del alcance regional para ver esta comparación."
             )
 
     # ── Tab 2: Focos por país ─────────────────────────────────────────────────
@@ -1455,7 +1459,7 @@ elif pagina == "Comparativo por País":
         else:
             st.warning(
                 "Sin datos de focos por país. "
-                "Verificá que el ETL histórico haya corrido para los 11 puntos del alcance regional."
+                "Verificá que el ETL histórico haya corrido para los 36 puntos del alcance regional."
             )
 
     # ── Tab 3: Tabla comparativa ──────────────────────────────────────────────
@@ -1577,7 +1581,7 @@ elif pagina == "Fuentes y Datos Crudos":
 **Acceso:** API REST completamente gratuita, sin clave
 **Granularidad:** Diaria por punto geográfico
 **Cobertura temporal:** Desde 1940 hasta ayer
-**Puntos monitoreados:** 11 ciudades distribuidas entre Uruguay, Brasil y Argentina
+**Puntos monitoreados:** 36 puntos: 19 departamentos de Uruguay + ciudades estratégicas de Brasil, Argentina y Chile + puntos volcánicos
 **Archivo ETL:** `etl/extract/extract_meteo.py`
         """)
     with col2:
@@ -1627,7 +1631,7 @@ elif pagina == "Fuentes y Datos Crudos":
 **Acceso:** Proxy gratuito vía Open-Meteo Air Quality API, sin clave
 **Granularidad:** Horaria por punto (se agrega a diaria en ETL)
 **Cobertura temporal:** 2018–2024
-**Puntos monitoreados:** 11 ciudades del alcance regional
+**Puntos monitoreados:** 36 puntos: Uruguay completo por departamentos + Brasil/Argentina estratégicos + Chile volcánico
 **Archivo ETL:** `etl/extract/extract_cams.py`
         """)
     with col2:
@@ -1677,7 +1681,7 @@ elif pagina == "Fuentes y Datos Crudos":
 **Acceso:** API gratuita vía ClimateSERV (NASA SERVIR)
 **Granularidad:** Mensual por punto geográfico
 **Cobertura temporal:** 1981–presente
-**Puntos monitoreados:** 11 ciudades del alcance regional
+**Puntos monitoreados:** 36 puntos: Uruguay completo por departamentos + Brasil/Argentina estratégicos + Chile volcánico
 **Archivo ETL:** `etl/extract/extract_chirps.py`
         """)
     with col2:

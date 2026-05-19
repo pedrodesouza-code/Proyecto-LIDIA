@@ -219,7 +219,7 @@ def extraer_chirps_todos_los_puntos(
     pausa: float = 2.0,
 ) -> pd.DataFrame:
     """
-    Extrae precipitación mensual CHIRPS para los 18 puntos de monitoreo SA.
+    Extrae precipitación mensual CHIRPS para los 36 puntos del alcance final.
 
     Args:
         anio_inicio: Año de inicio

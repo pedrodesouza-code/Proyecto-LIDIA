@@ -2,7 +2,7 @@
 
 **UTEC | Ingeniería de Datos e Inteligencia Artificial | Proyecto de Ingeniería de Datos | 2026**
 
-Sistema de monitoreo ambiental que integra fuentes de datos satelitales y meteorológicas para detectar, analizar y predecir riesgo de incendios forestales en Uruguay, Brasil y Argentina.
+Sistema de monitoreo ambiental que integra fuentes de datos satelitales y meteorológicas para detectar, analizar y predecir riesgo de incendios forestales y eventos atmosféricos transfronterizos en Uruguay, Brasil, Argentina y Chile.
 
 ---
 

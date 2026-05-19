@@ -7,7 +7,7 @@
 #
 # Contexto del proyecto:
 # Usamos CAMS vía Open-Meteo Air Quality API (proxy gratuito, sin key)
-# para los 18 puntos de monitoreo distribuidos en 6 países de Sudamérica.
+# para los 36 puntos del alcance final: Uruguay completo + Brasil/Argentina estratégicos + Chile volcánico.
 #
 # Variables principales:
 #   - PM10:  Partículas con diámetro ≤ 10 µm (humo de incendios)

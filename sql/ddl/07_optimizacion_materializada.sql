@@ -4,7 +4,7 @@
 -- Objetivo:
 --   Reducir tiempos de consultas analiticas frecuentes sobre focos_calor.
 --   La tabla supera los 10 millones de registros aun luego de acotar el alcance
---   a Uruguay, Brasil y Argentina; por eso se materializan los agregados usados
+--   a Uruguay, Brasil, Argentina y Chile; por eso se materializan los agregados usados
 --   por dashboard, defensa y comparacion SQL vs NoSQL.
 --
 -- Refresco recomendado despues de cada carga incremental:

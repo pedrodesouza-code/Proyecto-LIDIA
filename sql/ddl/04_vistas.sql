@@ -6,7 +6,7 @@
 --   2. Analítica: queries complejas pre-calculadas y reutilizables
 --
 -- Todas las vistas incluyen la columna `pais` para permitir
--- comparaciones entre Uruguay, Brasil y Argentina.
+-- comparaciones entre Uruguay, Brasil, Argentina y Chile.
 -- =============================================================================
 
 -- ── Vista 1: v_riesgo_actual ──────────────────────────────────────────────────
@@ -149,7 +149,7 @@ WHERE m.tipo_dato = 'historico'
 GROUP BY p.pais, DATE_TRUNC('month', m.fecha)
 ORDER BY p.pais, mes;
 
-COMMENT ON VIEW v_riesgo_por_pais IS 'Riesgo de incendio mensual agregado por país — permite comparación entre Uruguay, Brasil y Argentina';
+COMMENT ON VIEW v_riesgo_por_pais IS 'Riesgo de incendio mensual agregado por país — permite comparación entre Uruguay, Brasil, Argentina y Chile';
 
 -- ── Vista 8: v_focos_por_pais_mes ─────────────────────────────────────────────
 -- Cantidad de focos de calor por país y mes (para análisis comparativo)

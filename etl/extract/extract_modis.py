@@ -105,7 +105,7 @@ def solicitar_cobertura_vegetal(
     token: str = None,
 ) -> str:
     """
-    Envía una solicitud de extracción de LC_Type1 a AppEEARS para los 18 puntos.
+    Envía una solicitud de extracción de LC_Type1 a AppEEARS para los 36 puntos.
 
     AppEEARS trabaja de forma asíncrona: esta función envía la solicitud y
     devuelve el task_id para consultarlo más tarde con descargar_resultado().

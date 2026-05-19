@@ -5,9 +5,9 @@ Script para cargar los datos históricos faltantes año a año.
 
 Fuentes:
   - FIRMS VIIRS-SNPP archivo (focos de calor)
-  - Open-Meteo histórico (meteorología diaria, 18 puntos)
+  - Open-Meteo histórico (meteorología diaria, 36 puntos)
   - CAMS via Open-Meteo (calidad del aire, SOLO desde 2022)
-  - CHIRPS via ClimateSERV (precipitación mensual, 18 puntos)
+  - CHIRPS via ClimateSERV (precipitación mensual, 36 puntos)
 
 Estrategia:
   - Procesa un año completo por iteración
@@ -122,7 +122,7 @@ def _cargar_meteo(anio: int) -> None:
     fecha_inicio = f"{anio}-01-01"
     fecha_fin    = f"{anio}-12-31"
 
-    logger.info(f"[METEO] Extrayendo {fecha_inicio} -> {fecha_fin} (18 puntos)...")
+    logger.info(f"[METEO] Extrayendo {fecha_inicio} -> {fecha_fin} (36 puntos)...")
     df_crudo = extraer_meteo_todos_los_puntos(
         fecha_inicio=fecha_inicio,
         fecha_fin=fecha_fin,
@@ -158,7 +158,7 @@ def _cargar_cams(anio: int) -> None:
     fecha_inicio = f"{anio}-01-01"
     fecha_fin    = f"{anio}-12-31"
 
-    logger.info(f"[CAMS] Extrayendo {fecha_inicio} -> {fecha_fin} (18 puntos)...")
+    logger.info(f"[CAMS] Extrayendo {fecha_inicio} -> {fecha_fin} (36 puntos)...")
     df_crudo = extraer_cams_todos_los_puntos(
         fecha_inicio=fecha_inicio,
         fecha_fin=fecha_fin,
@@ -190,7 +190,7 @@ def _cargar_chirps(anio: int) -> None:
     from etl.transform.transform_chirps import transformar_chirps
     from etl.load.load_postgres import cargar_precipitacion
 
-    logger.info(f"[CHIRPS] Extrayendo año {anio} (18 puntos)...")
+    logger.info(f"[CHIRPS] Extrayendo año {anio} (36 puntos)...")
     df_crudo = extraer_chirps_todos_los_puntos(
         anio_inicio=anio,
         anio_fin=anio,

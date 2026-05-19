@@ -35,10 +35,11 @@ _bbox_vals = [float(v) for v in SA_BBOX.split(",")]
 SA_LON_MIN, SA_LAT_MIN, SA_LON_MAX, SA_LAT_MAX = _bbox_vals
 
 # Bounding boxes por país para asignar el campo pais durante la transformación.
-# Permite filtrar explícitamente al alcance BRA/ARG/URY sin depender solo del bbox.
+# Permite filtrar explícitamente al alcance BRA/ARG/URY/CHL sin depender solo del bbox.
 # Formato: código_iso3 -> (lat_min, lat_max, lon_min, lon_max)
 _BBOX_PAISES = {
     "URY": (-34.9, -30.1, -58.4, -53.1),  # Primero para evitar absorción por ARG/BRA
+    "CHL": (-56.0, -17.5, -75.7, -66.4),
     "ARG": (-55.1, -21.8, -73.6, -53.6),
     "BRA": (-34.0,   5.3, -73.9, -34.8),
 }
@@ -129,7 +130,7 @@ def transformar_firms(df: pd.DataFrame, guardar: bool = True) -> pd.DataFrame:
         for cod, (lat_min, lat_max, lon_min, lon_max) in _BBOX_PAISES.items():
             if lat_min <= lat <= lat_max and lon_min <= lon <= lon_max:
                 return cod
-        return "OTR"   # Otro (fuera del alcance BRA/ARG/URY pero dentro del bbox regional)
+        return "OTR"   # Otro (fuera del alcance BRA/ARG/URY/CHL pero dentro del bbox regional)
 
     df["pais"] = [
         _asignar_pais(lat, lon)
@@ -140,7 +141,7 @@ def transformar_firms(df: pd.DataFrame, guardar: bool = True) -> pd.DataFrame:
     focos_fuera_alcance = int((~df["pais"].isin(paises_validos)).sum())
     if focos_fuera_alcance > 0:
         logger.info(
-            f"  Eliminando {focos_fuera_alcance} focos fuera del alcance BRA/ARG/URY",
+            f"  Eliminando {focos_fuera_alcance} focos fuera del alcance BRA/ARG/URY/CHL",
             extra={"etl_stage": "transform", "source": "firms"},
         )
     df = df[df["pais"].isin(paises_validos)].copy()
