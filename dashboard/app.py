@@ -1173,16 +1173,10 @@ elif pagina == "Análisis de Riesgo":
     except ImportError:
         _analytics_ok = False
 
-    tab_rank, tab_estac, tab_anom, tab_corr, tab_criticos = st.tabs([
-        "Ranking de Zonas",
-        "Estacionalidad",
-        "Anomalías",
-        "Correlación Focos-Riesgo",
-        "Días Críticos",
-    ])
+    st.caption("La seccion se muestra completa en bloques abiertos para defensa: ranking, estacionalidad, anomalias, correlacion y dias criticos.")
 
     # ── Tab 1: Ranking de zonas ───────────────────────────────────────────────
-    with tab_rank:
+    with st.expander("Ranking de Zonas", expanded=True):
         st.subheader("¿Qué punto de monitoreo tiene mayor exposición histórica al riesgo?")
         st.caption(
             "**Cómo se calcula el score:** 50% índice de riesgo promedio del período "
@@ -1240,7 +1234,7 @@ elif pagina == "Análisis de Riesgo":
             st.warning("No hay datos meteorológicos suficientes.")
 
     # ── Tab 2: Análisis estacional ────────────────────────────────────────────
-    with tab_estac:
+    with st.expander("Estacionalidad", expanded=True):
         st.subheader("¿En qué época del año hay más riesgo de incendio?")
         st.caption(
             "Esta pregunta es clave para la gestión preventiva: si sabemos que el riesgo "
@@ -1300,7 +1294,7 @@ elif pagina == "Análisis de Riesgo":
             st.warning("Sin datos para análisis estacional.")
 
     # ── Tab 3: Anomalías ──────────────────────────────────────────────────────
-    with tab_anom:
+    with st.expander("Anomalias", expanded=True):
         st.subheader("¿Hubo días con condiciones excepcionalmente peligrosas?")
         st.caption(
             "Se usa **Isolation Forest**, un algoritmo de Machine Learning no supervisado que "
@@ -1371,7 +1365,7 @@ elif pagina == "Análisis de Riesgo":
             st.warning("Sin datos para análisis de anomalías.")
 
     # ── Tab 4: Correlación focos-riesgo ───────────────────────────────────────
-    with tab_corr:
+    with st.expander("Correlacion Focos-Riesgo", expanded=True):
         st.subheader("¿El índice de riesgo realmente predice la ocurrencia de incendios?")
         st.caption(
             "Esta es la **validación del modelo**: si el índice que calculamos es útil, "
@@ -1445,7 +1439,7 @@ elif pagina == "Análisis de Riesgo":
             st.warning("Se necesitan datos de focos y meteorología simultáneamente.")
 
     # ── Tab 5: Días críticos ──────────────────────────────────────────────────
-    with tab_criticos:
+    with st.expander("Dias Criticos", expanded=True):
         st.subheader("Días históricos con riesgo ALTO o MUY ALTO")
         st.caption(
             "Registro de todos los días en que al menos un punto de monitoreo superó el "

@@ -650,20 +650,42 @@ def cargar_dias_criticos() -> pd.DataFrame:
         return pd.DataFrame()
     df = pd.concat(frames, ignore_index=True)
     df["fecha"] = pd.to_datetime(df["fecha"])
-    df = df[
-        df["nivel_riesgo"].isin(["alto", "muy_alto"])
-        & (df.get("tipo_dato") == "historico")
-        & df["pais"].isin(PAISES_ALCANCE)
-    ].copy()
+    if "pais" not in df.columns and "punto" in df.columns:
+        punto_pais = {}
+        for punto, info in PUNTOS_METEO_SA.items():
+            if isinstance(info, dict):
+                pais = info.get("pais")
+            else:
+                pais = None
+            if pais:
+                punto_pais[punto] = pais
+        df["pais"] = df["punto"].map(punto_pais)
+
+    mascara = df["nivel_riesgo"].isin(["alto", "muy_alto"])
+    if "tipo_dato" in df.columns:
+        mascara &= df["tipo_dato"].eq("historico")
+    if "pais" in df.columns:
+        mascara &= df["pais"].isin(PAISES_ALCANCE)
+    df = df[mascara].copy()
     if df.empty:
         return pd.DataFrame()
-    agg = df.groupby("fecha").agg(
-        puntos_en_alerta=("punto", "nunique"),
-        paises_en_alerta=("pais", "nunique"),
-        indice_maximo=("indice_riesgo", "max"),
-        paises_afectados=("pais", lambda s: ", ".join(sorted(s.unique()))),
-        puntos_afectados=("punto", lambda s: ", ".join(sorted(s.unique()))),
-    ).reset_index().sort_values("fecha", ascending=False).reset_index(drop=True)
+    agg_kwargs = {
+        "puntos_en_alerta": ("punto", "nunique"),
+        "indice_maximo": ("indice_riesgo", "max"),
+        "puntos_afectados": ("punto", lambda s: ", ".join(sorted(s.unique()))),
+    }
+    if "pais" in df.columns and df["pais"].notna().any():
+        agg_kwargs.update({
+            "paises_en_alerta": ("pais", "nunique"),
+            "paises_afectados": ("pais", lambda s: ", ".join(sorted(s.dropna().unique()))),
+        })
+    agg = (
+        df.groupby("fecha")
+        .agg(**agg_kwargs)
+        .reset_index()
+        .sort_values("fecha", ascending=False)
+        .reset_index(drop=True)
+    )
     agg.attrs["fuente"] = "parquet"
     return agg
 
