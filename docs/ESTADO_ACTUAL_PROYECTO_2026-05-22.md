@@ -1,4 +1,4 @@
-# Estado actual del proyecto - 2026-05-20
+# Estado actual del proyecto - 2026-05-22
 
 Este documento es la fuente de verdad operativa para defensa. Los documentos fechados el `2026-05-15` quedan como evidencia historica de una sincronizacion UTEC anterior y no reemplazan el estado actual del repositorio.
 
@@ -26,7 +26,7 @@ Chile forma parte del alcance actual por su relevancia para eventos volcanicos y
 |---|---|
 | Tests automatizados | `20 PASS / 0 FAIL` |
 | Comando validado | `pytest tests -q` |
-| Resultado de ultima corrida | `20 passed in 7.72s` |
+| Resultado de ultima corrida | `20 passed in 16.77s` |
 | FIRMS procesado | `1.946.361` focos |
 | Alcance en reportes actuales | `ARG`, `BRA`, `CHL`, `URY` |
 | Cobertura de datasets | `36` puntos en meteo, CAMS y CHIRPS |

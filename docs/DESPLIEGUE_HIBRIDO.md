@@ -1,6 +1,6 @@
 # Despliegue hibrido
 
-Revision actualizada: **2026-05-20**.
+Revision actualizada: **2026-05-22**.
 
 La consigna pide integrar componentes en infraestructura institucional/in situ y componentes ejecutables localmente o en entorno cloud. El proyecto cubre esa arquitectura con PostgreSQL, MongoDB, Streamlit, Docker y configuracion externa.
 
@@ -27,7 +27,7 @@ La consigna pide integrar componentes en infraestructura institucional/in situ y
 
 ## Evidencia actual
 
-- `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`
+- `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md`
 - `reports/carga_completa_ultimo.json`
 - `reports/sql_vs_nosql_real_ultimo.json`
 - `tests/resultados_tests.json`

@@ -1,8 +1,8 @@
 # Matriz de cumplimiento contra consigna 2026
 
-Revision operativa actualizada: **2026-05-20**.
+Revision operativa actualizada: **2026-05-22**.
 
-Fuente de verdad del estado actual: `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`.
+Fuente de verdad del estado actual: `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md`.
 
 ## Estado ejecutivo
 
@@ -19,8 +19,8 @@ Alcance vigente:
 
 | Requisito de la consigna | Estado | Evidencia actual | Nota de defensa |
 |---|---:|---|---|
-| Problema real con datos abiertos | Cumplido | `docs/PROYECTO_FINAL_EC1_EC2.md`, `docs/FUENTES_Y_DATOS.md` | Riesgo de incendios y condiciones ambientales regionales. |
-| Arquitectura multicapa | Cumplido | `README.md`, `docs/ARQUITECTURA.md`, `docs/figures/` | Fuentes -> ETL -> SQL/NoSQL -> dashboard. |
+| Problema real con datos abiertos | Cumplido | `docs/UNIFICACION_EC1_EC2_EC3_FOCO_EC3_2026-05-22.md`, `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md` | Riesgo de incendios y condiciones ambientales regionales. |
+| Arquitectura multicapa | Cumplido | `README.md`, `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md`, `docs/figures/` | Fuentes -> ETL -> SQL/NoSQL -> dashboard. |
 | Persistencia poliglota SQL + NoSQL | Cumplido | `sql/`, `nosql/`, `etl/load/` | PostgreSQL analitico, MongoDB operacional. |
 | Python para ETL | Cumplido | `etl/extract/`, `etl/transform/`, `etl/load/`, `etl/scheduler.py` | Pipeline modular y reproducible. |
 | Idempotencia del pipeline | Cumplido | `tests/test_calidad_datos.py`, `tests/resultados_tests.json` | Mostrar reporte con 20 tests. |
@@ -41,30 +41,30 @@ Alcance vigente:
 
 | Requisito EC1 | Estado | Evidencia actual |
 |---|---:|---|
-| Introduccion al dominio | Cumplido | `docs/INFORME_EC1.md`, `docs/PROYECTO_FINAL_EC1_EC2.md` |
-| Contexto, actores, variables, dimension temporal y espacial | Cumplido | `docs/INFORME_EC1.md`, `docs/FUENTES_Y_DATOS.md` |
-| Problema claro y delimitado | Cumplido | `docs/PROYECTO_FINAL_EC1_EC2.md` |
-| Objetivos | Cumplido | `docs/INFORME_EC1.md` |
+| Introduccion al dominio | Cumplido | `docs/UNIFICACION_EC1_EC2_EC3_FOCO_EC3_2026-05-22.md`, `docs/_archivo/historico/INFORME_EC1.md` |
+| Contexto, actores, variables, dimension temporal y espacial | Cumplido | `docs/UNIFICACION_EC1_EC2_EC3_FOCO_EC3_2026-05-22.md`, `docs/_archivo/historico/FUENTES_Y_DATOS.md` |
+| Problema claro y delimitado | Cumplido | `docs/UNIFICACION_EC1_EC2_EC3_FOCO_EC3_2026-05-22.md` |
+| Objetivos | Cumplido | `docs/UNIFICACION_EC1_EC2_EC3_FOCO_EC3_2026-05-22.md`, `docs/_archivo/historico/INFORME_EC1.md` |
 | Minimo 3 fuentes reales y heterogeneas | Cumplido | FIRMS, Open-Meteo, CAMS, CHIRPS, MODIS |
 | Exploracion preliminar real | Cumplido | Datos procesados y reportes en `reports/` |
 | Calidad preliminar | Cumplido | `tests/test_calidad_datos.py` |
-| Viabilidad SQL + NoSQL | Cumplido | `docs/ARQUITECTURA.md`, `sql/`, `nosql/` |
+| Viabilidad SQL + NoSQL | Cumplido | `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md`, `sql/`, `nosql/` |
 | Preguntas analiticas | Cumplido | `sql/queries/01_analiticas.sql`, `docs/CORRESPONDENCIA_PREGUNTAS_CONSULTAS_DASHBOARD.md` |
 
 ## EC2 - Diseno de la solucion
 
 | Requisito EC2 | Estado | Evidencia actual |
 |---|---:|---|
-| Modelo ER/EER y explicacion formal | Cumplido | `docs/figures/figura_4_esquema_estrella.svg`, `docs/PROYECTO_FINAL_EC1_EC2.md` |
+| Modelo ER/EER y explicacion formal | Cumplido | `docs/figures/figura_4_esquema_estrella.svg`, `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md` |
 | Transformacion al modelo relacional | Cumplido | `sql/ddl/02_schema.sql`, `docs/ANEXO_A_DDL_MYSQL.md` |
-| Normalizacion justificada | Cumplido | `docs/PROYECTO_FINAL_EC1_EC2.md` |
+| Normalizacion justificada | Cumplido | `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md` |
 | Esquema fisico | Cumplido | `sql/ddl/` |
 | Modelo NoSQL | Cumplido | `nosql/schemas/`, `docs/ANEXO_B_JSON_SCHEMA_MONGODB.md` |
-| Arquitectura detallada | Cumplido | `docs/ARQUITECTURA.md`, `docs/figures/figura_5_arquitectura_detallada.svg` |
-| Diseno detallado del ETL | Cumplido | `etl/`, `docs/PROYECTO_FINAL_EC1_EC2.md` |
+| Arquitectura detallada | Cumplido | `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md`, `docs/figures/figura_5_arquitectura_detallada.svg` |
+| Diseno detallado del ETL | Cumplido | `etl/`, `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md` |
 | Constraints SQL y JSON Schema | Cumplido | `sql/ddl/02_schema.sql`, `nosql/schemas/` |
 | KPIs | Cumplido | `dashboard/app.py` |
-| Trade-offs | Cumplido | `docs/PROYECTO_FINAL_EC1_EC2.md`, `docs/SLA_Y_RENDIMIENTO.md` |
+| Trade-offs | Cumplido | `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md`, `docs/SLA_Y_RENDIMIENTO.md` |
 
 ## EC3 - Implementacion
 
@@ -87,7 +87,7 @@ Alcance vigente:
 
 ## Prioridad para defensa
 
-1. Mostrar `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`.
+1. Mostrar `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md`.
 2. Ejecutar `pytest tests -q`.
 3. Mostrar `reports/carga_completa_ultimo.json`.
 4. Mostrar `reports/sql_vs_nosql_real_ultimo.json`.

@@ -1,6 +1,6 @@
 # SLA y rendimiento
 
-Revision actualizada: **2026-05-20**.
+Revision actualizada: **2026-05-22**.
 
 Reportes usados:
 

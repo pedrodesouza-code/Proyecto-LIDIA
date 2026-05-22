@@ -1,6 +1,6 @@
 # Replicacion y sharding
 
-Revision actualizada: **2026-05-20**.
+Revision actualizada: **2026-05-22**.
 
 La consigna pide replicacion en ambos motores y sharding o simulacion de alto volumen. En este proyecto se adopta una postura explicita:
 

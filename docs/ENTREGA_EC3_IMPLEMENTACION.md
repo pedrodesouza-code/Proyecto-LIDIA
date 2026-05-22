@@ -1,8 +1,8 @@
 # Entrega EC3 - Implementacion funcional
 
-Estado operativo actualizado: **2026-05-20**.
+Estado operativo actualizado: **2026-05-22**.
 
-La fuente de verdad del estado actual es `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`. Los documentos fechados el `2026-05-15` se conservan como evidencia historica de una sincronizacion UTEC anterior.
+La fuente de verdad del estado actual es `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md`. Los documentos fechados el `2026-05-15` se conservan como evidencia historica de una sincronizacion UTEC anterior.
 
 ## Resumen ejecutivo
 

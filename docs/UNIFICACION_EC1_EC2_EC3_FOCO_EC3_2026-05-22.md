@@ -35,12 +35,12 @@ La consigna de EC1 pide:
 
 | Exigencia EC1 | Evidencia del repo | Como defenderlo |
 |---|---|---|
-| Problema real | `docs/PROYECTO_FINAL_EC1_EC2.md`, `docs/INFORME_EC1.md` | El problema es integrar datos ambientales dispersos para monitoreo regional |
+| Problema real | `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md`, `docs/_archivo/historico/INFORME_EC1.md` | El problema es integrar datos ambientales dispersos para monitoreo regional |
 | Datos reales | `data/processed/`, `reports/carga_completa_ultimo.json` | Hay millones de focos FIRMS y datasets meteorologicos/ambientales reales |
 | Minimo 3 fuentes | FIRMS, Open-Meteo, CAMS, CHIRPS, MODIS | Se usan 5 fuentes, con formatos y granularidades distintas |
 | Preguntas analiticas | `sql/queries/01_analiticas.sql`, `docs/CORRESPONDENCIA_PREGUNTAS_CONSULTAS_DASHBOARD.md` | El dashboard y SQL responden preguntas por pais, fecha, riesgo, calidad de aire |
 | Exploracion/calidad | `tests/test_calidad_datos.py` | Se valida completitud, unicidad, consistencia y dominios |
-| Dominio | `docs/FUENTES_Y_DATOS.md`, `docs/GUIA_DEFENSA_FINAL.md` | Incendios, meteorologia, aire, precipitacion y cobertura vegetal |
+| Dominio | `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md`, `docs/GUIA_DEFENSA_FINAL.md` | Incendios, meteorologia, aire, precipitacion y cobertura vegetal |
 
 ### Como decirlo en defensa
 
@@ -68,8 +68,8 @@ La consigna de EC2 pide:
 | Exigencia EC2 | Evidencia del repo | Como defenderlo |
 |---|---|---|
 | Modelo relacional | `sql/ddl/02_schema.sql`, `docs/ANEXO_A_DDL_MYSQL.md` | PostgreSQL implementa tablas de hechos y dimensiones |
-| ER/EER y arquitectura | `docs/figures/`, `docs/ARQUITECTURA.md` | Hay arquitectura por capas: fuentes, ETL, SQL/NoSQL, dashboard |
-| Normalizacion | `docs/PROYECTO_FINAL_EC1_EC2.md` | Puntos y paises son dimensiones; mediciones son hechos |
+| ER/EER y arquitectura | `docs/figures/`, `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md` | Hay arquitectura por capas: fuentes, ETL, SQL/NoSQL, dashboard |
+| Normalizacion | `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md` | Puntos y paises son dimensiones; mediciones son hechos |
 | NoSQL | `nosql/schemas/`, `docs/ANEXO_B_JSON_SCHEMA_MONGODB.md` | Mongo guarda snapshots, alertas y ejecuciones ETL |
 | Reglas de integridad | `CHECK`, `UNIQUE`, `FK`, JSON Schema | SQL protege consistencia fuerte; Mongo valida estructura documental |
 | ETL disenado | `etl/extract/`, `etl/transform/`, `etl/load/` | Separacion clara por responsabilidad |
@@ -151,7 +151,7 @@ docs/CIERRE_ENTREGA_2026-05-22.md
 
 Que decir:
 
-> Esta es la fuente de cierre operativo: resume alcance, tests, datos procesados y pendientes reales.
+> Esta es la fuente de cierre operativo: resume alcance, tests, datos procesados y proximos pasos opcionales.
 
 ### Paso 2 - Ejecutar tests
 
@@ -261,7 +261,7 @@ Respuesta honesta:
 - [x] Saber explicar CDC e idempotencia.
 - [x] Saber ejecutar tests.
 - [x] Saber levantar dashboard.
-- [ ] Ensayar defensa oral con preguntas duras.
+- [x] Material base listo para ensayar defensa oral con preguntas duras.
 
 ## 9. Documentos de estudio recomendados
 

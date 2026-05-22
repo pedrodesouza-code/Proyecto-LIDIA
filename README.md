@@ -124,7 +124,7 @@ docker compose -f docker/docker-compose.yml --env-file docker/.env.example confi
 Los documentos con fecha `2026-05-15` reflejan una sincronizacion historica UTEC de alcance anterior. La fuente de verdad actual del repositorio para defensa es:
 
 - `docs/CIERRE_ENTREGA_2026-05-22.md`
-- `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`
+- `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md`
 - `docs/ENTREGA_EC3_IMPLEMENTACION.md`
 - `docs/GUIA_DEFENSA_FINAL.md`
 - `docs/MATRIZ_CUMPLIMIENTO_CONSIGNA_2026.md`

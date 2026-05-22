@@ -1,8 +1,8 @@
 # Guia de defensa final
 
-Estado oficial: **2026-05-20**.
+Estado oficial: **2026-05-22**.
 
-Usar esta guia junto con `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`.
+Usar esta guia junto con `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md`.
 
 ## 1. Apertura
 
@@ -16,7 +16,7 @@ El proyecto tiene dos niveles de evidencia:
 
 | Nivel | Que representa | Archivo |
 |---|---|---|
-| Estado actual local | 4 paises, 36 puntos, 20 tests | `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md` |
+| Estado actual local | 4 paises, 36 puntos, 20 tests | `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md` |
 | Evidencia UTEC historica | Sincronizacion institucional del 2026-05-15 con alcance anterior | `reports/utec_verificacion_ultimo.json` |
 
 Si el tribunal pregunta por Chile en UTEC, responder:
@@ -71,7 +71,7 @@ http://localhost:8501
 
 | Tema | Archivo |
 |---|---|
-| Estado actual | `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md` |
+| Estado actual | `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md` |
 | Consigna vs cumplimiento | `docs/MATRIZ_CUMPLIMIENTO_CONSIGNA_2026.md` |
 | Entrega EC3 | `docs/ENTREGA_EC3_IMPLEMENTACION.md` |
 | Tests | `tests/resultados_tests.json` |

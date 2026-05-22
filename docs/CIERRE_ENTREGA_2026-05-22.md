@@ -45,11 +45,10 @@ Punto importante:
 - El estado funcional actual del repositorio es el alcance de cuatro paises y treinta y seis puntos, validado localmente el `2026-05-22`.
 - No afirmar que Chile ya esta sincronizado en UTEC salvo que se ejecute una nueva verificacion remota y el reporte lo confirme.
 
-## Pendientes reales antes de cerrar el dia
+## Pendientes opcionales antes de defensa
 
-- Revisar visualmente el dashboard local con `streamlit run dashboard/app.py`.
-- Decidir si se commitean los cambios documentales y reportes generados.
-- Si se va a entregar en UTEC, ejecutar una nueva verificacion remota para que el servidor refleje el alcance actual.
+- Si se va a demostrar UTEC, ejecutar una nueva verificacion remota para que el servidor refleje el alcance actual con Chile.
+- Ensayar la defensa oral usando `docs/UNIFICACION_EC1_EC2_EC3_FOCO_EC3_2026-05-22.md` y `docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md`.
 
 ## Checklist de cierre rapido
 
@@ -57,5 +56,5 @@ Punto importante:
 - [x] Compilacion Python sin errores.
 - [x] Docker Compose con configuracion valida.
 - [x] Fuente de verdad documental actualizada.
-- [ ] Dashboard revisado visualmente en navegador.
-- [ ] Cambios commiteados/pusheados si corresponde.
+- [x] Dashboard revisado en navegador local.
+- [x] Cambios commiteados y pusheados.
