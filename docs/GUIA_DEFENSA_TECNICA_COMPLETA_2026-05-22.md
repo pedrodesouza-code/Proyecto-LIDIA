@@ -702,6 +702,18 @@ Datos procesados principales:
 | `modis_lc.parquet` | 63 |
 | `eventos_volcanicos_impacto_uruguay.parquet` | 2 |
 
+Distribucion vigente de `firms_nrt_procesado.parquet` por pais, luego de
+reclasificar el snapshot NRT con el alcance actual `ARG/BRA/CHL/URY`:
+
+| Pais | Focos NRT |
+|---|---:|
+| ARG | 1.334 |
+| BRA | 2.930 |
+| CHL | 945 |
+| URY | 74 |
+
+Evidencia reproducible: `reports/firms_nrt_reclasificacion_ultimo.json`.
+
 Validaciones del cierre:
 
 - tests: 20 passed;
