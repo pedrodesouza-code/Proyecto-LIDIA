@@ -1,4 +1,4 @@
-# Evidencia de rendimiento y MongoDB
+﻿# Evidencia de rendimiento y MongoDB
 
 Este documento resume la evidencia generada para rendimiento preliminar,
 comparacion SQL/NoSQL y estado de MongoDB local.
@@ -41,7 +41,7 @@ Del reporte `reports/rendimiento_ultimo.json`:
 
 | Metrica | Tiempo promedio | Resultado |
 |---|---:|---:|
-| Lectura FIRMS procesado | `475.071 ms` | `1.836.537` filas |
+| Lectura FIRMS procesado | `1104.172 ms` | `1.946.361` filas |
 | Focos por mes | `346.579 ms` | `12` meses |
 | Ranking dias con focos | `49.441 ms` | `417.340` |
 | Riesgo por punto | `2.775 ms` | `5.748` |

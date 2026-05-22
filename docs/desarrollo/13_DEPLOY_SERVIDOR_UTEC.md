@@ -1,29 +1,29 @@
-# 13 — Deploy al servidor UTEC
+﻿# 13 â€” Deploy al servidor UTEC
 
-> **Atención**: esta guía asume un servidor Linux (Ubuntu Server 22.04 LTS o similar) con acceso SSH. Si el servidor de UTEC es algo distinto (un servicio gestionado tipo VPS administrado, una VM con Windows Server, o un servicio PaaS), ajustá la sección 1 según corresponda. La lógica de fondo es la misma: instalar Postgres y Mongo, clonar el repo, configurar el `.env`, levantar el ETL y exponer el dashboard.
+> **AtenciÃ³n**: esta guÃ­a asume un servidor Linux (Ubuntu Server 22.04 LTS o similar) con acceso SSH. Si el servidor de UTEC es algo distinto (un servicio gestionado tipo VPS administrado, una VM con Windows Server, o un servicio PaaS), ajustÃ¡ la secciÃ³n 1 segÃºn corresponda. La lÃ³gica de fondo es la misma: instalar Postgres y Mongo, clonar el repo, configurar el `.env`, levantar el ETL y exponer el dashboard.
 
-## Datos del servidor que necesitás antes de empezar
+## Datos del servidor que necesitÃ¡s antes de empezar
 
-Pedile al docente o al área de infraestructura:
+Pedile al docente o al Ã¡rea de infraestructura:
 
-| Dato | Ejemplo | Cómo se usa |
+| Dato | Ejemplo | CÃ³mo se usa |
 |------|---------|-------------|
 | IP o hostname | `servidor.utec.edu.uy` o `192.168.x.x` | Para SSH |
 | Usuario SSH | `rquintana` | `ssh usuario@host` |
-| Forma de autenticación | clave pública o contraseña | Para conectarte |
-| Sistema operativo | Ubuntu 22.04 | Determina los comandos de instalación |
-| Permisos sudo | sí/no | Para instalar paquetes |
+| Forma de autenticaciÃ³n | clave pÃºblica o contraseÃ±a | Para conectarte |
+| Sistema operativo | Ubuntu 22.04 | Determina los comandos de instalaciÃ³n |
+| Permisos sudo | sÃ­/no | Para instalar paquetes |
 | Puertos abiertos | 5432? 27017? 8501? 22? 443? | Define si el dashboard se ve desde fuera |
-| ¿Docker disponible? | sí/no | Define si usamos contenedores o instalación nativa |
-| ¿Hay dominio asignado? | `sinia.utec.edu.uy` | Para configurar nginx/reverse proxy |
+| Â¿Docker disponible? | sÃ­/no | Define si usamos contenedores o instalaciÃ³n nativa |
+| Â¿Hay dominio asignado? | `sinia.utec.edu.uy` | Para configurar nginx/reverse proxy |
 | Espacio en disco | 20 GB+ recomendado | Postgres + Mongo + logs crecen |
 | RAM | 4 GB+ recomendado | Postgres + Mongo + Streamlit + scheduler |
 
-**Anotalos en un archivo local `servidor_utec.md` (NO commitearlo) o en tu gestor de contraseñas.**
+**Anotalos en un archivo local `servidor_utec.md` (NO commitearlo) o en tu gestor de contraseÃ±as.**
 
-## Escenario A — Servidor con Docker disponible (recomendado)
+## Escenario A â€” Servidor con Docker disponible (recomendado)
 
-Es el camino más limpio: replicás casi exacto el setup local.
+Es el camino mÃ¡s limpio: replicÃ¡s casi exacto el setup local.
 
 ### A.1 Conectarse al servidor
 
@@ -32,7 +32,7 @@ Es el camino más limpio: replicás casi exacto el setup local.
 ssh tu_usuario@servidor.utec.edu.uy
 ```
 
-Si te pide contraseña, ingresala. Si configuraste clave SSH, entra directo.
+Si te pide contraseÃ±a, ingresala. Si configuraste clave SSH, entra directo.
 
 ### A.2 Verificar Docker
 
@@ -41,7 +41,7 @@ docker --version
 docker compose version
 ```
 
-Si no están instalados, pedile al admin del servidor que los instale (en Ubuntu: `sudo apt install docker.io docker-compose-v2 && sudo usermod -aG docker $USER`). Cerrá y volvé a abrir la sesión SSH para que el grupo `docker` tome efecto.
+Si no estÃ¡n instalados, pedile al admin del servidor que los instale (en Ubuntu: `sudo apt install docker.io docker-compose-v2 && sudo usermod -aG docker $USER`). CerrÃ¡ y volvÃ© a abrir la sesiÃ³n SSH para que el grupo `docker` tome efecto.
 
 ### A.3 Clonar el repo
 
@@ -53,32 +53,32 @@ cd sinia-uy
 git checkout main                                 # asegurarte de estar en main
 ```
 
-Si el repo es privado, configurá una clave SSH del servidor en GitHub (Settings → SSH Keys) y cloná con `git@github.com:...`. O usá un Personal Access Token de solo lectura.
+Si el repo es privado, configurÃ¡ una clave SSH del servidor en GitHub (Settings â†’ SSH Keys) y clonÃ¡ con `git@github.com:...`. O usÃ¡ un Personal Access Token de solo lectura.
 
 ### A.4 Configurar el `.env` del servidor
 
-**No copies el `.env` de tu PC.** En el servidor las contraseñas deben ser distintas y más fuertes:
+**No copies el `.env` de tu PC.** En el servidor las contraseÃ±as deben ser distintas y mÃ¡s fuertes:
 
 ```bash
 cp docker/.env.example docker/.env
 nano docker/.env
 ```
 
-Generá contraseñas largas con `openssl rand -base64 32` y pegalas en `docker/.env`:
+GenerÃ¡ contraseÃ±as largas con `openssl rand -base64 32` y pegalas en `docker/.env`:
 
 ```env
 PG_SUPERUSER=postgres
-PG_SUPERPASS=<contraseña_fuerte_postgres_super>
+PG_SUPERPASS=<contraseÃ±a_fuerte_postgres_super>
 PG_DATABASE=sinia_uy
 PG_USER=sinia_etl_user
-PG_PASSWORD=<contraseña_fuerte_etl>
+PG_PASSWORD=<contraseÃ±a_fuerte_etl>
 PG_PORT=5432
 
 MONGO_ROOT_USER=mongo_admin
-MONGO_ROOT_PASS=<contraseña_fuerte_mongo_root>
+MONGO_ROOT_PASS=<contraseÃ±a_fuerte_mongo_root>
 MONGO_DATABASE=sinia_uy
 MONGO_USER=sinia_etl_user
-MONGO_PASSWORD=<contraseña_fuerte_mongo_etl>
+MONGO_PASSWORD=<contraseÃ±a_fuerte_mongo_etl>
 MONGO_PORT=27017
 
 FIRMS_MAP_KEY=<tu_api_key_firms>
@@ -86,21 +86,21 @@ LOG_LEVEL=INFO
 TIMEZONE=America/Montevideo
 ```
 
-Y también `config/.env` para el ETL Python:
+Y tambiÃ©n `config/.env` para el ETL Python:
 
 ```bash
 cp docker/.env config/.env
 nano config/.env
 ```
 
-Cambiá los hosts a los nombres del contenedor (lo verás en `docker-compose.yml`):
+CambiÃ¡ los hosts a los nombres del contenedor (lo verÃ¡s en `docker-compose.yml`):
 
 ```env
 PG_HOST=localhost           # el ETL python corre fuera de los containers
 PG_PORT=5432
 MONGO_HOST=localhost
 MONGO_PORT=27017
-# ... resto idéntico a docker/.env
+# ... resto idÃ©ntico a docker/.env
 ```
 
 ### A.5 Levantar Postgres y Mongo
@@ -111,7 +111,7 @@ docker compose up -d postgres mongo
 docker compose ps
 ```
 
-Esperá los healthchecks. Verificá:
+EsperÃ¡ los healthchecks. VerificÃ¡:
 
 ```bash
 docker compose logs postgres | tail -50
@@ -154,7 +154,7 @@ python tests/test_calidad_datos.py
 cat tests/resultados_tests.json | python -m json.tool | grep '"estado"'
 ```
 
-Si los 17 tests dan PASS, el deploy está sano.
+Si los 17 tests dan PASS, el deploy estÃ¡ sano.
 
 ### A.8 Levantar el dashboard
 
@@ -163,18 +163,18 @@ docker compose up -d streamlit
 docker compose ps
 ```
 
-Si el puerto 8501 está abierto, accedés desde tu PC con `http://<ip-servidor>:8501`. Si **no** está abierto (lo normal en servidores universitarios), pasá al paso A.9.
+Si el puerto 8501 estÃ¡ abierto, accedÃ©s desde tu PC con `http://<ip-servidor>:8501`. Si **no** estÃ¡ abierto (lo normal en servidores universitarios), pasÃ¡ al paso A.9.
 
-### A.9 Reverse proxy con nginx (acceso vía HTTPS)
+### A.9 Reverse proxy con nginx (acceso vÃ­a HTTPS)
 
-Si UTEC te asignó un dominio (ej. `sinia.utec.edu.uy`), exponé el dashboard vía nginx + Let's Encrypt:
+Si UTEC te asignÃ³ un dominio (ej. `sinia.utec.edu.uy`), exponÃ© el dashboard vÃ­a nginx + Let's Encrypt:
 
 ```bash
 sudo apt install -y nginx certbot python3-certbot-nginx
 sudo nano /etc/nginx/sites-available/sinia
 ```
 
-Pegá:
+PegÃ¡:
 
 ```nginx
 server {
@@ -203,23 +203,23 @@ sudo systemctl reload nginx
 sudo certbot --nginx -d sinia.utec.edu.uy     # certificado HTTPS gratis
 ```
 
-Si no hay dominio, usá un túnel SSH desde tu PC:
+Si no hay dominio, usÃ¡ un tÃºnel SSH desde tu PC:
 
 ```powershell
 ssh -L 8501:localhost:8501 tu_usuario@servidor.utec.edu.uy
 ```
 
-Y abrí `http://localhost:8501` en tu navegador local.
+Y abrÃ­ `http://localhost:8501` en tu navegador local.
 
 ### A.10 Scheduler como servicio systemd
 
-Para que el ETL corra automáticamente y sobreviva reinicios:
+Para que el ETL corra automÃ¡ticamente y sobreviva reinicios:
 
 ```bash
 sudo nano /etc/systemd/system/sinia-scheduler.service
 ```
 
-Pegá:
+PegÃ¡:
 
 ```ini
 [Unit]
@@ -257,20 +257,20 @@ Ver logs en vivo:
 journalctl -u sinia-scheduler -f
 ```
 
-### A.11 Backups automáticos vía cron
+### A.11 Backups automÃ¡ticos vÃ­a cron
 
 ```bash
 crontab -e
 ```
 
-Agregá:
+AgregÃ¡:
 
 ```cron
 # Backup diario 04:00 UTC (01:00 Uruguay)
 0 4 * * * cd /opt/sinia-uy && bash backups/backup.sh >> /opt/sinia-uy/logs/backup.log 2>&1
 ```
 
-Verificá que `backups/backup.sh` tiene permisos:
+VerificÃ¡ que `backups/backup.sh` tiene permisos:
 
 ```bash
 chmod +x backups/backup.sh
@@ -283,14 +283,14 @@ chmod +x backups/restore.sh
 sudo ufw allow 22/tcp       # SSH
 sudo ufw allow 80/tcp       # HTTP (para certbot)
 sudo ufw allow 443/tcp      # HTTPS
-# NO abrir 5432 ni 27017 al exterior — solo localhost
+# NO abrir 5432 ni 27017 al exterior â€” solo localhost
 sudo ufw enable
 sudo ufw status
 ```
 
-## Escenario B — Servidor sin Docker (instalación nativa)
+## Escenario B â€” Servidor sin Docker (instalaciÃ³n nativa)
 
-Si UTEC no permite Docker, instalá Postgres y Mongo directamente.
+Si UTEC no permite Docker, instalÃ¡ Postgres y Mongo directamente.
 
 ### B.1 Instalar PostgreSQL 16
 
@@ -300,11 +300,11 @@ sudo systemctl enable postgresql
 sudo systemctl start postgresql
 ```
 
-Setear contraseña del superuser:
+Setear contraseÃ±a del superuser:
 
 ```bash
 sudo -u postgres psql
-\password postgres            # ingresá la contraseña
+\password postgres            # ingresÃ¡ la contraseÃ±a
 \q
 ```
 
@@ -319,10 +319,10 @@ sudo -u postgres psql -d sinia_uy -f /opt/sinia-uy/sql/ddl/04_vistas.sql
 sudo -u postgres psql -d sinia_uy -f /opt/sinia-uy/sql/dml/01_seed_puntos.sql
 ```
 
-Verificá:
+VerificÃ¡:
 
 ```bash
-sudo -u postgres psql -d sinia_uy -c "SELECT COUNT(*) FROM puntos_monitoreo;"   # debería decir 19
+sudo -u postgres psql -d sinia_uy -c "SELECT COUNT(*) FROM puntos_monitoreo;"   # deberÃ­a decir 19
 ```
 
 ### B.2 Instalar MongoDB 7
@@ -336,7 +336,7 @@ sudo systemctl enable mongod
 sudo systemctl start mongod
 ```
 
-Habilitar autenticación: editar `/etc/mongod.conf`, agregar `security: { authorization: enabled }`, reiniciar:
+Habilitar autenticaciÃ³n: editar `/etc/mongod.conf`, agregar `security: { authorization: enabled }`, reiniciar:
 
 ```bash
 sudo systemctl restart mongod
@@ -345,7 +345,7 @@ mongosh
 
 Crear usuarios (ver `nosql/init/01_setup_mongo.js` y replicar el script en `mongosh`).
 
-### B.3 Resto idéntico al Escenario A
+### B.3 Resto idÃ©ntico al Escenario A
 
 Pasos A.3 (clonar repo), A.4 (.env), A.6 (Python), A.7 (cargar datos), A.10 (systemd para scheduler), A.11 (backups), A.12 (firewall) se aplican igual.
 
@@ -355,26 +355,26 @@ Una vez todo levantado, el ciclo es:
 
 ```
 [Tu PC]                                [GitHub]                    [Servidor UTEC]
-  ↓
-  trabajás en feature/...
-  ↓
+  â†“
+  trabajÃ¡s en feature/...
+  â†“
   git commit -m "..."
-  git push origin dev   ─────────────→   dev actualizado
-  ↓
-  PR dev → main                            ↓
+  git push origin dev   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â†’   dev actualizado
+  â†“
+  PR dev â†’ main                            â†“
   git tag v1.x.x
-  git push origin main  ─────────────→   main actualizado  ────→   ssh + git pull
+  git push origin main  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â†’   main actualizado  â”€â”€â”€â”€â†’   ssh + git pull
                                                                     docker compose restart
                                                                     o systemctl restart sinia-scheduler
 ```
 
 ### Script de deploy en el servidor
 
-Creá `scripts/deploy.sh` en el repo:
+CreÃ¡ `scripts/deploy.sh` en el repo:
 
 ```bash
 #!/bin/bash
-# Script de actualización en servidor UTEC.
+# Script de actualizaciÃ³n en servidor UTEC.
 # Uso: bash scripts/deploy.sh
 set -e
 cd /opt/sinia-uy
@@ -408,7 +408,7 @@ Permisos:
 chmod +x scripts/deploy.sh
 ```
 
-Próximo deploy desde el servidor:
+PrÃ³ximo deploy desde el servidor:
 
 ```bash
 cd /opt/sinia-uy
@@ -422,7 +422,7 @@ ls -lh backups/                       # listar backups disponibles
 bash backups/restore.sh backups/2026-05-11_040000
 ```
 
-## Monitoreo básico
+## Monitoreo bÃ¡sico
 
 ```bash
 # Estado general
@@ -432,7 +432,7 @@ sudo systemctl status sinia-scheduler
 # Logs del scheduler
 tail -f logs/scheduler.log
 
-# Última ejecución ETL
+# Ãšltima ejecuciÃ³n ETL
 docker exec sinia_postgres psql -U postgres -d sinia_uy -c \
   "SELECT fuente, etapa, estado, finalizado_en FROM etl_ejecuciones ORDER BY finalizado_en DESC LIMIT 10;"
 
@@ -443,19 +443,19 @@ du -sh /opt/sinia-uy/data /opt/sinia-uy/logs /opt/sinia-uy/backups
 
 ## Checklist final de deploy
 
-- [ ] Conexión SSH al servidor funciona.
-- [ ] Repo clonado en `/opt/sinia-uy` (o ubicación equivalente).
-- [ ] `docker/.env` y `config/.env` con contraseñas distintas a las locales.
+- [ ] ConexiÃ³n SSH al servidor funciona.
+- [ ] Repo clonado en `/opt/sinia-uy` (o ubicaciÃ³n equivalente).
+- [ ] `docker/.env` y `config/.env` con contraseÃ±as distintas a las locales.
 - [ ] Postgres y Mongo levantados y `healthy`.
 - [ ] Schemas creados (tablas y colecciones visibles).
-- [ ] ETL corrió la primera vez sin errores.
-- [ ] 17/17 tests PASS.
-- [ ] Dashboard accesible (vía dominio + nginx, o túnel SSH).
+- [ ] ETL corriÃ³ la primera vez sin errores.
+- [ ] 20/20 tests PASS.
+- [ ] Dashboard accesible (vÃ­a dominio + nginx, o tÃºnel SSH).
 - [ ] Scheduler corre como servicio systemd.
-- [ ] Backup automático configurado en cron.
+- [ ] Backup automÃ¡tico configurado en cron.
 - [ ] Firewall configurado (solo 22, 80, 443 abiertos al exterior).
 - [ ] Script `scripts/deploy.sh` probado.
 
 ---
 
-**Próximo paso:** [14_PLAN_DOCUMENTACION_PARALELA.md](14_PLAN_DOCUMENTACION_PARALELA.md) — escribir la doc de desarrollo mientras hacés esto.
+**PrÃ³ximo paso:** [14_PLAN_DOCUMENTACION_PARALELA.md](14_PLAN_DOCUMENTACION_PARALELA.md) â€” escribir la doc de desarrollo mientras hacÃ©s esto.

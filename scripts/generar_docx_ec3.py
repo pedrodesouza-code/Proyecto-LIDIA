@@ -184,7 +184,7 @@ def add_cover(doc: Document, source: Path) -> None:
         ("Objetivo", "Demostrar funcionamiento con datos reales, ETL modular, SQL/NoSQL, CDC, testing, seguridad, dashboard, despliegue hibrido y rendimiento."),
         ("Estado", "Cumplido con evidencia versionada."),
         ("Fecha de cierre operativo", "2026-05-15"),
-        ("Rama Git", "codex-flujo-local-utec"),
+        ("Rama Git", "rama de trabajo del proyecto"),
         ("Documento fuente", str(source.relative_to(ROOT)).replace("\\", "/")),
     ]
     for i, (label, value) in enumerate(rows):

@@ -1,4 +1,4 @@
-# Guia separada de pruebas para el tribunal
+﻿# Guia separada de pruebas para el tribunal
 
 Usa esta guia para practicar cuando el profesor quiera tocar datos o buscar errores.
 
@@ -61,7 +61,7 @@ python -m pytest tests/test_calidad_datos.py -q
 Resultado esperado:
 
 ```text
-17 passed
+20 passed
 ```
 
 Para ejemplos SQL mas largos:

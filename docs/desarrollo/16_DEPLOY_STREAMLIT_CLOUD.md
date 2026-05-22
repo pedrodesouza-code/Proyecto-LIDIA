@@ -1,8 +1,8 @@
-# 16. Deploy del dashboard a Streamlit Community Cloud
+﻿# 16. Deploy del dashboard a Streamlit Community Cloud
 
 Esta guia documenta como publicar el dashboard del proyecto SINIA-UY en
 Streamlit Community Cloud (gratis), de modo que tenga una URL publica
-accesible desde cualquier navegador — util para la defensa y para mostrar
+accesible desde cualquier navegador â€” util para la defensa y para mostrar
 el sistema sin depender de tu maquina local ni de la red interna de UTEC.
 
 ## 1. Por que Streamlit Cloud y no la BD UTEC directamente
@@ -55,7 +55,7 @@ Si los parquets no aparecen, los agregas:
 ```bash
 git add data/processed/*.parquet
 git commit -m "Versionar parquets para deploy a Streamlit Cloud"
-git push origin codex-flujo-local-utec   # o la rama que uses
+git push origin main                     # o la rama que uses
 ```
 
 ### 3.2. Cuenta de Streamlit Cloud
@@ -100,13 +100,13 @@ Una vez levantado, verificar manualmente en `https://sinia-uy.streamlit.app`:
 
 - Pagina principal carga con KPIs llenos (focos, riesgo, alertas).
 - Panel de mapa muestra puntos.
-- Filtros por pais (ARG/BRA/URY) funcionan.
+- Filtros por pais (ARG/BRA/URY/CHL) funcionan.
 - Panel NRT muestra focos de las ultimas 24h (los del ultimo
   `firms_nrt_procesado.parquet` commiteado).
 - Pestana "Riesgo por pais" tiene barras llenas (replica de
   `v_riesgo_por_pais`).
 - Pestana "Dias criticos" tiene tabla (replica de `v_dias_criticos`).
-- Sidebar dice "Fuente: parquet" (no postgresql) — confirmando el
+- Sidebar dice "Fuente: parquet" (no postgresql) â€” confirmando el
   fallback funciona.
 
 ## 5. Actualizar los datos
@@ -115,7 +115,7 @@ Para refrescar los datos del dashboard cloud:
 
 1. Correr el ETL local (que actualiza `data/processed/*.parquet`).
 2. `git add data/processed/*.parquet`
-3. `git commit -m "Refrescar parquets — YYYY-MM-DD"`
+3. `git commit -m "Refrescar parquets â€” YYYY-MM-DD"`
 4. `git push`
 5. Streamlit Cloud detecta el push y redeploya automaticamente en 1-2 min.
 

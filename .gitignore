@@ -28,9 +28,6 @@ data/*.json
 data/mongo_local/
 backups/
 
-# Claude Code settings locales
-.claude/
-
 # Logs
 logs/
 *.log
@@ -60,3 +57,7 @@ tmp/
 *.tmp
 *.bak
 ~$*.docx
+
+# Archivos personales fuera del alcance del proyecto
+CV_*.docx
+CV_*.pdf

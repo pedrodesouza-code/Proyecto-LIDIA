@@ -1,30 +1,40 @@
 # Guia de defensa final
 
-Objetivo: demostrar que SINIA-UY es un sistema funcional de ingenieria de datos,
-con datos reales, ETL reproducible, persistencia SQL/NoSQL, CDC, calidad, rendimiento
-y dashboard.
+Estado oficial: **2026-05-20**.
+
+Usar esta guia junto con `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`.
 
 ## 1. Apertura
 
 Mensaje breve:
 
-> SINIA-UY integra datos satelitales y meteorologicos para monitorear riesgo de
-> incendios forestales en Uruguay, Brasil y Argentina. El sistema usa Python para
-> ETL, PostgreSQL como Data Warehouse, MongoDB para trazabilidad/snapshots/alertas
-> y Streamlit para la capa analitica.
+> SINIA-UY integra datos satelitales, meteorologicos y atmosfericos para monitorear focos de calor, riesgo de incendios y calidad ambiental en Uruguay, Brasil, Argentina y Chile. El sistema usa Python para ETL, PostgreSQL como capa analitica, MongoDB para snapshots/trazabilidad, tests automaticos para calidad/idempotencia/CDC y Streamlit como dashboard.
 
-## 2. Comandos de demo
+## 2. Lo primero que hay que dejar claro
+
+El proyecto tiene dos niveles de evidencia:
+
+| Nivel | Que representa | Archivo |
+|---|---|---|
+| Estado actual local | 4 paises, 36 puntos, 20 tests | `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md` |
+| Evidencia UTEC historica | Sincronizacion institucional del 2026-05-15 con alcance anterior | `reports/utec_verificacion_ultimo.json` |
+
+Si el tribunal pregunta por Chile en UTEC, responder:
+
+> Chile esta incorporado en el estado actual del repositorio y en los reportes locales. La verificacion UTEC versionada corresponde a una sincronizacion anterior del 15/05; para afirmar Chile en UTEC se debe ejecutar una nueva verificacion remota.
+
+## 3. Comandos de demo
 
 Desde la raiz del proyecto:
 
 ```bash
-python tests/test_calidad_datos.py
+pytest tests -q
 ```
 
 Resultado esperado:
 
 ```text
-Resultado: 17 PASS / 0 FAIL
+20 passed
 ```
 
 Medir rendimiento:
@@ -33,30 +43,22 @@ Medir rendimiento:
 python scripts/medir_rendimiento.py
 ```
 
-Resultado esperado:
-
-```text
-Reporte generado: reports/rendimiento_<fecha>.json
-```
-
-Simular sharding:
+Comparar SQL vs NoSQL:
 
 ```bash
-python scripts/simular_sharding.py
+python scripts/comparar_sql_nosql_real.py
 ```
 
-Resultado esperado:
+Validar Docker Compose:
 
-```text
-filas_firms: 1836537
-sql_shards: 4
-mongo_shards_logicos: 36
+```bash
+docker compose -f docker/docker-compose.yml --env-file docker/.env.example config --quiet
 ```
 
 Levantar dashboard:
 
 ```bash
-streamlit run dashboard/app.py --server.port 8501
+streamlit run dashboard/app.py
 ```
 
 Abrir:
@@ -65,75 +67,89 @@ Abrir:
 http://localhost:8501
 ```
 
-## 3. Evidencia que conviene mostrar
+## 4. Evidencia que conviene mostrar
 
 | Tema | Archivo |
 |---|---|
+| Estado actual | `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md` |
 | Consigna vs cumplimiento | `docs/MATRIZ_CUMPLIMIENTO_CONSIGNA_2026.md` |
+| Entrega EC3 | `docs/ENTREGA_EC3_IMPLEMENTACION.md` |
+| Tests | `tests/resultados_tests.json` |
+| Carga completa | `reports/carga_completa_ultimo.json` |
+| SQL vs NoSQL | `reports/sql_vs_nosql_real_ultimo.json` |
 | SLA y rendimiento | `docs/SLA_Y_RENDIMIENTO.md` |
-| Reporte rendimiento | `reports/rendimiento_ultimo.json` |
 | Replicacion y sharding | `docs/REPLICACION_Y_SHARDING.md` |
-| Reporte sharding | `reports/sharding_simulado_ultimo.json` |
 | Seguridad y backup | `docs/SEGURIDAD_BACKUP_GOBERNANZA.md` |
 | Preguntas -> consultas -> dashboard | `docs/CORRESPONDENCIA_PREGUNTAS_CONSULTAS_DASHBOARD.md` |
 | Despliegue hibrido | `docs/DESPLIEGUE_HIBRIDO.md` |
 
-## 4. Puntos tecnicos para defender
+## 5. Puntos tecnicos para defender
 
 ### Por que SQL y NoSQL
 
-PostgreSQL guarda hechos estructurados y consultables por agregaciones temporales:
-focos, meteorologia, calidad del aire y vistas analiticas.
+PostgreSQL guarda hechos estructurados: focos, meteorologia, calidad del aire, precipitacion y cobertura vegetal. Sirve para integridad, restricciones, claves, indices y consultas analiticas.
 
-MongoDB guarda documentos variables: ejecuciones ETL, alertas y snapshots diarios,
-donde conviene flexibilidad sin joins.
+MongoDB guarda documentos operacionales: snapshots, ejecuciones ETL, alertas y resumenes materializados. Sirve para trazabilidad y estructuras flexibles.
+
+Respuesta corta:
+
+> SQL y NoSQL no compiten en el proyecto: PostgreSQL resuelve consistencia analitica y MongoDB resuelve trazabilidad documental.
 
 ### CDC e idempotencia
 
-CDC usa watermark temporal en `etl/scheduler.py`. La idempotencia se sostiene con claves
-naturales, upserts/deduplicacion y tests automaticos. La evidencia principal es
-`tests/resultados_tests.json`.
+CDC detecta registros nuevos y modificaciones. La idempotencia asegura que correr dos veces la misma carga no duplique datos.
+
+Evidencia:
+
+- `tests/test_calidad_datos.py`
+- `tests/resultados_tests.json`
+- claves naturales en `sql/ddl/02_schema.sql`
+- upserts en `etl/load/`
+
+### Calidad de datos
+
+Los tests cubren:
+
+- alcance de 4 paises y 36 puntos;
+- Uruguay completo con 19 departamentos;
+- completitud;
+- unicidad;
+- consistencia;
+- validez;
+- idempotencia;
+- CDC.
 
 ### Rendimiento
 
-El SLA de consultas analiticas es 3000 ms. La peor consulta local medida fue focos por
-mes sobre 1.836.537 registros, con 490.622 ms promedio. Cumple.
+El SLA interactivo de consultas analiticas es de hasta 3000 ms. Los reportes actuales muestran que las consultas materializadas en SQL y Mongo quedan por debajo de ese umbral.
 
 ### Sharding
 
-No se activa sharding real porque el volumen academico cabe en un nodo. Se simula y se
-elige:
+No se activa sharding fisico porque el volumen academico entra en un nodo. Se simula una estrategia reproducible:
 
-- SQL: `focos_calor` particionada por `fecha_adq`.
-- MongoDB: `focos_snapshots` con `{ fecha: 1, pais: "hashed" }`.
+- SQL: particionamiento de `focos_calor` por `fecha_adq`.
+- MongoDB: `focos_snapshots` con clave conceptual `{ fecha: 1, pais: "hashed" }`.
 
-### Replicacion
+Respuesta corta:
 
-La arquitectura define:
+> El proyecto no necesita sharding real hoy; deja disenada y medida una estrategia de escalamiento para cuando el volumen lo justifique.
 
-- PostgreSQL primario + replicas de lectura por WAL streaming.
-- MongoDB replica set de tres miembros.
+### Docker
 
-Si preguntan por ejecucion real, responder con honestidad: la evidencia actual es
-arquitectonica y reproducible; la configuracion real queda como paso de infraestructura
-si el entorno UTEC/cloud lo requiere.
+La configuracion Docker es valida. Si el engine no levanta por Windows/WSL, no invalida el repositorio: se demuestra con `docker compose config --quiet`.
 
-## 5. Plan B de demo
+## 6. Plan B de demo
 
-Si PostgreSQL o MongoDB no levantan:
+Si PostgreSQL o MongoDB no responden:
 
-1. Mostrar que el dashboard tiene fallback a Parquet.
-2. Ejecutar `python tests/test_calidad_datos.py`.
-3. Mostrar `reports/rendimiento_ultimo.json`.
-4. Mostrar `reports/sharding_simulado_ultimo.json`.
-5. Explicar que la arquitectura de persistencia esta implementada en `sql/`, `nosql/`
-   y `etl/load/`, aunque la demo visual use datos procesados.
+1. Ejecutar `pytest tests -q`.
+2. Mostrar `reports/carga_completa_ultimo.json`.
+3. Mostrar `reports/sql_vs_nosql_real_ultimo.json`.
+4. Mostrar `reports/rendimiento_ultimo.json`.
+5. Levantar el dashboard con fallback a Parquet.
 
-## 6. Cierre
+## 7. Cierre
 
 Mensaje breve:
 
-> El sistema cumple el ciclo de vida completo del dato: fuentes reales, extraccion,
-> transformacion, carga, calidad, CDC, trazabilidad, analitica y visualizacion. Las
-> brechas restantes son de infraestructura final: ejecutar replica real, evidencia
-> UTEC/cloud y restore probado en entorno final.
+> El sistema cubre el ciclo de vida completo del dato: fuentes reales, extraccion, transformacion, carga, calidad, CDC, trazabilidad, analitica, visualizacion, rendimiento y documentacion. Las brechas restantes son de infraestructura productiva final, no de diseno ni de implementacion academica.

@@ -30,7 +30,9 @@ y vistas del dashboard Streamlit.
 
 ## Evidencia de dashboard
 
-El dashboard fue levantado y verificado localmente el 2026-05-15:
+El dashboard queda alineado al alcance actual del repositorio: `ARG`, `BRA`, `CHL`, `URY` y `36` puntos de monitoreo.
+
+Comando de ejecucion:
 
 ```bash
 streamlit run dashboard/app.py --server.port 8501
@@ -44,10 +46,10 @@ http://localhost:8501
 
 Verificacion realizada:
 
-- pagina responde HTTP 200;
+- pagina responde en `http://localhost:8501`;
 - aparece `SINIA-UY`;
-- no hay `Traceback`;
-- no hay errores de consola del navegador.
+- el dashboard consume PostgreSQL si esta disponible;
+- si PostgreSQL no responde, usa fallback controlado a Parquet.
 
 ## Resultado consolidado
 

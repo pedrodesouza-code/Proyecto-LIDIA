@@ -1,4 +1,6 @@
-# Entrega EC3 desarrollada - Implementacion funcional del sistema
+﻿# Entrega EC3 desarrollada - Implementacion funcional del sistema
+
+> Nota 2026-05-20: este documento desarrollado queda como version historica. La version alineada para defensa es `docs/ENTREGA_EC3_IMPLEMENTACION.md` y la fuente actual es `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`.
 
 Proyecto: SINIA-UY - Sistema integrado de analisis de incendios, meteorologia,
 calidad del aire, precipitacion y cobertura vegetal.
@@ -49,14 +51,14 @@ El sistema esta implementado y ejecutable. Los puntos centrales de evidencia son
 
 | Area | Evidencia concreta | Resultado |
 |---|---|---:|
-| Tests de datos | `tests/resultados_tests.json` | `17 PASS / 0 FAIL` |
+| Tests de datos | `tests/resultados_tests.json` | `20 PASS / 0 FAIL` |
 | PostgreSQL UTEC | `reports/utec_verificacion_ultimo.json` | `1.841.820` focos |
 | MongoDB UTEC | `reports/utec_verificacion_ultimo.json` | `352` snapshots |
 | MongoDB calidad documental | `reports/utec_verificacion_ultimo.json` | `0` snapshots sin `pais` |
 | Vistas materializadas SQL | `reports/utec_verificacion_ultimo.json` | `3` y `39` filas |
 | Dashboard | HTTP local | `200` |
 | Docker Compose | `docker compose config --quiet` | valido |
-| Git remoto | rama `codex-flujo-local-utec` | actualizado |
+| Git remoto | rama de trabajo del proyecto | actualizado |
 
 ## 1. Implementacion del modelo relacional SQL
 
@@ -424,7 +426,7 @@ La validacion funcional conecta preguntas, consultas y dashboard:
 ### 5.7 Resultado final
 
 ```text
-17 passed
+20 passed
 ```
 
 ## 6. Seguridad

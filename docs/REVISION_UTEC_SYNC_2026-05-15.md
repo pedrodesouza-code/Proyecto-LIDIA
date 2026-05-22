@@ -1,5 +1,7 @@
 # Revision y sincronizacion UTEC - 2026-05-15
 
+> Nota 2026-05-20: este documento es evidencia historica de la sincronizacion UTEC del 15/05. El estado actual del repositorio esta documentado en `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md` y usa alcance `ARG/BRA/CHL/URY` con 36 puntos.
+
 ## Objetivo
 
 Verificar las bases de datos del servidor UTEC y dejarlas alineadas con el

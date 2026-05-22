@@ -1,5 +1,7 @@
 # Auditoria y Cronograma
 
+> Nota 2026-05-20: este documento es una auditoria historica del 11/05. No representa el estado actual del proyecto. Para defensa usar `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`.
+
 Fecha de corte: 2026-05-11
 
 ## Metodologia

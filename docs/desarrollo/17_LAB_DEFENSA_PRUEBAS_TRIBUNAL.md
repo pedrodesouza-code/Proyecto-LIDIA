@@ -1,13 +1,13 @@
-# Laboratorio de defensa: pruebas controladas del sistema
+﻿# Laboratorio de defensa: pruebas controladas del sistema
 
-Esta guía sirve para entrenar la defensa frente a una banca exigente. La idea es
-poder mostrar qué pasa si se modifican datos, si se insertan duplicados, si hay
-valores inválidos, si PostgreSQL no está disponible, y cómo se recupera el
+Esta guÃ­a sirve para entrenar la defensa frente a una banca exigente. La idea es
+poder mostrar quÃ© pasa si se modifican datos, si se insertan duplicados, si hay
+valores invÃ¡lidos, si PostgreSQL no estÃ¡ disponible, y cÃ³mo se recupera el
 sistema sin improvisar.
 
 ## Regla de oro
 
-Antes de tocar datos reales, trabajar siempre dentro de una transacción:
+Antes de tocar datos reales, trabajar siempre dentro de una transacciÃ³n:
 
 ```sql
 BEGIN;
@@ -15,10 +15,10 @@ BEGIN;
 ROLLBACK;
 ```
 
-`ROLLBACK` deshace todo lo que se hizo dentro de la transacción. Si se quiere
+`ROLLBACK` deshace todo lo que se hizo dentro de la transacciÃ³n. Si se quiere
 guardar el cambio, se usa `COMMIT`, pero para defensa conviene usar `ROLLBACK`.
 
-## Conexión rápida a PostgreSQL
+## ConexiÃ³n rÃ¡pida a PostgreSQL
 
 Desde Git Bash:
 
@@ -70,12 +70,12 @@ Resultado esperado: PostgreSQL rechaza el registro por el `CHECK` de latitud.
 
 Defensa oral:
 
-> La restricción evita cargar coordenadas físicamente imposibles. Esto protege
+> La restricciÃ³n evita cargar coordenadas fÃ­sicamente imposibles. Esto protege
 > la calidad desde la propia base de datos, no solo desde Python.
 
-## Prueba 2: demostrar dominio de países
+## Prueba 2: demostrar dominio de paÃ­ses
 
-Objetivo: mostrar por qué usamos códigos normalizados.
+Objetivo: mostrar por quÃ© usamos cÃ³digos normalizados.
 
 ```sql
 BEGIN;
@@ -124,16 +124,16 @@ VALUES (
 ROLLBACK;
 ```
 
-Resultado esperado: el segundo `INSERT` falla por la restricción `UNIQUE`.
+Resultado esperado: el segundo `INSERT` falla por la restricciÃ³n `UNIQUE`.
 
 Defensa oral:
 
-> La clave natural evita duplicados. Un foco se identifica por ubicación, fecha,
-> hora y satélite.
+> La clave natural evita duplicados. Un foco se identifica por ubicaciÃ³n, fecha,
+> hora y satÃ©lite.
 
 ## Prueba 4: demostrar upsert controlado en focos_calor
 
-Objetivo: mostrar cómo el ETL actualiza un dato existente en vez de duplicarlo.
+Objetivo: mostrar cÃ³mo el ETL actualiza un dato existente en vez de duplicarlo.
 
 ```sql
 BEGIN;
@@ -176,12 +176,12 @@ Resultado esperado: queda un solo registro con `potencia_radiativa = 99.000`.
 
 Defensa oral:
 
-> Esto demuestra CDC/upsert: si el registro ya existe y cambió un valor, se
-> actualiza; si no cambió, no se duplica.
+> Esto demuestra CDC/upsert: si el registro ya existe y cambiÃ³ un valor, se
+> actualiza; si no cambiÃ³, no se duplica.
 
-## Prueba 5: demostrar rango del índice de riesgo
+## Prueba 5: demostrar rango del Ã­ndice de riesgo
 
-Objetivo: intentar insertar un índice inválido.
+Objetivo: intentar insertar un Ã­ndice invÃ¡lido.
 
 ```sql
 BEGIN;
@@ -211,12 +211,12 @@ Resultado esperado: falla porque `indice_riesgo` debe estar entre 0 y 1.
 
 Defensa oral:
 
-> El índice está normalizado. La base impide guardar riesgos fuera del rango
-> matemático definido por el modelo.
+> El Ã­ndice estÃ¡ normalizado. La base impide guardar riesgos fuera del rango
+> matemÃ¡tico definido por el modelo.
 
 ## Prueba 6: demostrar dominio de nivel_riesgo
 
-Objetivo: intentar insertar una categoría no permitida.
+Objetivo: intentar insertar una categorÃ­a no permitida.
 
 ```sql
 BEGIN;
@@ -240,11 +240,11 @@ Resultado esperado: falla por el `CHECK` de `nivel_riesgo`.
 Defensa oral:
 
 > Usamos dominio controlado: bajo, moderado, alto y muy_alto. Eso evita errores
-> semánticos en consultas y dashboard.
+> semÃ¡nticos en consultas y dashboard.
 
-## Prueba 7: demostrar calidad de aire y límite OMS
+## Prueba 7: demostrar calidad de aire y lÃ­mite OMS
 
-Objetivo: insertar un día de PM10 alto y ver cómo aparece en la vista de alertas.
+Objetivo: insertar un dÃ­a de PM10 alto y ver cÃ³mo aparece en la vista de alertas.
 
 ```sql
 BEGIN;
@@ -270,16 +270,16 @@ WHERE fecha = '2026-01-03';
 ROLLBACK;
 ```
 
-Resultado esperado: la vista muestra el día como alerta.
+Resultado esperado: la vista muestra el dÃ­a como alerta.
 
 Defensa oral:
 
 > CAMS crudo viene horario, el ETL lo agrega a diario y marca si supera el
-> umbral OMS de PM10. La vista consume esa lógica para alertas.
+> umbral OMS de PM10. La vista consume esa lÃ³gica para alertas.
 
 ## Prueba 8: demostrar vista de riesgo actual
 
-Objetivo: ver el último riesgo disponible por punto.
+Objetivo: ver el Ãºltimo riesgo disponible por punto.
 
 ```sql
 SELECT *
@@ -289,12 +289,12 @@ ORDER BY indice_riesgo DESC;
 
 Defensa oral:
 
-> La vista encapsula una consulta analítica: último registro histórico por
-> punto. El dashboard no necesita recalcular esta lógica.
+> La vista encapsula una consulta analÃ­tica: Ãºltimo registro histÃ³rico por
+> punto. El dashboard no necesita recalcular esta lÃ³gica.
 
-## Prueba 9: demostrar vista de días críticos
+## Prueba 9: demostrar vista de dÃ­as crÃ­ticos
 
-Objetivo: ver días con riesgo alto o muy alto.
+Objetivo: ver dÃ­as con riesgo alto o muy alto.
 
 ```sql
 SELECT *
@@ -306,18 +306,18 @@ LIMIT 10;
 Defensa oral:
 
 > Esta vista transforma registros diarios por punto en una lectura ejecutiva:
-> qué días fueron críticos, cuántos puntos y países estuvieron afectados.
+> quÃ© dÃ­as fueron crÃ­ticos, cuÃ¡ntos puntos y paÃ­ses estuvieron afectados.
 
 ## Prueba 10: demostrar fallback del dashboard
 
-Objetivo: explicar comportamiento si PostgreSQL no está disponible.
+Objetivo: explicar comportamiento si PostgreSQL no estÃ¡ disponible.
 
-En `dashboard/db.py`, cada función intenta primero PostgreSQL y si falla usa
+En `dashboard/db.py`, cada funciÃ³n intenta primero PostgreSQL y si falla usa
 Parquet desde `data/processed/`.
 
 Defensa oral:
 
-> El sistema prioriza PostgreSQL como fuente analítica, pero mantiene Parquet
+> El sistema prioriza PostgreSQL como fuente analÃ­tica, pero mantiene Parquet
 > como respaldo procesado. Esto permite que el dashboard funcione en entornos
 > sin base activa, como Streamlit Cloud o una demo local limitada.
 
@@ -332,7 +332,7 @@ python -m pytest tests/test_calidad_datos.py -q
 Resultado esperado:
 
 ```text
-17 passed
+20 passed
 ```
 
 Generar reporte JSON limpio:
@@ -344,42 +344,42 @@ python tests/test_calidad_datos.py
 Resultado esperado:
 
 ```text
-Resultado: 17 PASS / 0 FAIL
+Resultado: 20 PASS / 0 FAIL
 ```
 
 ## Preguntas trampa y respuestas
 
 ### Si modifico un dato manualmente, se rompe el sistema?
 
-Depende del dato. Si viola una restricción, PostgreSQL lo rechaza. Si es válido
-pero cambia una métrica, las vistas lo reflejan automáticamente.
+Depende del dato. Si viola una restricciÃ³n, PostgreSQL lo rechaza. Si es vÃ¡lido
+pero cambia una mÃ©trica, las vistas lo reflejan automÃ¡ticamente.
 
-### Por qué hay validaciones en Python y también en SQL?
+### Por quÃ© hay validaciones en Python y tambiÃ©n en SQL?
 
 Porque son capas distintas. Python limpia antes de cargar. SQL protege la
 integridad final aunque alguien intente insertar datos manualmente.
 
-### Qué pasa si cargo dos veces el mismo archivo?
+### QuÃ© pasa si cargo dos veces el mismo archivo?
 
 El modelo usa claves naturales y `ON CONFLICT`. El registro no se duplica. Si
-cambió, se actualiza; si es igual, queda sin cambio.
+cambiÃ³, se actualiza; si es igual, queda sin cambio.
 
-### Por qué usar ROLLBACK en defensa?
+### Por quÃ© usar ROLLBACK en defensa?
 
 Porque permite demostrar errores y comportamientos sin ensuciar la base real.
 
-### Cuál es la prueba más fuerte para base de datos?
+### CuÃ¡l es la prueba mÃ¡s fuerte para base de datos?
 
-Mostrar una restricción fallando, un upsert funcionando, una vista reflejando el
+Mostrar una restricciÃ³n fallando, un upsert funcionando, una vista reflejando el
 cambio y luego hacer `ROLLBACK`.
 
 ## Secuencia recomendada para practicar frente al tribunal
 
 1. Mostrar conteos de tablas.
-2. Mostrar ER verbalmente: puntos como dimensión, tablas ambientales como hechos.
-3. Ejecutar una prueba de restricción inválida.
+2. Mostrar ER verbalmente: puntos como dimensiÃ³n, tablas ambientales como hechos.
+3. Ejecutar una prueba de restricciÃ³n invÃ¡lida.
 4. Ejecutar una prueba de duplicado.
 5. Ejecutar una prueba de upsert.
-6. Mostrar una vista analítica.
+6. Mostrar una vista analÃ­tica.
 7. Ejecutar tests de calidad.
 8. Cerrar explicando idempotencia, CDC y fallback a Parquet.

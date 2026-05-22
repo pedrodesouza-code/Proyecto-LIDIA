@@ -4393,5 +4393,1045 @@
     },
     "mensaje": "CDC: 0.4111 -> 0.5111, detectado: True",
     "ejecutado": "2026-05-19T16:30:03.591172+00:00"
+  },
+  {
+    "test": "alcance_final_4_paises_36_puntos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "paises": [
+        "ARG",
+        "BRA",
+        "CHL",
+        "URY"
+      ],
+      "puntos_por_pais": {
+        "URY": 19,
+        "CHL": 8,
+        "ARG": 4,
+        "BRA": 5
+      }
+    },
+    "mensaje": "Alcance final: Uruguay 19 departamentos, Brasil 5 puntos, Argentina 4 puntos, Chile 8 puntos",
+    "ejecutado": "2026-05-20T01:24:01.256835+00:00"
+  },
+  {
+    "test": "alcance_uruguay_19_departamentos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "faltantes": [],
+      "extras": [],
+      "total_uy": 19
+    },
+    "mensaje": "Uruguay cubre los 19 departamentos por capital/departamental",
+    "ejecutado": "2026-05-20T01:24:01.286796+00:00"
+  },
+  {
+    "test": "cobertura_datasets_36_puntos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "meteo": [],
+      "cams": [],
+      "chirps": []
+    },
+    "mensaje": "Datasets procesados cubren los 36 puntos del alcance",
+    "ejecutado": "2026-05-20T01:24:02.755359+00:00"
+  },
+  {
+    "test": "completitud_firms_criticos",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "latitud": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      },
+      "longitud": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      },
+      "fecha_adq": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      }
+    },
+    "mensaje": "Todos los campos críticos completos",
+    "ejecutado": "2026-05-20T01:24:05.063932+00:00"
+  },
+  {
+    "test": "completitud_meteo_indice_riesgo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "total": 88087
+    },
+    "mensaje": "0 nulos (0.0%) en indice_riesgo",
+    "ejecutado": "2026-05-20T01:24:05.100807+00:00"
+  },
+  {
+    "test": "completitud_cams_pm10",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "filas_evaluadas": 41465
+    },
+    "mensaje": "0 nulos (0.0%) en pm10_media sobre dias con observacion valida",
+    "ejecutado": "2026-05-20T01:24:05.166110+00:00"
+  },
+  {
+    "test": "unicidad_firms",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0,
+      "clave": [
+        "latitud",
+        "longitud",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite"
+      ]
+    },
+    "mensaje": "0 duplicados por clave natural ['latitud', 'longitud', 'fecha_adq', 'hora_adq_hhmm', 'satelite']",
+    "ejecutado": "2026-05-20T01:24:06.030274+00:00"
+  },
+  {
+    "test": "unicidad_meteo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0,
+      "clave": [
+        "punto",
+        "fecha"
+      ]
+    },
+    "mensaje": "0 duplicados (punto, fecha)",
+    "ejecutado": "2026-05-20T01:24:06.079580+00:00"
+  },
+  {
+    "test": "unicidad_cams",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0
+    },
+    "mensaje": "0 duplicados (punto, fecha)",
+    "ejecutado": "2026-05-20T01:24:06.119459+00:00"
+  },
+  {
+    "test": "consistencia_firms_coordenadas",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_bbox_regional": 0,
+      "paises_invalidos": 0,
+      "total": 1946361
+    },
+    "mensaje": "0 focos fuera del bbox regional y 0 con país fuera de BRA/ARG/URY/CHL",
+    "ejecutado": "2026-05-20T01:24:06.260102+00:00"
+  },
+  {
+    "test": "consistencia_meteo_indice_rango",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_de_rango": 0,
+      "rango": "[0, 1]"
+    },
+    "mensaje": "0 índices de riesgo fuera del rango [0,1]",
+    "ejecutado": "2026-05-20T01:24:06.307153+00:00"
+  },
+  {
+    "test": "consistencia_cams_pm10_no_negativo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "negativos": 0
+    },
+    "mensaje": "0 valores negativos en pm10_media",
+    "ejecutado": "2026-05-20T01:24:06.341586+00:00"
+  },
+  {
+    "test": "consistencia_humedad_rango",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_de_rango": 0
+    },
+    "mensaje": "0 valores de humedad fuera de [0%, 100%]",
+    "ejecutado": "2026-05-20T01:24:06.382315+00:00"
+  },
+  {
+    "test": "validez_firms_confianza",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0
+    },
+    "mensaje": "0 valores de confianza fuera de l/n/h (puede ser MODIS numerico)",
+    "ejecutado": "2026-05-20T01:24:08.332774+00:00"
+  },
+  {
+    "test": "validez_meteo_nivel_riesgo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0,
+      "dominio": [
+        "bajo",
+        "muy_alto",
+        "alto",
+        "moderado"
+      ]
+    },
+    "mensaje": "0 valores de nivel_riesgo fuera del dominio permitido",
+    "ejecutado": "2026-05-20T01:24:08.391221+00:00"
+  },
+  {
+    "test": "validez_cams_nivel_pm10",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0,
+      "dominio": [
+        "elevado",
+        "alerta",
+        "normal"
+      ]
+    },
+    "mensaje": "0 valores de nivel_pm10 fuera del dominio",
+    "ejecutado": "2026-05-20T01:24:08.509911+00:00"
+  },
+  {
+    "test": "idempotencia_firms_doble_carga",
+    "categoria": "idempotencia",
+    "estado": "PASS",
+    "metricas": {
+      "original": 1946361,
+      "doble": 3892722,
+      "dedup": 1946361
+    },
+    "mensaje": "Original: 1946361, doble+dedup: 1946361 — deben ser iguales",
+    "ejecutado": "2026-05-20T01:24:10.854796+00:00"
+  },
+  {
+    "test": "idempotencia_meteo_doble_carga",
+    "categoria": "idempotencia",
+    "estado": "PASS",
+    "metricas": {
+      "original": 88087,
+      "dedup": 88087
+    },
+    "mensaje": "Idempotencia meteo: 88087 -> 88087",
+    "ejecutado": "2026-05-20T01:24:11.079372+00:00"
+  },
+  {
+    "test": "cdc_detecta_nuevos",
+    "categoria": "cdc",
+    "estado": "PASS",
+    "metricas": {
+      "registro_nuevo_detectado": true
+    },
+    "mensaje": "CDC detectó correctamente registro nuevo (fecha 2030-01-01)",
+    "ejecutado": "2026-05-20T01:24:11.123864+00:00"
+  },
+  {
+    "test": "cdc_detecta_modificacion",
+    "categoria": "cdc",
+    "estado": "PASS",
+    "metricas": {
+      "valor_original": 0.4111,
+      "valor_modificado": 0.5111,
+      "cambio_detectado": true
+    },
+    "mensaje": "CDC: 0.4111 -> 0.5111, detectado: True",
+    "ejecutado": "2026-05-20T01:24:11.163491+00:00"
+  },
+  {
+    "test": "alcance_final_4_paises_36_puntos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "paises": [
+        "ARG",
+        "BRA",
+        "CHL",
+        "URY"
+      ],
+      "puntos_por_pais": {
+        "ARG": 4,
+        "URY": 19,
+        "BRA": 5,
+        "CHL": 8
+      }
+    },
+    "mensaje": "Alcance final: Uruguay 19 departamentos, Brasil 5 puntos, Argentina 4 puntos, Chile 8 puntos",
+    "ejecutado": "2026-05-20T12:38:01.833595+00:00"
+  },
+  {
+    "test": "alcance_uruguay_19_departamentos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "faltantes": [],
+      "extras": [],
+      "total_uy": 19
+    },
+    "mensaje": "Uruguay cubre los 19 departamentos por capital/departamental",
+    "ejecutado": "2026-05-20T12:38:01.853040+00:00"
+  },
+  {
+    "test": "cobertura_datasets_36_puntos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "meteo": [],
+      "cams": [],
+      "chirps": []
+    },
+    "mensaje": "Datasets procesados cubren los 36 puntos del alcance",
+    "ejecutado": "2026-05-20T12:38:02.003839+00:00"
+  },
+  {
+    "test": "completitud_firms_criticos",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "latitud": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      },
+      "longitud": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      },
+      "fecha_adq": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      }
+    },
+    "mensaje": "Todos los campos críticos completos",
+    "ejecutado": "2026-05-20T12:38:03.213705+00:00"
+  },
+  {
+    "test": "completitud_meteo_indice_riesgo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "total": 88087
+    },
+    "mensaje": "0 nulos (0.0%) en indice_riesgo",
+    "ejecutado": "2026-05-20T12:38:03.234769+00:00"
+  },
+  {
+    "test": "completitud_cams_pm10",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "filas_evaluadas": 41465
+    },
+    "mensaje": "0 nulos (0.0%) en pm10_media sobre dias con observacion valida",
+    "ejecutado": "2026-05-20T12:38:03.261884+00:00"
+  },
+  {
+    "test": "unicidad_firms",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0,
+      "clave": [
+        "latitud",
+        "longitud",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite"
+      ]
+    },
+    "mensaje": "0 duplicados por clave natural ['latitud', 'longitud', 'fecha_adq', 'hora_adq_hhmm', 'satelite']",
+    "ejecutado": "2026-05-20T12:38:03.846317+00:00"
+  },
+  {
+    "test": "unicidad_meteo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0,
+      "clave": [
+        "punto",
+        "fecha"
+      ]
+    },
+    "mensaje": "0 duplicados (punto, fecha)",
+    "ejecutado": "2026-05-20T12:38:03.885003+00:00"
+  },
+  {
+    "test": "unicidad_cams",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0
+    },
+    "mensaje": "0 duplicados (punto, fecha)",
+    "ejecutado": "2026-05-20T12:38:03.942516+00:00"
+  },
+  {
+    "test": "consistencia_firms_coordenadas",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_bbox_regional": 0,
+      "paises_invalidos": 0,
+      "total": 1946361
+    },
+    "mensaje": "0 focos fuera del bbox regional y 0 con país fuera de BRA/ARG/URY/CHL",
+    "ejecutado": "2026-05-20T12:38:04.088442+00:00"
+  },
+  {
+    "test": "consistencia_meteo_indice_rango",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_de_rango": 0,
+      "rango": "[0, 1]"
+    },
+    "mensaje": "0 índices de riesgo fuera del rango [0,1]",
+    "ejecutado": "2026-05-20T12:38:04.128157+00:00"
+  },
+  {
+    "test": "consistencia_cams_pm10_no_negativo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "negativos": 0
+    },
+    "mensaje": "0 valores negativos en pm10_media",
+    "ejecutado": "2026-05-20T12:38:04.162382+00:00"
+  },
+  {
+    "test": "consistencia_humedad_rango",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_de_rango": 0
+    },
+    "mensaje": "0 valores de humedad fuera de [0%, 100%]",
+    "ejecutado": "2026-05-20T12:38:04.187185+00:00"
+  },
+  {
+    "test": "validez_firms_confianza",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0
+    },
+    "mensaje": "0 valores de confianza fuera de l/n/h (puede ser MODIS numerico)",
+    "ejecutado": "2026-05-20T12:38:06.328021+00:00"
+  },
+  {
+    "test": "validez_meteo_nivel_riesgo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0,
+      "dominio": [
+        "bajo",
+        "alto",
+        "muy_alto",
+        "moderado"
+      ]
+    },
+    "mensaje": "0 valores de nivel_riesgo fuera del dominio permitido",
+    "ejecutado": "2026-05-20T12:38:06.393128+00:00"
+  },
+  {
+    "test": "validez_cams_nivel_pm10",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0,
+      "dominio": [
+        "elevado",
+        "normal",
+        "alerta"
+      ]
+    },
+    "mensaje": "0 valores de nivel_pm10 fuera del dominio",
+    "ejecutado": "2026-05-20T12:38:06.445836+00:00"
+  },
+  {
+    "test": "idempotencia_firms_doble_carga",
+    "categoria": "idempotencia",
+    "estado": "PASS",
+    "metricas": {
+      "original": 1946361,
+      "doble": 3892722,
+      "dedup": 1946361
+    },
+    "mensaje": "Original: 1946361, doble+dedup: 1946361 — deben ser iguales",
+    "ejecutado": "2026-05-20T12:38:08.607768+00:00"
+  },
+  {
+    "test": "idempotencia_meteo_doble_carga",
+    "categoria": "idempotencia",
+    "estado": "PASS",
+    "metricas": {
+      "original": 88087,
+      "dedup": 88087
+    },
+    "mensaje": "Idempotencia meteo: 88087 -> 88087",
+    "ejecutado": "2026-05-20T12:38:08.808393+00:00"
+  },
+  {
+    "test": "cdc_detecta_nuevos",
+    "categoria": "cdc",
+    "estado": "PASS",
+    "metricas": {
+      "registro_nuevo_detectado": true
+    },
+    "mensaje": "CDC detectó correctamente registro nuevo (fecha 2030-01-01)",
+    "ejecutado": "2026-05-20T12:38:08.880550+00:00"
+  },
+  {
+    "test": "cdc_detecta_modificacion",
+    "categoria": "cdc",
+    "estado": "PASS",
+    "metricas": {
+      "valor_original": 0.4111,
+      "valor_modificado": 0.5111,
+      "cambio_detectado": true
+    },
+    "mensaje": "CDC: 0.4111 -> 0.5111, detectado: True",
+    "ejecutado": "2026-05-20T12:38:08.929609+00:00"
+  },
+  {
+    "test": "alcance_final_4_paises_36_puntos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "paises": [
+        "ARG",
+        "BRA",
+        "CHL",
+        "URY"
+      ],
+      "puntos_por_pais": {
+        "BRA": 5,
+        "URY": 19,
+        "CHL": 8,
+        "ARG": 4
+      }
+    },
+    "mensaje": "Alcance final: Uruguay 19 departamentos, Brasil 5 puntos, Argentina 4 puntos, Chile 8 puntos",
+    "ejecutado": "2026-05-22T11:09:38.849859+00:00"
+  },
+  {
+    "test": "alcance_uruguay_19_departamentos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "faltantes": [],
+      "extras": [],
+      "total_uy": 19
+    },
+    "mensaje": "Uruguay cubre los 19 departamentos por capital/departamental",
+    "ejecutado": "2026-05-22T11:09:38.890493+00:00"
+  },
+  {
+    "test": "cobertura_datasets_36_puntos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "meteo": [],
+      "cams": [],
+      "chirps": []
+    },
+    "mensaje": "Datasets procesados cubren los 36 puntos del alcance",
+    "ejecutado": "2026-05-22T11:09:40.455111+00:00"
+  },
+  {
+    "test": "completitud_firms_criticos",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "latitud": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      },
+      "longitud": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      },
+      "fecha_adq": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      }
+    },
+    "mensaje": "Todos los campos críticos completos",
+    "ejecutado": "2026-05-22T11:09:42.913569+00:00"
+  },
+  {
+    "test": "completitud_meteo_indice_riesgo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "total": 88087
+    },
+    "mensaje": "0 nulos (0.0%) en indice_riesgo",
+    "ejecutado": "2026-05-22T11:09:42.972517+00:00"
+  },
+  {
+    "test": "completitud_cams_pm10",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "filas_evaluadas": 41465
+    },
+    "mensaje": "0 nulos (0.0%) en pm10_media sobre dias con observacion valida",
+    "ejecutado": "2026-05-22T11:09:43.047859+00:00"
+  },
+  {
+    "test": "unicidad_firms",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0,
+      "clave": [
+        "latitud",
+        "longitud",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite"
+      ]
+    },
+    "mensaje": "0 duplicados por clave natural ['latitud', 'longitud', 'fecha_adq', 'hora_adq_hhmm', 'satelite']",
+    "ejecutado": "2026-05-22T11:09:43.953882+00:00"
+  },
+  {
+    "test": "unicidad_meteo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0,
+      "clave": [
+        "punto",
+        "fecha"
+      ]
+    },
+    "mensaje": "0 duplicados (punto, fecha)",
+    "ejecutado": "2026-05-22T11:09:44.009012+00:00"
+  },
+  {
+    "test": "unicidad_cams",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0
+    },
+    "mensaje": "0 duplicados (punto, fecha)",
+    "ejecutado": "2026-05-22T11:09:44.061671+00:00"
+  },
+  {
+    "test": "consistencia_firms_coordenadas",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_bbox_regional": 0,
+      "paises_invalidos": 0,
+      "total": 1946361
+    },
+    "mensaje": "0 focos fuera del bbox regional y 0 con país fuera de BRA/ARG/URY/CHL",
+    "ejecutado": "2026-05-22T11:09:44.228665+00:00"
+  },
+  {
+    "test": "consistencia_meteo_indice_rango",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_de_rango": 0,
+      "rango": "[0, 1]"
+    },
+    "mensaje": "0 índices de riesgo fuera del rango [0,1]",
+    "ejecutado": "2026-05-22T11:09:44.287803+00:00"
+  },
+  {
+    "test": "consistencia_cams_pm10_no_negativo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "negativos": 0
+    },
+    "mensaje": "0 valores negativos en pm10_media",
+    "ejecutado": "2026-05-22T11:09:44.346199+00:00"
+  },
+  {
+    "test": "consistencia_humedad_rango",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_de_rango": 0
+    },
+    "mensaje": "0 valores de humedad fuera de [0%, 100%]",
+    "ejecutado": "2026-05-22T11:09:44.405067+00:00"
+  },
+  {
+    "test": "validez_firms_confianza",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0
+    },
+    "mensaje": "0 valores de confianza fuera de l/n/h (puede ser MODIS numerico)",
+    "ejecutado": "2026-05-22T11:09:46.325939+00:00"
+  },
+  {
+    "test": "validez_meteo_nivel_riesgo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0,
+      "dominio": [
+        "moderado",
+        "alto",
+        "muy_alto",
+        "bajo"
+      ]
+    },
+    "mensaje": "0 valores de nivel_riesgo fuera del dominio permitido",
+    "ejecutado": "2026-05-22T11:09:46.447442+00:00"
+  },
+  {
+    "test": "validez_cams_nivel_pm10",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0,
+      "dominio": [
+        "alerta",
+        "elevado",
+        "normal"
+      ]
+    },
+    "mensaje": "0 valores de nivel_pm10 fuera del dominio",
+    "ejecutado": "2026-05-22T11:09:46.510788+00:00"
+  },
+  {
+    "test": "idempotencia_firms_doble_carga",
+    "categoria": "idempotencia",
+    "estado": "PASS",
+    "metricas": {
+      "original": 1946361,
+      "doble": 3892722,
+      "dedup": 1946361
+    },
+    "mensaje": "Original: 1946361, doble+dedup: 1946361 — deben ser iguales",
+    "ejecutado": "2026-05-22T11:09:49.117577+00:00"
+  },
+  {
+    "test": "idempotencia_meteo_doble_carga",
+    "categoria": "idempotencia",
+    "estado": "PASS",
+    "metricas": {
+      "original": 88087,
+      "dedup": 88087
+    },
+    "mensaje": "Idempotencia meteo: 88087 -> 88087",
+    "ejecutado": "2026-05-22T11:09:49.375212+00:00"
+  },
+  {
+    "test": "cdc_detecta_nuevos",
+    "categoria": "cdc",
+    "estado": "PASS",
+    "metricas": {
+      "registro_nuevo_detectado": true
+    },
+    "mensaje": "CDC detectó correctamente registro nuevo (fecha 2030-01-01)",
+    "ejecutado": "2026-05-22T11:09:49.438224+00:00"
+  },
+  {
+    "test": "cdc_detecta_modificacion",
+    "categoria": "cdc",
+    "estado": "PASS",
+    "metricas": {
+      "valor_original": 0.4111,
+      "valor_modificado": 0.5111,
+      "cambio_detectado": true
+    },
+    "mensaje": "CDC: 0.4111 -> 0.5111, detectado: True",
+    "ejecutado": "2026-05-22T11:09:49.492133+00:00"
+  },
+  {
+    "test": "alcance_final_4_paises_36_puntos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "paises": [
+        "ARG",
+        "BRA",
+        "CHL",
+        "URY"
+      ],
+      "puntos_por_pais": {
+        "URY": 19,
+        "BRA": 5,
+        "CHL": 8,
+        "ARG": 4
+      }
+    },
+    "mensaje": "Alcance final: Uruguay 19 departamentos, Brasil 5 puntos, Argentina 4 puntos, Chile 8 puntos",
+    "ejecutado": "2026-05-22T11:46:00.263048+00:00"
+  },
+  {
+    "test": "alcance_uruguay_19_departamentos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "faltantes": [],
+      "extras": [],
+      "total_uy": 19
+    },
+    "mensaje": "Uruguay cubre los 19 departamentos por capital/departamental",
+    "ejecutado": "2026-05-22T11:46:00.299873+00:00"
+  },
+  {
+    "test": "cobertura_datasets_36_puntos",
+    "categoria": "alcance",
+    "estado": "PASS",
+    "metricas": {
+      "meteo": [],
+      "cams": [],
+      "chirps": []
+    },
+    "mensaje": "Datasets procesados cubren los 36 puntos del alcance",
+    "ejecutado": "2026-05-22T11:46:01.763094+00:00"
+  },
+  {
+    "test": "completitud_firms_criticos",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "latitud": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      },
+      "longitud": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      },
+      "fecha_adq": {
+        "nulos": 0,
+        "pct_nulos": 0.0
+      }
+    },
+    "mensaje": "Todos los campos críticos completos",
+    "ejecutado": "2026-05-22T11:46:03.908100+00:00"
+  },
+  {
+    "test": "completitud_meteo_indice_riesgo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "total": 88087
+    },
+    "mensaje": "0 nulos (0.0%) en indice_riesgo",
+    "ejecutado": "2026-05-22T11:46:03.946660+00:00"
+  },
+  {
+    "test": "completitud_cams_pm10",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "filas_evaluadas": 41465
+    },
+    "mensaje": "0 nulos (0.0%) en pm10_media sobre dias con observacion valida",
+    "ejecutado": "2026-05-22T11:46:04.008240+00:00"
+  },
+  {
+    "test": "unicidad_firms",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0,
+      "clave": [
+        "latitud",
+        "longitud",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite"
+      ]
+    },
+    "mensaje": "0 duplicados por clave natural ['latitud', 'longitud', 'fecha_adq', 'hora_adq_hhmm', 'satelite']",
+    "ejecutado": "2026-05-22T11:46:04.886392+00:00"
+  },
+  {
+    "test": "unicidad_meteo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0,
+      "clave": [
+        "punto",
+        "fecha"
+      ]
+    },
+    "mensaje": "0 duplicados (punto, fecha)",
+    "ejecutado": "2026-05-22T11:46:04.940482+00:00"
+  },
+  {
+    "test": "unicidad_cams",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "duplicados": 0
+    },
+    "mensaje": "0 duplicados (punto, fecha)",
+    "ejecutado": "2026-05-22T11:46:04.987191+00:00"
+  },
+  {
+    "test": "consistencia_firms_coordenadas",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_bbox_regional": 0,
+      "paises_invalidos": 0,
+      "total": 1946361
+    },
+    "mensaje": "0 focos fuera del bbox regional y 0 con país fuera de BRA/ARG/URY/CHL",
+    "ejecutado": "2026-05-22T11:46:05.161567+00:00"
+  },
+  {
+    "test": "consistencia_meteo_indice_rango",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_de_rango": 0,
+      "rango": "[0, 1]"
+    },
+    "mensaje": "0 índices de riesgo fuera del rango [0,1]",
+    "ejecutado": "2026-05-22T11:46:05.200763+00:00"
+  },
+  {
+    "test": "consistencia_cams_pm10_no_negativo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "negativos": 0
+    },
+    "mensaje": "0 valores negativos en pm10_media",
+    "ejecutado": "2026-05-22T11:46:05.259936+00:00"
+  },
+  {
+    "test": "consistencia_humedad_rango",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "fuera_de_rango": 0
+    },
+    "mensaje": "0 valores de humedad fuera de [0%, 100%]",
+    "ejecutado": "2026-05-22T11:46:05.325948+00:00"
+  },
+  {
+    "test": "validez_firms_confianza",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0
+    },
+    "mensaje": "0 valores de confianza fuera de l/n/h (puede ser MODIS numerico)",
+    "ejecutado": "2026-05-22T11:46:07.159194+00:00"
+  },
+  {
+    "test": "validez_meteo_nivel_riesgo",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0,
+      "dominio": [
+        "moderado",
+        "muy_alto",
+        "bajo",
+        "alto"
+      ]
+    },
+    "mensaje": "0 valores de nivel_riesgo fuera del dominio permitido",
+    "ejecutado": "2026-05-22T11:46:07.217106+00:00"
+  },
+  {
+    "test": "validez_cams_nivel_pm10",
+    "categoria": "calidad",
+    "estado": "PASS",
+    "metricas": {
+      "invalidos": 0,
+      "dominio": [
+        "normal",
+        "elevado",
+        "alerta"
+      ]
+    },
+    "mensaje": "0 valores de nivel_pm10 fuera del dominio",
+    "ejecutado": "2026-05-22T11:46:07.262041+00:00"
+  },
+  {
+    "test": "idempotencia_firms_doble_carga",
+    "categoria": "idempotencia",
+    "estado": "PASS",
+    "metricas": {
+      "original": 1946361,
+      "doble": 3892722,
+      "dedup": 1946361
+    },
+    "mensaje": "Original: 1946361, doble+dedup: 1946361 — deben ser iguales",
+    "ejecutado": "2026-05-22T11:46:09.223684+00:00"
+  },
+  {
+    "test": "idempotencia_meteo_doble_carga",
+    "categoria": "idempotencia",
+    "estado": "PASS",
+    "metricas": {
+      "original": 88087,
+      "dedup": 88087
+    },
+    "mensaje": "Idempotencia meteo: 88087 -> 88087",
+    "ejecutado": "2026-05-22T11:46:09.435836+00:00"
+  },
+  {
+    "test": "cdc_detecta_nuevos",
+    "categoria": "cdc",
+    "estado": "PASS",
+    "metricas": {
+      "registro_nuevo_detectado": true
+    },
+    "mensaje": "CDC detectó correctamente registro nuevo (fecha 2030-01-01)",
+    "ejecutado": "2026-05-22T11:46:09.488800+00:00"
+  },
+  {
+    "test": "cdc_detecta_modificacion",
+    "categoria": "cdc",
+    "estado": "PASS",
+    "metricas": {
+      "valor_original": 0.4111,
+      "valor_modificado": 0.5111,
+      "cambio_detectado": true
+    },
+    "mensaje": "CDC: 0.4111 -> 0.5111, detectado: True",
+    "ejecutado": "2026-05-22T11:46:09.534747+00:00"
   }
 ]

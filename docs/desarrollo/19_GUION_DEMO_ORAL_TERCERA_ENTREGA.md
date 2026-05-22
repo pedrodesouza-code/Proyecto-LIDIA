@@ -1,4 +1,4 @@
-# Guion de demo oral para tercera entrega
+﻿# Guion de demo oral para tercera entrega
 
 Este guion sirve para defender el proyecto en vivo sin perderse. La idea es
 mostrar comportamiento real: datos, ETL, bases, CDC, pruebas, dashboard y
@@ -9,7 +9,7 @@ rendimiento.
 Frase inicial:
 
 > El proyecto SINIA-UY integra datos satelitales, meteorologicos y ambientales
-> para monitorear riesgo de incendios en Uruguay, Brasil y Argentina. La solucion
+> para monitorear riesgo de incendios en Uruguay, Brasil, Argentina y Chile. La solucion
 > implementa un pipeline ETL en Python, persistencia relacional en PostgreSQL,
 > persistencia documental en MongoDB y un dashboard Streamlit para analisis.
 
@@ -162,7 +162,7 @@ Frase:
 Resultado esperado:
 
 ```text
-17 passed
+20 passed
 ```
 
 ## 8. Demo rendimiento

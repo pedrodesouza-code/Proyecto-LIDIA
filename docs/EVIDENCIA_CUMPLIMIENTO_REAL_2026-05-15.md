@@ -1,5 +1,7 @@
 # Evidencia de cumplimiento real - 2026-05-15
 
+> Nota 2026-05-20: este documento se conserva como evidencia historica del corte 15/05. El estado vigente para defensa esta en `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`.
+
 Este documento registra verificaciones ejecutadas sobre el entorno local real del proyecto SINIA-UY.
 
 ## Bases de datos reales

@@ -1,4 +1,6 @@
-# Guia de estudio para defensa - Proceso completo SINIA-UY
+﻿# Guia de estudio para defensa - Proceso completo SINIA-UY
+
+> Nota 2026-05-20: esta guia fue preparada el 15/05 y puede contener ejemplos historicos. Para numeros oficiales actuales usar `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`: 4 paises, 36 puntos y 20 tests PASS.
 
 Fecha de preparacion: 2026-05-15
 
@@ -534,7 +536,7 @@ En MongoDB UTEC:
 
 PostgreSQL UTEC:
 
-- `focos_calor`: `1.841.820`, datos hasta `2026-05-15`.
+- `focos_calor`: evidencia UTEC historica `1.841.820`; estado actual local documentado en `reports/carga_completa_ultimo.json`.
 - FIRMS NRT ultimos 5 dias: `5283`.
 - `mv_focos_por_pais`: `3`.
 - `mv_focos_por_pais_mes`: `39`.
@@ -565,7 +567,7 @@ Archivo:
 Resultado final:
 
 ```text
-17 PASS / 0 FAIL
+20 PASS / 0 FAIL
 ```
 
 Que se valido:
@@ -768,7 +770,7 @@ Local:
 - MongoDB funcionando como proceso local.
 - Scheduler corriendo.
 - Datos recientes cargados.
-- Tests: `17 PASS / 0 FAIL`.
+- Tests: `20 PASS / 0 FAIL`.
 
 UTEC:
 
@@ -804,12 +806,12 @@ Si preguntan por tiempo real:
 Si preguntan por calidad:
 
 > Se implementaron tests de completitud, unicidad, consistencia, validez,
-> idempotencia y CDC. La ultima ejecucion dio 17 PASS y 0 FAIL.
+> idempotencia y CDC. La ultima ejecucion dio 20 PASS y 0 FAIL.
 
 Si preguntan por UTEC:
 
 > Se verifico que el servidor estaba accesible pero no actualizado. Luego se
-> corrigio el alcance a Uruguay, Brasil y Argentina, se materializaron resumenes
+> corrigio el alcance a Uruguay, Brasil, Argentina y Chile, se materializaron resumenes
 > SQL y se recargo MongoDB con snapshots historicos y NRT reales. Al final UTEC
 > quedo con datos hasta el 15 de mayo de 2026 y evidencia en reportes versionados.
 

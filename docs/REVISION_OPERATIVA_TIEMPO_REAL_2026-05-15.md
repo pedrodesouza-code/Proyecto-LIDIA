@@ -1,5 +1,7 @@
 # Revision operativa de tiempo real
 
+> Nota 2026-05-20: este documento queda como evidencia historica del 15/05. El estado actual para defensa esta consolidado en `docs/ESTADO_ACTUAL_PROYECTO_2026-05-20.md`.
+
 Fecha: 2026-05-15
 
 Objetivo: verificar que el sistema SINIA-UY este funcionando sin errores operativos

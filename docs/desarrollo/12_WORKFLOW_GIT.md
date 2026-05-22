@@ -22,7 +22,7 @@ El `.gitignore` actual ya excluye correctamente:
 - `.env` y todo `.env.*` (excepto `.env.example`)
 - `data/raw/`, `data/processed/`, `backups/`
 - `logs/`, `*.log`
-- `.claude/`, `.vscode/`, `.idea/`
+- `.vscode/`, `.idea/` y configuraciones locales de herramientas
 
 **Verificación crítica antes de commitear**:
 
