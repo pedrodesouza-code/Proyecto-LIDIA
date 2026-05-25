@@ -1,0 +1,24 @@
+{
+  "inicio": "2026-05-19T15:18:45.268258+00:00",
+  "alcance": {
+    "paises": [
+      "ARG",
+      "BRA",
+      "CHL",
+      "URY"
+    ],
+    "puntos": 36
+  },
+  "fuentes": {
+    "cams": {
+      "nuevos": 18060,
+      "consolidado": 92429,
+      "puntos_consolidados": 34,
+      "errores": {
+        "Fray_Bentos": "429 Client Error: Too Many Requests for url: https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-33.13&longitude=-58.3&start_date=2018-01-01&end_date=2026-03-29&timezone=UTC&hourly=pm10%2Cpm2_5%2Caerosol_optical_depth%2Cdust%2Ceuropean_aqi%2Ceuropean_aqi_pm10%2Ceuropean_aqi_pm2_5",
+        "Tacuarembo": "429 Client Error: Too Many Requests for url: https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-31.73&longitude=-55.98&start_date=2018-01-01&end_date=2026-03-29&timezone=UTC&hourly=pm10%2Cpm2_5%2Caerosol_optical_depth%2Cdust%2Ceuropean_aqi%2Ceuropean_aqi_pm10%2Ceuropean_aqi_pm2_5"
+      }
+    }
+  },
+  "fin": "2026-05-19T15:20:16.310901+00:00"
+}

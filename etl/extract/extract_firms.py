@@ -46,7 +46,7 @@ logger = setup_logger("sinia.extract.firms")
 
 # Bounding box de Sudamérica importado desde settings.
 # Formato requerido por la API de FIRMS: "lon_min,lat_min,lon_max,lat_max"
-# Cubre los 6 países núcleo: Brasil, Bolivia, Paraguay, Argentina, Chile, Perú.
+# Cubre el alcance final: Uruguay, Brasil, Argentina y Chile.
 FIRMS_BBOX = SA_BBOX   # "-82.0,-56.0,-34.0,13.0"
 
 # Máximo de días por request que acepta el endpoint de archivo de FIRMS
@@ -93,7 +93,7 @@ def extraer_firms_nrt(
         )
 
     # Construimos la URL de la API para descarga NRT por bounding box (Sudamérica).
-    # Usamos bbox en lugar de código de país porque cubrimos 6 países simultáneamente.
+    # Usamos bbox en lugar de código de país porque cubrimos el alcance regional completo.
     # Formato: /area/csv/{key}/{sensor}/{bbox}/{días_hacia_atrás}
     url = f"{FIRMS_BASE_URL}/{FIRMS_MAP_KEY}/{sensor}/{FIRMS_BBOX}/{dias}"
 
@@ -398,28 +398,73 @@ def explorar_muestra_firms(df: pd.DataFrame) -> dict:
 # =============================================================================
 
 if __name__ == "__main__":
+    import json
+
     print("=" * 60)
     print("SINIA-SA — Extractor NASA FIRMS (Sudamérica)")
     print("=" * 60)
+    print(f"Fuente      : NASA FIRMS (Fire Information for Resource Management System)")
+    print(f"Satélites   : VIIRS Suomi NPP / NOAA-20 / MODIS Terra-Aqua")
+    print(f"Cobertura   : Sudamérica — bbox {FIRMS_BBOX}")
+    print(f"Endpoint    : {FIRMS_BASE_URL}")
 
     # Verificamos si la MAP_KEY está configurada antes de intentar descargar
     if not FIRMS_MAP_KEY:
         print(
-            "\nMAP_KEY no configurada.\n"
+            "\n[ERROR] MAP_KEY no configurada.\n"
             "1. Andá a: https://firms.modaps.eosdis.nasa.gov/api/area/\n"
             "2. Registrate y copiá tu MAP_KEY\n"
             "3. Agregá a config/.env: FIRMS_MAP_KEY=tu_key_aqui\n"
         )
     else:
-        # Mostramos los primeros 8 caracteres de la key por seguridad
         print(f"\nMAP_KEY detectada: {FIRMS_MAP_KEY[:8]}...")
-        print("Descargando focos NRT (últimos 2 días)...\n")
 
-        # Ejecutamos la descarga NRT de prueba
-        df = extraer_firms_nrt(dias=2)
+        # ── Prueba 1: NRT (últimos 2 días) ──────────────────────────────
+        print("\n" + "-" * 60)
+        print("PRUEBA 1 — Descarga NRT (Near Real-Time, últimos 2 días)")
+        print("-" * 60)
+        print("Sensor   : VIIRS_SNPP_NRT")
+        print("Período  : últimos 2 días")
+        print("Descargando...\n")
 
-        # Si obtuvimos datos, mostramos las métricas de calidad
-        if not df.empty:
-            metricas = explorar_muestra_firms(df)
-            import json
-            print(json.dumps(metricas, indent=2, ensure_ascii=False))
+        df_nrt = extraer_firms_nrt(sensor="VIIRS_SNPP_NRT", dias=2)
+
+        if not df_nrt.empty:
+            print(f"[OK] Registros descargados : {len(df_nrt)}")
+            print(f"     Columnas              : {list(df_nrt.columns)}")
+            print(f"\nPrimeras 5 filas:")
+            print(df_nrt.head().to_string())
+            print(f"\nMétricas de calidad:")
+            metricas_nrt = explorar_muestra_firms(df_nrt)
+            print(json.dumps(metricas_nrt, indent=2, ensure_ascii=False))
+        else:
+            print("[INFO] Sin focos detectados en el período NRT solicitado.")
+
+        # ── Prueba 2: Archivo histórico (muestra de 5 días) ─────────────
+        print("\n" + "-" * 60)
+        print("PRUEBA 2 — Descarga Archivo Histórico (muestra: 5 días)")
+        print("-" * 60)
+        print("Sensor   : VIIRS_SNPP_SP")
+        print("Período  : 2024-01-01  →  2024-01-05")
+        print("Descargando...\n")
+
+        df_arch = extraer_firms_archivo(
+            sensor="VIIRS_SNPP_SP",
+            fecha_inicio="2024-01-01",
+            fecha_fin="2024-01-05",
+        )
+
+        if not df_arch.empty:
+            print(f"[OK] Registros descargados : {len(df_arch)}")
+            print(f"     Columnas              : {list(df_arch.columns)}")
+            print(f"\nPrimeras 5 filas:")
+            print(df_arch.head().to_string())
+            print(f"\nMétricas de calidad:")
+            metricas_arch = explorar_muestra_firms(df_arch)
+            print(json.dumps(metricas_arch, indent=2, ensure_ascii=False))
+        else:
+            print("[INFO] Sin focos en el período de archivo solicitado.")
+
+    print("\n" + "=" * 60)
+    print("Extractor FIRMS finalizado.")
+    print("=" * 60)

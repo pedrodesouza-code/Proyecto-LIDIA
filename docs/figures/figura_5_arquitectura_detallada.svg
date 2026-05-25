@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      .title { font: 700 28px Arial, Helvetica, sans-serif; fill: #1f2a36; }
+      .label { font: 700 18px Arial, Helvetica, sans-serif; fill: #1f2a36; }
+      .body { font: 400 14px Arial, Helvetica, sans-serif; fill: #314151; }
+      .src { fill: #dbeafe; stroke: #335c81; stroke-width: 2; rx: 16; ry: 16; }
+      .etl { fill: #fde68a; stroke: #a16207; stroke-width: 2; rx: 16; ry: 16; }
+      .stg { fill: #e9d5ff; stroke: #6b21a8; stroke-width: 2; rx: 16; ry: 16; }
+      .sql { fill: #dcfce7; stroke: #166534; stroke-width: 2; rx: 16; ry: 16; }
+      .nosql { fill: #cffafe; stroke: #155e75; stroke-width: 2; rx: 16; ry: 16; }
+      .app { fill: #fee2e2; stroke: #b91c1c; stroke-width: 2; rx: 16; ry: 16; }
+      .ops { fill: #f3f4f6; stroke: #4b5563; stroke-width: 2; rx: 16; ry: 16; }
+      .line { stroke: #334155; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="800" y="50" text-anchor="middle" class="title">Figura 5. Arquitectura detallada con flujo de datos y componentes</text>
+
+  <rect x="50" y="110" width="220" height="70" class="src"/>
+  <text x="160" y="153" text-anchor="middle" class="label">NASA FIRMS</text>
+
+  <rect x="50" y="210" width="220" height="70" class="src"/>
+  <text x="160" y="253" text-anchor="middle" class="label">Open-Meteo / ERA5-Land</text>
+
+  <rect x="50" y="310" width="220" height="70" class="src"/>
+  <text x="160" y="353" text-anchor="middle" class="label">CAMS / Copernicus</text>
+
+  <rect x="50" y="410" width="220" height="70" class="src"/>
+  <text x="160" y="453" text-anchor="middle" class="label">CHIRPS</text>
+
+  <rect x="50" y="510" width="220" height="70" class="src"/>
+  <text x="160" y="553" text-anchor="middle" class="label">MODIS / AppEEARS</text>
+
+  <rect x="380" y="90" width="280" height="170" class="etl"/>
+  <text x="520" y="130" text-anchor="middle" class="label">Extract</text>
+  <text x="520" y="160" text-anchor="middle" class="body">Scripts Python por fuente</text>
+  <text x="520" y="185" text-anchor="middle" class="body">APIs REST y descargas reproducibles</text>
+  <text x="520" y="210" text-anchor="middle" class="body">Ventanas temporales CDC</text>
+
+  <rect x="380" y="300" width="280" height="190" class="etl"/>
+  <text x="520" y="340" text-anchor="middle" class="label">Transform</text>
+  <text x="520" y="370" text-anchor="middle" class="body">Validación con Pydantic</text>
+  <text x="520" y="395" text-anchor="middle" class="body">Normalización temporal y espacial</text>
+  <text x="520" y="420" text-anchor="middle" class="body">Cálculo de índice de riesgo</text>
+  <text x="520" y="445" text-anchor="middle" class="body">Controles de calidad</text>
+
+  <rect x="380" y="540" width="280" height="120" class="stg"/>
+  <text x="520" y="580" text-anchor="middle" class="label">Staging</text>
+  <text x="520" y="610" text-anchor="middle" class="body">Parquet / lotes procesados</text>
+  <text x="520" y="635" text-anchor="middle" class="body">Base para recarga y auditoría</text>
+
+  <rect x="780" y="180" width="300" height="180" class="sql"/>
+  <text x="930" y="220" text-anchor="middle" class="label">MySQL Data Warehouse</text>
+  <text x="930" y="250" text-anchor="middle" class="body">Dimensiones conformadas</text>
+  <text x="930" y="275" text-anchor="middle" class="body">Hechos por grano temporal</text>
+  <text x="930" y="300" text-anchor="middle" class="body">Upserts idempotentes</text>
+  <text x="930" y="325" text-anchor="middle" class="body">Constraints, índices y vistas</text>
+
+  <rect x="780" y="450" width="300" height="180" class="nosql"/>
+  <text x="930" y="490" text-anchor="middle" class="label">MongoDB</text>
+  <text x="930" y="520" text-anchor="middle" class="body">ejecuciones_etl</text>
+  <text x="930" y="545" text-anchor="middle" class="body">alertas</text>
+  <text x="930" y="570" text-anchor="middle" class="body">focos_snapshots</text>
+  <text x="930" y="595" text-anchor="middle" class="body">JSON Schema y trazabilidad</text>
+
+  <rect x="1180" y="240" width="270" height="150" class="app"/>
+  <text x="1315" y="280" text-anchor="middle" class="label">Streamlit</text>
+  <text x="1315" y="310" text-anchor="middle" class="body">KPIs</text>
+  <text x="1315" y="335" text-anchor="middle" class="body">Series temporales y mapas</text>
+  <text x="1315" y="360" text-anchor="middle" class="body">Comparativos y trazabilidad</text>
+
+  <rect x="1180" y="500" width="270" height="150" class="ops"/>
+  <text x="1315" y="540" text-anchor="middle" class="label">Operación y control</text>
+  <text x="1315" y="570" text-anchor="middle" class="body">CDC, idempotencia, logs</text>
+  <text x="1315" y="595" text-anchor="middle" class="body">Testing y calidad de datos</text>
+  <text x="1315" y="620" text-anchor="middle" class="body">Evidencia para seguimiento</text>
+
+  <path d="M 270 145 L 380 145" class="line"/>
+  <path d="M 270 245 L 380 170" class="line"/>
+  <path d="M 270 345 L 380 195" class="line"/>
+  <path d="M 270 445 L 380 220" class="line"/>
+  <path d="M 270 545 L 380 245" class="line"/>
+
+  <path d="M 520 260 L 520 300" class="line"/>
+  <path d="M 520 490 L 520 540" class="line"/>
+  <path d="M 660 390 L 780 270" class="line"/>
+  <path d="M 660 430 L 780 540" class="line"/>
+  <path d="M 660 600 L 780 270" class="line"/>
+  <path d="M 660 600 L 780 540" class="line"/>
+
+  <path d="M 1080 270 L 1180 315" class="line"/>
+  <path d="M 1080 540 L 1180 575" class="line"/>
+  <path d="M 1315 390 L 1315 500" class="line"/>
+
+  <text x="800" y="875" text-anchor="middle" class="body">Fuente: elaboración propia.</text>
+</svg>

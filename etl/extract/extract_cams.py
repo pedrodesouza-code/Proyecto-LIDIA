@@ -7,7 +7,7 @@
 #
 # Contexto del proyecto:
 # Usamos CAMS vía Open-Meteo Air Quality API (proxy gratuito, sin key)
-# para los 18 puntos de monitoreo distribuidos en 6 países de Sudamérica.
+# para los 36 puntos del alcance final: Uruguay completo + Brasil/Argentina estratégicos + Chile volcánico.
 #
 # Variables principales:
 #   - PM10:  Partículas con diámetro ≤ 10 µm (humo de incendios)
@@ -252,22 +252,65 @@ if __name__ == "__main__":
     import json
 
     print("=" * 60)
-    print("SINIA-UY — Extractor CAMS (Calidad del Aire)")
+    print("SINIA-SA — Extractor CAMS (Calidad del Aire)")
     print("=" * 60)
-    print("\nDescargando calidad del aire para Buenos_Aires (enero 2024)...\n")
+    print(f"Fuente      : CAMS vía Open-Meteo Air Quality API (proxy gratuito)")
+    print(f"Endpoint    : {URL_CALIDAD_AIRE}")
+    print(f"Resolución  : horaria (datos desde 2022)")
+    print(f"Variables   : {VARIABLES_HORARIAS_CALIDAD}")
+    print(f"Puntos conf : {list(PUNTOS_METEO.keys())}")
+
+    # ── Prueba 1: un punto, un mes ───────────────────────────────────────
+    PUNTO_PRUEBA = list(PUNTOS_METEO.keys())[0]   # Primer punto configurado
+    print("\n" + "-" * 60)
+    print(f"PRUEBA 1 — Calidad del aire para {PUNTO_PRUEBA} (enero 2024)")
+    print("-" * 60)
+    print(f"Punto      : {PUNTO_PRUEBA}")
+    print(f"Período    : 2024-01-01  →  2024-01-31")
+    print(f"Granular.  : hourly")
+    print("Descargando...\n")
 
     df = extraer_cams_historico(
-        punto="Buenos_Aires",
+        punto=PUNTO_PRUEBA,
         fecha_inicio="2024-01-01",
         fecha_fin="2024-01-31",
     )
 
     if not df.empty:
-        print(f"Registros: {len(df)}")
-        print(f"Columnas: {list(df.columns)}")
-        print(f"\nPrimeras filas:")
+        print(f"[OK] Registros descargados : {len(df)}")
+        print(f"     Columnas              : {list(df.columns)}")
+        print(f"     Rango fechas          : {df['fecha_hora'].min()}  →  {df['fecha_hora'].max()}")
+        print(f"\nPrimeras 5 filas:")
         print(df.head().to_string())
         print(f"\nMétricas de calidad:")
         metricas = explorar_muestra_cams(df)
         print(json.dumps(metricas, indent=2, ensure_ascii=False))
+    else:
+        print(f"[ERROR] Sin datos para {PUNTO_PRUEBA} — verificar conectividad.")
+
+    # ── Prueba 2: segundo punto de control ──────────────────────────────
+    if len(PUNTOS_METEO) > 1:
+        PUNTO_PRUEBA_2 = list(PUNTOS_METEO.keys())[1]
+        print("\n" + "-" * 60)
+        print(f"PRUEBA 2 — Control rápido para {PUNTO_PRUEBA_2} (enero 2024)")
+        print("-" * 60)
+        print("Descargando...\n")
+
+        df2 = extraer_cams_historico(
+            punto=PUNTO_PRUEBA_2,
+            fecha_inicio="2024-01-01",
+            fecha_fin="2024-01-07",
+        )
+        if not df2.empty:
+            print(f"[OK] Registros: {len(df2)}")
+            for col in ["pm10", "pm2_5", "european_aqi"]:
+                if col in df2.columns:
+                    media = df2[col].mean(skipna=True)
+                    print(f"     {col:<25} media = {media:.2f}")
+        else:
+            print(f"[INFO] Sin datos para {PUNTO_PRUEBA_2}.")
+
+    print("\n" + "=" * 60)
+    print("Extractor CAMS finalizado.")
+    print("=" * 60)
 1

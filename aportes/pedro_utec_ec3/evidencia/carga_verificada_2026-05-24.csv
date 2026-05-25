@@ -1,0 +1,12 @@
+capa,tabla,registros,estado
+staging,stg_firms_incendios,3672055,validado
+staging,stg_openmeteo_clima,157752,validado
+staging,stg_calidad_aire,1630848,validado
+staging,stg_chirps_precipitacion,1404,validado
+staging,stg_modis_cobertura,266,validado
+dw,fact_incendio,3672055,validado
+dw,dim_clima,6573,validado
+dw,dim_calidad_aire,17544,validado
+dw,dim_precipitacion,1872,validado
+dw,dim_cobertura_vegetal,140,validado
+dw,fact_incendio_con_clima_id,110000,parcial

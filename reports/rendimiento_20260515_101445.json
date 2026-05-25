@@ -1,0 +1,130 @@
+{
+  "generado_en": "2026-05-15T13:14:42.193597+00:00",
+  "entorno": {
+    "python": "3.13.5",
+    "sistema": "Windows-11-10.0.26200-SP0",
+    "maquina": "AMD64"
+  },
+  "archivos": {
+    "cams_nrt_procesado.parquet": {
+      "bytes": 22129,
+      "modificado": "2026-03-29T18:55:51.590331+00:00"
+    },
+    "cams_procesado_todos.parquet": {
+      "bytes": 202383,
+      "modificado": "2026-05-12T03:25:08.931306+00:00"
+    },
+    "chirps_sa.parquet": {
+      "bytes": 22399,
+      "modificado": "2026-05-12T03:25:10.318411+00:00"
+    },
+    "firms_procesado.parquet": {
+      "bytes": 42317452,
+      "modificado": "2026-05-12T03:24:47.858604+00:00"
+    },
+    "forecast_riesgo.parquet": {
+      "bytes": 18271,
+      "modificado": "2026-05-12T03:24:52.550382+00:00"
+    },
+    "meteo_procesado_todos.parquet": {
+      "bytes": 437514,
+      "modificado": "2026-05-12T03:24:52.441251+00:00"
+    },
+    "modis_lc.parquet": {
+      "bytes": 4702,
+      "modificado": "2026-05-12T03:25:35.834318+00:00"
+    }
+  },
+  "metricas": {
+    "lectura_firms_procesado": {
+      "ms_min": 750.991,
+      "ms_promedio": 750.991,
+      "ms_max": 750.991,
+      "repeticiones": 1,
+      "resultado": 1836537
+    },
+    "lectura_meteo_procesado_todos": {
+      "ms_min": 13.945,
+      "ms_promedio": 13.945,
+      "ms_max": 13.945,
+      "repeticiones": 1,
+      "resultado": 23104
+    },
+    "lectura_cams_procesado_todos": {
+      "ms_min": 9.171,
+      "ms_promedio": 9.171,
+      "ms_max": 9.171,
+      "repeticiones": 1,
+      "resultado": 23199
+    },
+    "lectura_forecast_riesgo": {
+      "ms_min": 6.371,
+      "ms_promedio": 6.371,
+      "ms_max": 6.371,
+      "repeticiones": 1,
+      "resultado": 63
+    },
+    "lectura_chirps_sa": {
+      "ms_min": 4.861,
+      "ms_promedio": 4.861,
+      "ms_max": 4.861,
+      "repeticiones": 1,
+      "resultado": 858
+    },
+    "lectura_modis_lc": {
+      "ms_min": 4.31,
+      "ms_promedio": 4.31,
+      "ms_max": 4.31,
+      "repeticiones": 1,
+      "resultado": 63
+    },
+    "q1_focos_por_mes": {
+      "ms_min": 449.567,
+      "ms_promedio": 490.622,
+      "ms_max": 546.954,
+      "repeticiones": 3,
+      "resultado": 12
+    },
+    "q2_ranking_dias_focos": {
+      "ms_min": 52.432,
+      "ms_promedio": 54.646,
+      "ms_max": 55.811,
+      "repeticiones": 3,
+      "resultado": 417340
+    },
+    "q3_riesgo_por_punto": {
+      "ms_min": 2.782,
+      "ms_promedio": 3.533,
+      "ms_max": 4.682,
+      "repeticiones": 3,
+      "resultado": 5748
+    },
+    "q4_pm10_por_punto": {
+      "ms_min": 2.285,
+      "ms_promedio": 4.515,
+      "ms_max": 8.334,
+      "repeticiones": 3,
+      "resultado": 21.741518188567188
+    },
+    "incremental_firms_ultimos_7_dias": {
+      "ms_min": 135.225,
+      "ms_promedio": 148.51,
+      "ms_max": 160.979,
+      "repeticiones": 3,
+      "resultado": 12145
+    },
+    "simulacion_carga_doble_idempotente_firms": {
+      "ms_min": 81.741,
+      "ms_promedio": 87.158,
+      "ms_max": 97.886,
+      "repeticiones": 3,
+      "resultado": 100000
+    }
+  },
+  "sla": {
+    "carga_completa_max_min": 15,
+    "carga_incremental_max_min": 2,
+    "consulta_analitica_max_ms": 3000,
+    "actualizacion_minima": "diaria historica y cada 1-3 horas para NRT"
+  }
+}

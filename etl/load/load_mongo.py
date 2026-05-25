@@ -21,6 +21,7 @@ Estrategia CDC:
 
 from __future__ import annotations
 
+import os
 import socket
 from datetime import datetime, timezone, date
 from pathlib import Path
@@ -51,7 +52,7 @@ def get_client() -> MongoClient:
     uri = (
         f"mongodb://{MONGO_CONFIG['user']}:{MONGO_CONFIG['password']}"
         f"@{MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}"
-        f"/{MONGO_CONFIG['database']}?authSource=admin"
+        f"/{MONGO_CONFIG['database']}?authSource={os.getenv('MONGO_AUTH_SOURCE', MONGO_CONFIG['database'])}"
         if MONGO_CONFIG.get("user") and MONGO_CONFIG.get("password")
         else f"mongodb://{MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}"
     )
@@ -101,12 +102,21 @@ def crear_colecciones_con_schema() -> None:
             )
             logger.info(f"Colección creada: {nombre_col}")
         else:
-            # Actualizar validador si ya existe
-            db.command("collMod", nombre_col,
-                       validator=schema,
-                       validationLevel="moderate",
-                       validationAction="warn")
-            logger.info(f"Colección ya existe, validador actualizado: {nombre_col}")
+            # Actualizar validador si ya existe. En servidores académicos puede
+            # no haber permisos para collMod; en ese caso seguimos sin fallar.
+            try:
+                db.command(
+                    "collMod",
+                    nombre_col,
+                    validator=schema,
+                    validationLevel="moderate",
+                    validationAction="warn",
+                )
+                logger.info(f"Colección ya existe, validador actualizado: {nombre_col}")
+            except Exception as exc:
+                logger.warning(
+                    f"No se pudo actualizar el validador de {nombre_col}: {exc}"
+                )
 
     # ── Índices ───────────────────────────────────────────────────────────────
     col_etl: Collection = db["ejecuciones_etl"]
@@ -347,6 +357,7 @@ def guardar_snapshot_focos(df_focos: pd.DataFrame, df_meteo: pd.DataFrame | None
             focos_lista = []
             for _, row in grupo.iterrows():
                 focos_lista.append({
+                    "pais":               _safe(row.get("pais")),
                     "latitud":            _safe(row.get("latitud")),
                     "longitud":           _safe(row.get("longitud")),
                     "hora_adq_hhmm":      _safe(row.get("hora_adq_hhmm")),

@@ -281,17 +281,28 @@ def cargar_focos_calor(df: pd.DataFrame) -> dict[str, int]:
         extra={"etl_stage": "load", "source": "firms"},
     )
 
-    # Refrescar vista materializada si hubo inserciones nuevas
+    # Refrescar vista materializada si existe y el usuario tiene permisos.
+    # El dashboard usa la vista normal v_focos_por_pais_mes, por lo que este
+    # refresco es una optimizacion opcional y no debe marcar error operativo.
     if insertados > 0:
         try:
             conn2 = get_connection()
             with conn2.cursor() as cur:
-                cur.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY mv_focos_por_pais_mes")
-            conn2.commit()
+                cur.execute("""
+                    SELECT 1
+                    FROM pg_matviews
+                    WHERE schemaname = 'public'
+                      AND matviewname = 'mv_focos_por_pais_mes'
+                """)
+                if cur.fetchone():
+                    cur.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY mv_focos_por_pais_mes")
+                    conn2.commit()
+                    logger.info("mv_focos_por_pais_mes refrescada", extra={"etl_stage": "load", "source": "firms"})
+                else:
+                    logger.info("mv_focos_por_pais_mes no existe; se usa v_focos_por_pais_mes")
             conn2.close()
-            logger.info("mv_focos_por_pais_mes refrescada", extra={"etl_stage": "load", "source": "firms"})
         except Exception as e:
-            logger.warning(f"No se pudo refrescar mv_focos_por_pais_mes: {e}")
+            logger.info(f"Refresh opcional de mv_focos_por_pais_mes omitido: {e}")
 
     return {"insertados": insertados, "actualizados": actualizados,
             "sin_cambio": sin_cambio, "errores": errores}
@@ -759,7 +770,7 @@ def ejecutar_carga_completa() -> None:
             cargar_meteo_diario(df_fc, tipo_dato="forecast")
 
     # ── 4. calidad del aire ───────────────────────────────────────────────────
-    for parquet in DIR_PROCESADO.glob("cams_*.parquet"):
+    for parquet in DIR_PROCESADO.glob("cams_procesado_*.parquet"):
         df_c = pd.read_parquet(parquet)
         if not df_c.empty:
             logger.info(f"Cargando CAMS desde {parquet.name} ({len(df_c)} registros)...")

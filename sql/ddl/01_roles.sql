@@ -26,15 +26,22 @@ BEGIN
 END
 $$;
 
--- Usuarios con contraseña (las contraseñas se gestionan por variables de entorno)
--- En producción reemplazar 'CAMBIAR_PASSWORD' por valores seguros del .env
+-- Usuarios de aplicacion.
+-- Las contrasenas reales NO se versionan en este archivo.
+-- Despues de crear los usuarios, asignar passwords desde un entorno seguro:
+--
+--   ALTER USER sinia_dash_user WITH PASSWORD '<valor_seguro_del_env>';
+--   ALTER USER sinia_etl_user  WITH PASSWORD '<valor_seguro_del_env>';
+--
+-- En Docker o despliegue, esos valores deben venir de docker/.env, config/.env
+-- o del gestor de secretos del ambiente.
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'sinia_dash_user') THEN
-        CREATE USER sinia_dash_user WITH PASSWORD 'sinia_dash_2026' IN ROLE sinia_readonly;
+        CREATE USER sinia_dash_user IN ROLE sinia_readonly;
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'sinia_etl_user') THEN
-        CREATE USER sinia_etl_user WITH PASSWORD 'sinia_etl_2026' IN ROLE sinia_etl;
+        CREATE USER sinia_etl_user IN ROLE sinia_etl;
     END IF;
 END
 $$;

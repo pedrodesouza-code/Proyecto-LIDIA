@@ -1,0 +1,107 @@
+{
+  "generado_en": "2026-05-18T01:29:56.567087+00:00",
+  "alcance": [
+    "URY",
+    "BRA",
+    "ARG"
+  ],
+  "postgres": {
+    "estado": "ok",
+    "metricas": {
+      "focos_por_pais": {
+        "ms_min": 0.718,
+        "ms_promedio": 3.252,
+        "ms_max": 8.262,
+        "repeticiones": 3,
+        "resultado": {
+          "ARG": 1039964,
+          "BRA": 9257301,
+          "URY": 46317
+        }
+      },
+      "focos_por_mes": {
+        "ms_min": 1.694,
+        "ms_promedio": 2.92,
+        "ms_max": 5.179,
+        "repeticiones": 3,
+        "resultado": 255
+      },
+      "ejecuciones_etl": {
+        "ms_min": 0.653,
+        "ms_promedio": 2.62,
+        "ms_max": 6.551,
+        "repeticiones": 3,
+        "resultado": 72
+      },
+      "riesgo_por_pais": {
+        "ms_min": 52.666,
+        "ms_promedio": 65.374,
+        "ms_max": 90.265,
+        "repeticiones": 3,
+        "resultado": {
+          "ARG": 0.3748877568825126,
+          "BRA": 0.4141895385808453,
+          "URY": 0.37446761904761905
+        }
+      }
+    }
+  },
+  "mongo": {
+    "estado": "ok",
+    "metricas": {
+      "focos_por_pais_embebidos": {
+        "ms_min": 9216.278,
+        "ms_promedio": 9630.797,
+        "ms_max": 10081.484,
+        "repeticiones": 3,
+        "resultado": {
+          "ARG": 96232,
+          "BRA": 1737010,
+          "URY": 3295
+        }
+      },
+      "focos_por_pais_materializado": {
+        "ms_min": 1.515,
+        "ms_promedio": 4.472,
+        "ms_max": 9.943,
+        "repeticiones": 3,
+        "resultado": {
+          "ARG": 96232,
+          "BRA": 1737010,
+          "URY": 3295
+        }
+      },
+      "snapshots_por_mes": {
+        "ms_min": 3.912,
+        "ms_promedio": 4.783,
+        "ms_max": 5.808,
+        "repeticiones": 3,
+        "resultado": 12
+      },
+      "focos_por_mes_materializado": {
+        "ms_min": 1.64,
+        "ms_promedio": 1.759,
+        "ms_max": 1.88,
+        "repeticiones": 3,
+        "resultado": 36
+      },
+      "ejecuciones_etl": {
+        "ms_min": 1.56,
+        "ms_promedio": 1.74,
+        "ms_max": 1.844,
+        "repeticiones": 3,
+        "resultado": 1
+      },
+      "snapshots_totales": {
+        "ms_min": 2.325,
+        "ms_promedio": 2.482,
+        "ms_max": 2.588,
+        "repeticiones": 3,
+        "resultado": 347
+      }
+    }
+  },
+  "estado_general": "ok",
+  "lectura": "PostgreSQL mide hechos normalizados; MongoDB mide documentos/snapshots embebidos y trazabilidad.",
+  "nota": "Si MongoDB local no esta activo, la seccion Mongo queda como pendiente sin invalidar las metricas PostgreSQL."
+}

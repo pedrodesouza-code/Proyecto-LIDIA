@@ -1,0 +1,51 @@
+{
+  "tipo": "backup_real",
+  "generado_en": "2026-05-15T18:07:20.167277+00:00",
+  "directorio": "C:\\Users\\rqf18\\OneDrive\\Documentos\\api\\Custom Office Templates\\EjercicioSQL\\Escritorio\\PROYECTO INGIENERIA DE DATOS\\SONIA-UY\\backups\\real_20260515_150720",
+  "postgres": {
+    "estado": "ok",
+    "conteos_antes": {
+      "puntos_monitoreo": 14,
+      "focos_calor": 10343582,
+      "meteo_diario": 23316,
+      "calidad_aire_diario": 23719,
+      "precipitacion_mensual": 858,
+      "cobertura_vegetal": 63,
+      "etl_ejecuciones": 72
+    },
+    "herramienta": "C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe",
+    "archivo": "C:\\Users\\rqf18\\OneDrive\\Documentos\\api\\Custom Office Templates\\EjercicioSQL\\Escritorio\\PROYECTO INGIENERIA DE DATOS\\SONIA-UY\\backups\\real_20260515_150720\\postgres_sinia_uy_20260515_150720.dump",
+    "bytes": 215898181
+  },
+  "mongo": {
+    "estado": "ok",
+    "conteos_antes": {
+      "alertas": 0,
+      "ejecuciones_etl": 20,
+      "focos_snapshots": 2520
+    },
+    "metodo": "pymongo_jsonl_gzip",
+    "database": "sinia_uy",
+    "colecciones": {
+      "alertas": {
+        "documentos": 0,
+        "archivo": "C:\\Users\\rqf18\\OneDrive\\Documentos\\api\\Custom Office Templates\\EjercicioSQL\\Escritorio\\PROYECTO INGIENERIA DE DATOS\\SONIA-UY\\backups\\real_20260515_150720\\mongo_jsonl\\alertas.jsonl.gz",
+        "bytes": 39
+      },
+      "ejecuciones_etl": {
+        "documentos": 20,
+        "archivo": "C:\\Users\\rqf18\\OneDrive\\Documentos\\api\\Custom Office Templates\\EjercicioSQL\\Escritorio\\PROYECTO INGIENERIA DE DATOS\\SONIA-UY\\backups\\real_20260515_150720\\mongo_jsonl\\ejecuciones_etl.jsonl.gz",
+        "bytes": 1023
+      },
+      "focos_snapshots": {
+        "documentos": 2520,
+        "archivo": "C:\\Users\\rqf18\\OneDrive\\Documentos\\api\\Custom Office Templates\\EjercicioSQL\\Escritorio\\PROYECTO INGIENERIA DE DATOS\\SONIA-UY\\backups\\real_20260515_150720\\mongo_jsonl\\focos_snapshots.jsonl.gz",
+        "bytes": 9397257
+      }
+    }
+  },
+  "config": {
+    "estado": "ok",
+    "directorio": "C:\\Users\\rqf18\\OneDrive\\Documentos\\api\\Custom Office Templates\\EjercicioSQL\\Escritorio\\PROYECTO INGIENERIA DE DATOS\\SONIA-UY\\backups\\real_20260515_150720\\config"
+  }
+}

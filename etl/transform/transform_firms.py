@@ -1,11 +1,11 @@
 # =============================================================================
-# SINIA-SA — Transformación de Datos FIRMS
+# SINIA-UY — Transformación de Datos FIRMS
 # =============================================================================
 # Este módulo limpia y enriquece los datos crudos de focos de calor de NASA FIRMS.
 #
 # Los datos crudos tienen problemas típicos que hay que resolver:
 #   - Tipos de datos incorrectos (fechas como strings, números como texto)
-#   - Focos detectados fuera del bounding box de Sudamérica (ruido geográfico)
+#   - Focos detectados fuera del alcance regional del proyecto
 #   - Duplicados en los bordes entre chunks de descarga
 #   - Confianza en formato texto (l/n/h) que dificulta el análisis numérico
 #
@@ -29,24 +29,19 @@ logger = setup_logger("sinia.transform.firms")
 # CONSTANTES DE TRANSFORMACIÓN
 # -----------------------------------------------------------------------------
 
-# Límites geográficos de Sudamérica parseados desde SA_BBOX
+# Límites geográficos regionales parseados desde SA_BBOX
 # SA_BBOX formato: "lon_min,lat_min,lon_max,lat_max"
 _bbox_vals = [float(v) for v in SA_BBOX.split(",")]
 SA_LON_MIN, SA_LAT_MIN, SA_LON_MAX, SA_LAT_MAX = _bbox_vals
-# SA_LAT_MIN=-56.0, SA_LAT_MAX=13.0, SA_LON_MIN=-82.0, SA_LON_MAX=-34.0
 
 # Bounding boxes por país para asignar el campo pais durante la transformación.
-# Permite hacer JOIN país sin necesidad de geocoding externo.
+# Permite filtrar explícitamente al alcance BRA/ARG/URY/CHL sin depender solo del bbox.
 # Formato: código_iso3 -> (lat_min, lat_max, lon_min, lon_max)
 _BBOX_PAISES = {
-    # Países más pequeños primero: evita que bbox grande de BRA absorba a sus vecinos
-    "PRY": (-27.6, -19.3, -62.6, -54.3),
-    "CHL": (-55.9, -17.5, -75.7, -66.4),
-    "BOL": (-22.9,  -9.7, -69.6, -57.5),
-    "PER": (-18.4,   0.0, -81.3, -68.7),
-    "URY": (-34.9, -30.1, -58.4, -53.1),  # Antes de ARG y BRA para no ser absorbido
+    "URY": (-34.9, -30.1, -58.4, -53.1),  # Primero para evitar absorción por ARG/BRA
+    "CHL": (-56.0, -17.5, -75.7, -66.4),
     "ARG": (-55.1, -21.8, -73.6, -53.6),
-    "BRA": (-34.0,   5.3, -73.9, -34.8),  # Último: bbox más grande
+    "BRA": (-34.0,   5.3, -73.9, -34.8),
 }
 
 # Mapeo del nivel de confianza de VIIRS a valor numérico
@@ -65,7 +60,7 @@ def transformar_firms(df: pd.DataFrame, guardar: bool = True) -> pd.DataFrame:
 
     Pasos de transformación:
     1. Casteo de tipos de datos (strings -> datetime, strings -> float)
-    2. Filtro geográfico (elimina focos fuera de Uruguay)
+    2. Filtro geográfico preliminar por bbox regional
     3. Eliminación de duplicados por clave natural
     4. Normalización de confianza (l/n/h -> 1/2/3)
     5. Creación de columnas derivadas (hora de adquisición, es diurno)
@@ -108,7 +103,7 @@ def transformar_firms(df: pd.DataFrame, guardar: bool = True) -> pd.DataFrame:
             # errors="coerce" convierte valores no numéricos a NaN en lugar de error
 
     # ── Paso 2: Filtro geográfico ─────────────────────────────────────────────
-    # Filtramos focos dentro del bounding box de Sudamérica (6 países núcleo).
+    # Filtramos focos dentro del bounding box regional.
     # Esto elimina cualquier dato espurio fuera de la región de interés.
 
     mascara_geografica = (
@@ -120,7 +115,7 @@ def transformar_firms(df: pd.DataFrame, guardar: bool = True) -> pd.DataFrame:
 
     if focos_fuera > 0:
         logger.warning(
-            f"  Eliminando {focos_fuera} focos con coordenadas fuera del bbox SA",
+            f"  Eliminando {focos_fuera} focos con coordenadas fuera del bbox regional",
             extra={"etl_stage": "transform", "source": "firms"},
         )
 
@@ -135,12 +130,21 @@ def transformar_firms(df: pd.DataFrame, guardar: bool = True) -> pd.DataFrame:
         for cod, (lat_min, lat_max, lon_min, lon_max) in _BBOX_PAISES.items():
             if lat_min <= lat <= lat_max and lon_min <= lon <= lon_max:
                 return cod
-        return "OTR"   # Otro (fuera de los 6 países núcleo pero dentro del bbox SA)
+        return "OTR"   # Otro (fuera del alcance BRA/ARG/URY/CHL pero dentro del bbox regional)
 
     df["pais"] = [
         _asignar_pais(lat, lon)
         for lat, lon in zip(df["latitude"], df["longitude"])
     ]
+
+    paises_validos = set(PAISES_SA.keys())
+    focos_fuera_alcance = int((~df["pais"].isin(paises_validos)).sum())
+    if focos_fuera_alcance > 0:
+        logger.info(
+            f"  Eliminando {focos_fuera_alcance} focos fuera del alcance BRA/ARG/URY/CHL",
+            extra={"etl_stage": "transform", "source": "firms"},
+        )
+    df = df[df["pais"].isin(paises_validos)].copy()
 
     # ── Paso 3: Eliminación de duplicados ────────────────────────────────────
     # Un foco es duplicado si tiene la misma posición, fecha, hora y satélite
@@ -233,7 +237,7 @@ if __name__ == "__main__":
     import glob
 
     print("=" * 60)
-    print("SINIA-SA — Transformación de Datos FIRMS")
+    print("SINIA-UY — Transformación de Datos FIRMS")
     print("=" * 60)
 
     # Buscamos el archivo CSV más reciente en data/raw/firms/

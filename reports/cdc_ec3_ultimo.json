@@ -1,0 +1,65 @@
+{
+  "generado_en": "2026-05-18T01:29:26.369579+00:00",
+  "script": "scripts/evidenciar_cdc_ec3.py",
+  "postgres": {
+    "estado": "ok",
+    "objetivo": "Demostrar insercion, idempotencia, modificacion CDC y rollback en meteo_diario.",
+    "conexion": {
+      "host": "localhost",
+      "port": 5432,
+      "database": "sinia_uy",
+      "user": "sinia_etl_user"
+    },
+    "punto_usado": {
+      "id": 1,
+      "nombre": "Rivera"
+    },
+    "clave_natural": {
+      "fecha": "2099-01-01",
+      "id_punto": 1,
+      "tipo_dato": "forecast"
+    },
+    "conteos": {
+      "antes": 0,
+      "durante_transaccion": 1,
+      "despues_rollback": 0
+    },
+    "operaciones": {
+      "insert_inicial_rowcount": 1,
+      "repeticion_idempotente_rowcount": 0,
+      "modificacion_cdc_rowcount": 1
+    },
+    "fila_modificada_en_transaccion": {
+      "indice_riesgo": 0.8,
+      "nivel_riesgo": "muy_alto",
+      "temperature_2m_max": 41.0
+    },
+    "lectura_defensa": "La primera operacion inserta, la segunda no duplica y la tercera actualiza porque detecta cambios. ROLLBACK deja la base como estaba.",
+    "duracion_segundos": 0.034
+  },
+  "mongo": {
+    "estado": "ok",
+    "objetivo": "Demostrar insercion y limpieza controlada de una ejecucion ETL documental.",
+    "conexion": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "sinia_uy",
+      "user": ""
+    },
+    "conteos": {
+      "antes": 0,
+      "despues_limpieza": 0
+    },
+    "insertado": true,
+    "documento_encontrado": {
+      "fuente": "cdc_demo_ec3",
+      "etapa": "testing",
+      "marca_demo": "cdc_demo_ec3_20260518012927"
+    },
+    "documentos_borrados_limpieza": 1,
+    "lectura_defensa": "MongoDB registra una ejecucion ETL flexible en formato documental. La prueba inserta evidencia y la limpia para no dejar basura.",
+    "duracion_segundos": 0.062
+  },
+  "estado_general": "ok",
+  "nota": "PostgreSQL es obligatorio para la evidencia CDC principal. MongoDB es evidencia complementaria y puede fallar si el servicio no esta activo localmente."
+}

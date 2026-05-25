@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900">
+  <defs>
+    <style>
+      .title { font: 700 28px Arial, Helvetica, sans-serif; fill: #1f2a36; }
+      .label { font: 700 18px Arial, Helvetica, sans-serif; fill: #1f2a36; }
+      .body { font: 400 14px Arial, Helvetica, sans-serif; fill: #314151; }
+      .dim { fill: #dbeafe; stroke: #335c81; stroke-width: 2; rx: 16; ry: 16; }
+      .fact { fill: #dcfce7; stroke: #2f6f4f; stroke-width: 2; rx: 16; ry: 16; }
+      .doc { fill: #fef3c7; stroke: #9a6700; stroke-width: 2; rx: 16; ry: 16; }
+      .line { stroke: #475569; stroke-width: 3; fill: none; }
+    </style>
+  </defs>
+
+  <text x="750" y="50" text-anchor="middle" class="title">Figura 3. Modelo integrado de destino</text>
+
+  <rect x="110" y="110" width="220" height="120" class="dim"/>
+  <text x="220" y="145" text-anchor="middle" class="label">dim_tiempo</text>
+  <text x="220" y="175" text-anchor="middle" class="body">tiempo_key</text>
+  <text x="220" y="200" text-anchor="middle" class="body">fecha, año, mes, día</text>
+
+  <rect x="110" y="300" width="220" height="120" class="dim"/>
+  <text x="220" y="335" text-anchor="middle" class="label">dim_pais</text>
+  <text x="220" y="365" text-anchor="middle" class="body">pais_key</text>
+  <text x="220" y="390" text-anchor="middle" class="body">ISO, nombre, subregión</text>
+
+  <rect x="110" y="490" width="220" height="140" class="dim"/>
+  <text x="220" y="525" text-anchor="middle" class="label">dim_grilla</text>
+  <text x="220" y="555" text-anchor="middle" class="body">grilla_key</text>
+  <text x="220" y="580" text-anchor="middle" class="body">celda_id, 0.25°</text>
+  <text x="220" y="605" text-anchor="middle" class="body">lat/lon centro y bordes</text>
+
+  <rect x="110" y="700" width="220" height="120" class="dim"/>
+  <text x="220" y="735" text-anchor="middle" class="label">dim_cobertura</text>
+  <text x="220" y="765" text-anchor="middle" class="body">cobertura_key</text>
+  <text x="220" y="790" text-anchor="middle" class="body">IGBP, descripción, combustible</text>
+
+  <rect x="520" y="110" width="300" height="140" class="fact"/>
+  <text x="670" y="145" text-anchor="middle" class="label">fact_incendios_diario</text>
+  <text x="670" y="175" text-anchor="middle" class="body">cantidad_focos, FRP total/prom/max</text>
+  <text x="670" y="200" text-anchor="middle" class="body">focos alta confianza, diurnos/nocturnos</text>
+  <text x="670" y="225" text-anchor="middle" class="body">tiempo_key, pais_key, grilla_key</text>
+
+  <rect x="520" y="290" width="300" height="160" class="fact"/>
+  <text x="670" y="325" text-anchor="middle" class="label">fact_meteorologia_diaria</text>
+  <text x="670" y="355" text-anchor="middle" class="body">temperatura, humedad, viento, ET0</text>
+  <text x="670" y="380" text-anchor="middle" class="body">índice_riesgo, nivel_riesgo</text>
+  <text x="670" y="405" text-anchor="middle" class="body">tiempo_key, pais_key, grilla_key</text>
+  <text x="670" y="430" text-anchor="middle" class="body">lote_hash, trazabilidad de carga</text>
+
+  <rect x="520" y="500" width="300" height="140" class="fact"/>
+  <text x="670" y="535" text-anchor="middle" class="label">fact_calidad_aire_diaria</text>
+  <text x="670" y="565" text-anchor="middle" class="body">PM10, PM2.5, AQI, AOD</text>
+  <text x="670" y="590" text-anchor="middle" class="body">horas válidas, alerta OMS</text>
+  <text x="670" y="615" text-anchor="middle" class="body">tiempo_key, pais_key, grilla_key</text>
+
+  <rect x="520" y="690" width="300" height="120" class="fact"/>
+  <text x="670" y="725" text-anchor="middle" class="label">fact_precipitacion_mensual</text>
+  <text x="670" y="755" text-anchor="middle" class="body">precipitación total, anomalía, categoría</text>
+  <text x="670" y="780" text-anchor="middle" class="body">tiempo_key, pais_key, grilla_key</text>
+
+  <rect x="980" y="330" width="310" height="140" class="fact"/>
+  <text x="1135" y="365" text-anchor="middle" class="label">fact_cobertura_vegetal_anual</text>
+  <text x="1135" y="395" text-anchor="middle" class="body">cobertura_key, cambio_interanual</text>
+  <text x="1135" y="420" text-anchor="middle" class="body">porcentaje_clase_dominante</text>
+  <text x="1135" y="445" text-anchor="middle" class="body">tiempo_key, pais_key, grilla_key</text>
+
+  <rect x="980" y="570" width="310" height="170" class="doc"/>
+  <text x="1135" y="605" text-anchor="middle" class="label">MongoDB</text>
+  <text x="1135" y="635" text-anchor="middle" class="body">ejecuciones_etl</text>
+  <text x="1135" y="660" text-anchor="middle" class="body">alertas</text>
+  <text x="1135" y="685" text-anchor="middle" class="body">focos_snapshots</text>
+  <text x="1135" y="715" text-anchor="middle" class="body">Trazabilidad, CDC y calidad</text>
+
+  <path d="M 330 170 L 520 170" class="line"/>
+  <path d="M 330 360 L 520 170" class="line"/>
+  <path d="M 330 560 L 520 170" class="line"/>
+
+  <path d="M 330 170 L 520 360" class="line"/>
+  <path d="M 330 360 L 520 360" class="line"/>
+  <path d="M 330 560 L 520 360" class="line"/>
+
+  <path d="M 330 170 L 520 570" class="line"/>
+  <path d="M 330 360 L 520 570" class="line"/>
+  <path d="M 330 560 L 520 570" class="line"/>
+
+  <path d="M 330 170 L 520 750" class="line"/>
+  <path d="M 330 360 L 520 750" class="line"/>
+  <path d="M 330 560 L 520 750" class="line"/>
+
+  <path d="M 330 760 L 980 400" class="line"/>
+  <path d="M 330 560 L 980 400" class="line"/>
+  <path d="M 330 360 L 980 400" class="line"/>
+  <path d="M 330 170 L 980 400" class="line"/>
+
+  <path d="M 820 180 L 980 625" class="line"/>
+  <path d="M 820 370 L 980 625" class="line"/>
+  <path d="M 820 570 L 980 625" class="line"/>
+  <path d="M 820 750 L 980 625" class="line"/>
+  <path d="M 1290 470 L 1290 570" class="line"/>
+
+  <text x="750" y="860" text-anchor="middle" class="body">Fuente: elaboración propia.</text>
+</svg>

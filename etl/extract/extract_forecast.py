@@ -203,21 +203,66 @@ if __name__ == "__main__":
     import json
 
     print("=" * 60)
-    print("SINIA-UY — Extractor de Pronóstico Open-Meteo")
+    print("SINIA-SA — Extractor Pronóstico Meteorológico (Open-Meteo Forecast)")
     print("=" * 60)
-    print("\nDescargando pronóstico 7 días para todos los puntos...\n")
+    print(f"Fuente      : Open-Meteo Forecast API (sin registro, sin key)")
+    print(f"Endpoint    : {OPENMETEO_BASE_URL}/forecast")
+    print(f"Actualiz.   : cada ~1 hora (modelo GFS/ECMWF)")
+    print(f"Variables   : {VARIABLES_PRONOSTICO_DIARIAS}")
+    print(f"Puntos conf : {list(PUNTOS_METEO.keys())}")
 
-    # Descargamos el pronóstico de 7 días para los 5 departamentos
+    # ── Prueba 1: pronóstico para un punto ──────────────────────────────
+    PUNTO_PRUEBA = list(PUNTOS_METEO.keys())[0]
+    print("\n" + "-" * 60)
+    print(f"PRUEBA 1 — Pronóstico 7 días para {PUNTO_PRUEBA}")
+    print("-" * 60)
+    print(f"Punto      : {PUNTO_PRUEBA}")
+    print(f"Días       : 7 (hacia adelante desde hoy)")
+    print("Descargando...\n")
+
+    df_punto = extraer_pronostico_punto(punto=PUNTO_PRUEBA, dias=7)
+
+    if not df_punto.empty:
+        print(f"[OK] Días de pronóstico    : {len(df_punto)}")
+        print(f"     Columnas              : {list(df_punto.columns)}")
+        print(f"\nPronóstico completo:")
+        columnas_mostrar = [
+            "fecha", "temperature_2m_max", "temperature_2m_min",
+            "relative_humidity_2m_min", "wind_speed_10m_max",
+            "precipitation_sum", "precipitation_probability_max",
+        ]
+        columnas_presentes = [c for c in columnas_mostrar if c in df_punto.columns]
+        print(df_punto[columnas_presentes].to_string(index=False))
+    else:
+        print(f"[ERROR] Sin datos de pronóstico para {PUNTO_PRUEBA}.")
+
+    # ── Prueba 2: pronóstico para todos los puntos ──────────────────────
+    print("\n" + "-" * 60)
+    print("PRUEBA 2 — Pronóstico 7 días para todos los puntos")
+    print("-" * 60)
+    print("Descargando...\n")
+
     df = extraer_pronostico_todos(dias=7)
 
     if not df.empty:
-        print(f"Total de registros: {len(df)}")
-        print(f"Puntos incluidos: {list(df['punto'].unique())}")
-        print(f"\nPrimeros días del pronóstico:")
-        # Mostramos las columnas más relevantes para evaluación rápida
-        columnas_mostrar = [
+        print(f"[OK] Total registros       : {len(df)}")
+        print(f"     Puntos incluidos      : {sorted(df['punto'].unique().tolist())}")
+        print(f"\nResumen por punto (temperatura máx promedio del pronóstico):")
+        for punto, grupo in df.groupby("punto"):
+            if "temperature_2m_max" in grupo.columns:
+                tmax_prom = grupo["temperature_2m_max"].mean()
+                lluvia_tot = grupo["precipitation_sum"].sum() if "precipitation_sum" in grupo.columns else 0
+                print(f"  {punto:<20}  T_max_prom={tmax_prom:.1f}°C   lluvia_total={lluvia_tot:.1f}mm")
+        print(f"\nPrimeras 7 filas del consolidado:")
+        columnas_resumen = [
             "fecha", "punto", "temperature_2m_max", "relative_humidity_2m_min",
-            "wind_speed_10m_max", "precipitation_sum", "precipitation_probability_max"
+            "wind_speed_10m_max", "precipitation_sum", "precipitation_probability_max",
         ]
-        columnas_presentes = [c for c in columnas_mostrar if c in df.columns]
-        print(df[columnas_presentes].to_string())
+        cols_presentes = [c for c in columnas_resumen if c in df.columns]
+        print(df[cols_presentes].head(7).to_string(index=False))
+    else:
+        print("[ERROR] Sin datos de pronóstico.")
+
+    print("\n" + "=" * 60)
+    print("Extractor Pronóstico finalizado.")
+    print("=" * 60)

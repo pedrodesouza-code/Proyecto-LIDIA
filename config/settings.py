@@ -1,5 +1,5 @@
-1# =============================================================================
-# SINIA-SA — Configuración Central del Proyecto (Sudamérica)
+# =============================================================================
+# SINIA-UY — Configuración Central del Proyecto
 # =============================================================================
 # Este archivo es el corazón de la configuración. Define TODAS las constantes,
 # URLs, credenciales y parámetros que usan el resto de los módulos.
@@ -96,56 +96,85 @@ OPENMETEO_ARCHIVE_URL = os.getenv(
 )
 
 # -----------------------------------------------------------------------------
-# ALCANCE GEOGRÁFICO — SUDAMÉRICA
-# 6 países núcleo con mayor actividad de incendios forestales (2018-2025).
+# ALCANCE GEOGRÁFICO — URUGUAY, BRASIL, ARGENTINA Y CHILE
+# 4 países: Uruguay (sede del proyecto), Brasil y Argentina como países
+# limítrofes con mayor influencia sobre incendios en territorio uruguayo, y
+# Chile como país fuente de eventos volcánicos/aerosoles transfronterizos.
+# Justificación: los focos del sur de Brasil (RS), del norte argentino y las
+# erupciones chilenas como Puyehue-Cordón Caulle (2011) o Calbuco (2015)
+# pueden afectar la calidad del aire, la visibilidad y el transporte aéreo
+# en Uruguay.
+# Por compatibilidad mantenemos el nombre PAISES_SA aunque el alcance operativo
+# actual sea de cuatro países.
 # Formato PAISES_SA: código ISO 3166-1 alpha-3 → metadatos del país.
 # -----------------------------------------------------------------------------
 
 PAISES_SA = {
     "BRA": {"nombre": "Brasil",    "codigo_iso2": "BR"},
-    "BOL": {"nombre": "Bolivia",   "codigo_iso2": "BO"},
-    "PRY": {"nombre": "Paraguay",  "codigo_iso2": "PY"},
     "ARG": {"nombre": "Argentina", "codigo_iso2": "AR"},
+    "URY": {"nombre": "Uruguay",   "codigo_iso2": "UY"},
     "CHL": {"nombre": "Chile",     "codigo_iso2": "CL"},
-    "PER": {"nombre": "Perú",      "codigo_iso2": "PE"},
 }
 
-# Bounding box de Sudamérica para FIRMS y filtros espaciales
+# Bounding box regional para FIRMS y filtros espaciales.
+# Se mantiene amplio por compatibilidad con la extracción; el filtro definitivo
+# a BRA/ARG/URY/CHL ocurre en la transformación.
 # Formato: "lon_min,lat_min,lon_max,lat_max"
-SA_BBOX = "-82.0,-56.0,-34.0,13.0"
+SA_BBOX = "-76.0,-56.0,-34.0,6.0"
 
-# Puntos de monitoreo meteorológico — 18 ciudades en 6 países núcleo.
+# Puntos de monitoreo meteorologico — alcance final de 36 puntos:
+# - Uruguay: los 19 departamentos, representados por su capital/departamental.
+# - Brasil: 5 ciudades estrategicas.
+# - Argentina: 4 ciudades estrategicas.
+# - Chile: 6 ciudades estrategicas + 2 puntos volcanicos relevantes.
 # Formato: "Nombre": {"lat": float, "lon": float, "pais": str (ISO 3166-1 alpha-3)}
 # Se usa para extraer datos de Open-Meteo y CAMS por coordenada.
 PUNTOS_METEO_SA = {
-    # ── Brasil (5 puntos — mayor superficie de riesgo del continente) ──
+    # ── Brasil (5 puntos — mayor superficie de riesgo de la región y fuente
+    #    principal de humo transfronterizo hacia Uruguay) ──
     "Cuiabá":        {"lat": -15.60, "lon": -56.10, "pais": "BRA"},  # Capital de Mato Grosso, corazón del Cerrado
     "Porto_Alegre":  {"lat": -30.03, "lon": -51.23, "pais": "BRA"},  # Sur, frontera con AR/UY
     "Manaus":        {"lat":  -3.10, "lon": -60.02, "pais": "BRA"},  # Amazonia occidental
     "Campo_Grande":  {"lat": -20.47, "lon": -54.62, "pais": "BRA"},  # Mato Grosso do Sul, Pantanal
     "Brasília":      {"lat": -15.78, "lon": -47.93, "pais": "BRA"},  # Centro-oeste, Cerrado
-    # ── Bolivia (3 puntos — Chiquitanía y amazonia boliviana) ──
-    "Santa_Cruz":    {"lat": -17.80, "lon": -63.17, "pais": "BOL"},  # Chiquitanía — zona crítica de incendios
-    "Trinidad":      {"lat": -14.83, "lon": -64.90, "pais": "BOL"},  # Beni — amazonia boliviana
-    "La_Paz":        {"lat": -16.50, "lon": -68.15, "pais": "BOL"},  # Capital administrativa
-    # ── Paraguay (2 puntos — Chaco y bosque atlántico) ──
-    "Asunción":      {"lat": -25.29, "lon": -57.64, "pais": "PRY"},  # Capital, corredor de incendios
-    "Concepción":    {"lat": -23.41, "lon": -57.43, "pais": "PRY"},  # Norte, Chaco paraguayo
-    # ── Argentina (4 puntos — norte y centro) ──
+    # ── Argentina (4 puntos — norte y centro, frontera con Uruguay) ──
     "Salta":         {"lat": -24.79, "lon": -65.41, "pais": "ARG"},  # NOA, yungas y chaco salteño
-    "Posadas":       {"lat": -27.37, "lon": -55.90, "pais": "ARG"},  # Misiones, selva misionera
-    "Buenos_Aires":  {"lat": -34.61, "lon": -58.37, "pais": "ARG"},  # Referencia sur
+    "Posadas":       {"lat": -27.37, "lon": -55.90, "pais": "ARG"},  # Misiones, selva misionera limítrofe
+    "Buenos_Aires":  {"lat": -34.61, "lon": -58.37, "pais": "ARG"},  # AMBA, frontera oeste con UY
     "Mendoza":       {"lat": -32.89, "lon": -68.85, "pais": "ARG"},  # Cuyo, incendios de interfaz
-    # ── Chile (2 puntos — zona de interfaz urbano-forestal) ──
-    "Santiago":      {"lat": -33.46, "lon": -70.65, "pais": "CHL"},  # Región Metropolitana
-    "Temuco":        {"lat": -38.74, "lon": -72.59, "pais": "CHL"},  # La Araucanía — zona forestal crítica
-    # ── Perú (2 puntos — amazonia y altiplano) ──
-    "Lima":          {"lat": -12.06, "lon": -77.04, "pais": "PER"},  # Capital costera
-    "Cusco":         {"lat": -13.53, "lon": -71.97, "pais": "PER"},  # Sur andino, colindante con amazonia
+    # ── Chile (8 puntos — ciudades estrategicas y volcanes con impacto regional) ──
+    "Santiago":              {"lat": -33.45, "lon": -70.66, "pais": "CHL"},  # Referencia nacional y calidad de aire urbana
+    "Temuco":                {"lat": -38.74, "lon": -72.59, "pais": "CHL"},  # Zona forestal critica
+    "Valdivia":              {"lat": -39.82, "lon": -73.24, "pais": "CHL"},  # Sur de Chile, corredor volcanico
+    "Osorno":                {"lat": -40.57, "lon": -73.13, "pais": "CHL"},  # Area afectada por Puyehue
+    "Puerto_Montt":          {"lat": -41.47, "lon": -72.94, "pais": "CHL"},  # Area de influencia Calbuco
+    "Coyhaique":             {"lat": -45.57, "lon": -72.07, "pais": "CHL"},  # Patagonia y calidad de aire
+    "Puyehue_Cordon_Caulle": {"lat": -40.59, "lon": -72.12, "pais": "CHL"},  # Erupcion 2011, cenizas hacia Uruguay
+    "Calbuco":               {"lat": -41.33, "lon": -72.61, "pais": "CHL"},  # Erupcion 2015, cenizas reportadas sobre Uruguay
+    # ── Uruguay (19 departamentos — cobertura nacional completa) ──
+    "Artigas":                  {"lat": -30.40, "lon": -56.47, "pais": "URY"},
+    "Canelones":                {"lat": -34.52, "lon": -56.28, "pais": "URY"},
+    "Melo":                     {"lat": -32.37, "lon": -54.18, "pais": "URY"},  # Cerro Largo
+    "Colonia_del_Sacramento":   {"lat": -34.46, "lon": -57.84, "pais": "URY"},
+    "Durazno":                  {"lat": -33.38, "lon": -56.52, "pais": "URY"},
+    "Trinidad":                 {"lat": -33.52, "lon": -56.90, "pais": "URY"},  # Flores
+    "Florida":                  {"lat": -34.10, "lon": -56.21, "pais": "URY"},
+    "Minas":                    {"lat": -34.38, "lon": -55.24, "pais": "URY"},  # Lavalleja
+    "Maldonado":                {"lat": -34.91, "lon": -54.96, "pais": "URY"},
+    "Montevideo":               {"lat": -34.90, "lon": -56.19, "pais": "URY"},
+    "Paysandu":                 {"lat": -32.32, "lon": -58.08, "pais": "URY"},
+    "Fray_Bentos":              {"lat": -33.13, "lon": -58.30, "pais": "URY"},  # Rio Negro
+    "Rivera":                   {"lat": -30.91, "lon": -55.55, "pais": "URY"},
+    "Rocha":                    {"lat": -34.48, "lon": -54.33, "pais": "URY"},
+    "Salto":                    {"lat": -31.38, "lon": -57.97, "pais": "URY"},
+    "San_Jose_de_Mayo":         {"lat": -34.34, "lon": -56.71, "pais": "URY"},
+    "Mercedes":                 {"lat": -33.25, "lon": -58.03, "pais": "URY"},  # Soriano
+    "Tacuarembo":               {"lat": -31.73, "lon": -55.98, "pais": "URY"},
+    "Treinta_y_Tres":           {"lat": -33.23, "lon": -54.38, "pais": "URY"},
 }
 
-# Alias de compatibilidad: código existente que itere PUNTOS_METEO como {nombre: (lat, lon)}
-# sigue funcionando sin modificación durante la migración incremental.
+# Alias de compatibilidad: código existente que itere PUNTOS_METEO como
+# {nombre: (lat, lon)} sigue funcionando sin modificación.
 PUNTOS_METEO = {
     nombre: (info["lat"], info["lon"])
     for nombre, info in PUNTOS_METEO_SA.items()
@@ -206,8 +235,9 @@ MONGO_CONFIG = {
 # CONFIGURACIÓN GENERAL
 # -----------------------------------------------------------------------------
 
-# Zona horaria del proyecto — UTC es neutro para un sistema multi-país en Sudamérica.
-# Los 6 países núcleo cubren UTC-3 a UTC-5, así que usamos UTC como referencia.
+# Zona horaria del proyecto — UTC es neutro para un sistema regional de cuatro países.
+# Uruguay, Brasil, Argentina y Chile operan con husos cercanos, pero se mantiene UTC
+# como referencia técnica común.
 TIMEZONE  = os.getenv("TIMEZONE",  "UTC")
 
 # Nivel de detalle de los logs: DEBUG muestra todo, INFO solo lo importante,

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <style>
+      .title { font: 700 28px Arial, Helvetica, sans-serif; fill: #1f2a36; }
+      .label { font: 700 18px Arial, Helvetica, sans-serif; fill: #1f2a36; }
+      .body { font: 400 14px Arial, Helvetica, sans-serif; fill: #314151; }
+      .dim { fill: #dbeafe; stroke: #335c81; stroke-width: 2; rx: 16; ry: 16; }
+      .fact { fill: #dcfce7; stroke: #2f6f4f; stroke-width: 2; rx: 16; ry: 16; }
+      .line { stroke: #475569; stroke-width: 3; fill: none; }
+    </style>
+  </defs>
+
+  <text x="700" y="50" text-anchor="middle" class="title">Figura 4. Esquema estrella del Data Warehouse</text>
+
+  <rect x="520" y="330" width="360" height="180" class="fact"/>
+  <text x="700" y="370" text-anchor="middle" class="label">fact_incendios_diario</text>
+  <text x="700" y="400" text-anchor="middle" class="body">tiempo_key</text>
+  <text x="700" y="425" text-anchor="middle" class="body">pais_key</text>
+  <text x="700" y="450" text-anchor="middle" class="body">grilla_key</text>
+  <text x="700" y="475" text-anchor="middle" class="body">cantidad_focos, FRP, confianza</text>
+
+  <rect x="140" y="120" width="260" height="120" class="dim"/>
+  <text x="270" y="155" text-anchor="middle" class="label">dim_tiempo</text>
+  <text x="270" y="185" text-anchor="middle" class="body">fecha, año, trimestre, mes</text>
+  <text x="270" y="210" text-anchor="middle" class="body">día, semana, nivel temporal</text>
+
+  <rect x="1000" y="120" width="260" height="120" class="dim"/>
+  <text x="1130" y="155" text-anchor="middle" class="label">dim_pais</text>
+  <text x="1130" y="185" text-anchor="middle" class="body">ISO2, ISO3, país, subregión</text>
+
+  <rect x="140" y="650" width="260" height="140" class="dim"/>
+  <text x="270" y="685" text-anchor="middle" class="label">dim_grilla</text>
+  <text x="270" y="715" text-anchor="middle" class="body">celda_id, resolución</text>
+  <text x="270" y="740" text-anchor="middle" class="body">lat/lon centro y bordes</text>
+  <text x="270" y="765" text-anchor="middle" class="body">pais dominante</text>
+
+  <rect x="1000" y="650" width="260" height="140" class="dim"/>
+  <text x="1130" y="685" text-anchor="middle" class="label">dim_cobertura</text>
+  <text x="1130" y="715" text-anchor="middle" class="body">código IGBP</text>
+  <text x="1130" y="740" text-anchor="middle" class="body">descripción y combustible</text>
+
+  <rect x="540" y="120" width="320" height="120" class="fact"/>
+  <text x="700" y="155" text-anchor="middle" class="label">fact_meteorologia_diaria</text>
+  <text x="700" y="185" text-anchor="middle" class="body">índice_riesgo, nivel_riesgo</text>
+  <text x="700" y="210" text-anchor="middle" class="body">temp, humedad, viento, ET0</text>
+
+  <rect x="540" y="610" width="320" height="120" class="fact"/>
+  <text x="700" y="645" text-anchor="middle" class="label">fact_calidad_aire_diaria</text>
+  <text x="700" y="675" text-anchor="middle" class="body">PM10, PM2.5, AQI</text>
+  <text x="700" y="700" text-anchor="middle" class="body">horas válidas, alerta OMS</text>
+
+  <rect x="1030" y="330" width="250" height="110" class="fact"/>
+  <text x="1155" y="365" text-anchor="middle" class="label">fact_precipitacion_mensual</text>
+  <text x="1155" y="392" text-anchor="middle" class="body">precipitación, anomalía</text>
+
+  <rect x="1030" y="490" width="250" height="110" class="fact"/>
+  <text x="1155" y="525" text-anchor="middle" class="label">fact_cobertura_vegetal_anual</text>
+  <text x="1155" y="552" text-anchor="middle" class="body">clase dominante, transición</text>
+
+  <path d="M 400 180 L 540 180" class="line"/>
+  <path d="M 860 180 L 1000 180" class="line"/>
+  <path d="M 270 240 L 600 330" class="line"/>
+  <path d="M 1130 240 L 800 330" class="line"/>
+  <path d="M 400 720 L 560 500" class="line"/>
+  <path d="M 1000 720 L 840 500" class="line"/>
+  <path d="M 700 240 L 700 330" class="line"/>
+  <path d="M 700 510 L 700 610" class="line"/>
+  <path d="M 880 420 L 1030 385" class="line"/>
+  <path d="M 880 440 L 1030 545" class="line"/>
+  <path d="M 1130 650 L 1155 600" class="line"/>
+
+  <text x="700" y="860" text-anchor="middle" class="body">Fuente: elaboración propia.</text>
+</svg>

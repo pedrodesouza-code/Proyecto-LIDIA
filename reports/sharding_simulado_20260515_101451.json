@@ -1,0 +1,50 @@
+{
+  "generado_en": "2026-05-15T13:14:51.520044+00:00",
+  "fuente": "data/processed/firms_procesado.parquet",
+  "filas_firms": 1836537,
+  "sql_sharding": {
+    "tabla_candidata": "focos_calor",
+    "shard_key": "fecha_adq",
+    "estrategia": "particionamiento por rango trimestral",
+    "justificacion": "La mayoria de consultas analiticas filtran o agregan por fecha; la clave permite pruning temporal y mantiene alta cardinalidad.",
+    "resumen_distribucion": {
+      "shards": 4,
+      "registros_total": 1836537,
+      "min_registros": 117770,
+      "max_registros": 1144932,
+      "promedio_registros": 459134.25,
+      "desbalance_max_promedio": 2.494
+    },
+    "top_5_shards_mas_grandes": {
+      "2024Q3": 1144932,
+      "2024Q4": 429663,
+      "2024Q1": 144172,
+      "2024Q2": 117770
+    },
+    "shards_consultados_ejemplo_2024_Q1": [
+      "2024Q1"
+    ]
+  },
+  "mongo_sharding": {
+    "coleccion_candidata": "focos_snapshots",
+    "shard_key": "{ fecha: 1, pais: 'hashed' }",
+    "estrategia": "rango temporal mensual + hash conceptual de pais",
+    "justificacion": "La fecha permite consultas por ventana temporal y el hash de pais reduce concentracion de escrituras en un unico shard reciente.",
+    "resumen_distribucion": {
+      "shards": 36,
+      "registros_total": 1836537,
+      "min_registros": 96,
+      "max_registros": 579505,
+      "promedio_registros": 51014.92,
+      "desbalance_max_promedio": 11.36
+    },
+    "top_5_shards_mas_grandes": {
+      "2024-09_b1": 579505,
+      "2024-08_b1": 430760,
+      "2024-10_b1": 216515,
+      "2024-11_b1": 127791,
+      "2024-07_b1": 71942
+    }
+  },
+  "decision_operativa": "No se activa sharding real en el entorno local porque el volumen cabe en un nodo y agregaria complejidad operativa. La simulacion deja elegidas tabla/coleccion, shard key, distribucion esperada y patron de consulta."
+}

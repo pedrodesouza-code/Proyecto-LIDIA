@@ -19,12 +19,14 @@ config/credentials.json
 
 # Datos (pueden ser grandes o generados)
 data/raw/
-data/processed/
+# data/processed/ — versionamos los parquets para que el dashboard funcione
+# sin BD en Streamlit Cloud. Ver docs/desarrollo/16_DEPLOY_STREAMLIT_CLOUD.md.
+# Excluimos solo staging y backups dentro de processed/.
+data/processed/_backup_scope_*/
+data/processed/_staging/
 data/*.json
+data/mongo_local/
 backups/
-
-# Claude Code settings locales
-.claude/
 
 # Logs
 logs/
@@ -46,6 +48,16 @@ Thumbs.db
 .ipynb_checkpoints/
 *.ipynb
 
+# Pytest
+.pytest_cache/
+pytest-cache-files-*/
+
 # Archivos temporales
+tmp/
 *.tmp
 *.bak
+~$*.docx
+
+# Archivos personales fuera del alcance del proyecto
+CV_*.docx
+CV_*.pdf

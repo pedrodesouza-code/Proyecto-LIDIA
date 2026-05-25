@@ -105,7 +105,7 @@ def solicitar_cobertura_vegetal(
     token: str = None,
 ) -> str:
     """
-    Envía una solicitud de extracción de LC_Type1 a AppEEARS para los 18 puntos.
+    Envía una solicitud de extracción de LC_Type1 a AppEEARS para los 36 puntos.
 
     AppEEARS trabaja de forma asíncrona: esta función envía la solicitud y
     devuelve el task_id para consultarlo más tarde con descargar_resultado().
@@ -332,19 +332,59 @@ def _parsear_resultado_appeears(df_raw: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("SINIA-SA — Extractor MODIS Land Cover (AppEEARS)")
+    print("SINIA-SA — Extractor MODIS Land Cover (NASA AppEEARS)")
     print("=" * 60)
+    print(f"Fuente      : MODIS MCD12Q1 v6.1 vía NASA AppEEARS")
+    print(f"Endpoint    : {APPEEARS_BASE_URL}")
+    print(f"Producto    : {MODIS_PRODUCTO}  |  Variable: {MODIS_VARIABLE}")
+    print(f"Resolución  : 500 m global, clasificación anual (IGBP)")
+    print(f"Puntos conf : {list(PUNTOS_METEO_SA.keys())}")
+    print(f"\nClases IGBP disponibles:")
+    for codigo, descripcion in IGBP_LABELS.items():
+        if codigo != 255:
+            print(f"  {codigo:>3}  {descripcion}")
 
     if not APPEEARS_USER:
         print(
-            "\nCredenciales AppEEARS no configuradas.\n"
-            "Agregar a config/.env:\n"
-            "  APPEEARS_USER=tu_usuario_earthdata\n"
-            "  APPEEARS_PASSWORD=tu_password_earthdata\n"
+            "\n[ERROR] Credenciales AppEEARS no configuradas.\n"
+            "  1. Crear cuenta en: https://urs.earthdata.nasa.gov/\n"
+            "  2. Agregar a config/.env:\n"
+            "       APPEEARS_USER=tu_usuario_earthdata\n"
+            "       APPEEARS_PASSWORD=tu_password_earthdata\n"
         )
     else:
-        print(f"\nUsuario AppEEARS: {APPEEARS_USER}")
-        print("Enviando solicitud de extracción (2018-2024)...\n")
+        print(f"\nUsuario AppEEARS : {APPEEARS_USER}")
+        print(f"Período          : 2018  →  2024")
+        print(f"N° puntos        : {len(PUNTOS_METEO_SA)}")
+        print("\n" + "-" * 60)
+        print("PASO 1 — Enviando solicitud de extracción a AppEEARS...")
+        print("-" * 60)
+        print("(AppEEARS es asíncrono: la solicitud se encola y procesa en segundo plano)\n")
+
         task_id = solicitar_cobertura_vegetal(anio_inicio=2018, anio_fin=2024)
-        print(f"Task ID: {task_id}")
-        print("Usar descargar_resultado_appeears(task_id) para obtener los datos.")
+        print(f"[OK] Solicitud enviada")
+        print(f"     Task ID : {task_id}")
+        print(f"\n" + "-" * 60)
+        print("PASO 2 — Esperando resultado y descargando...")
+        print("-" * 60)
+        print("(Puede tardar entre 2 y 15 minutos según la carga del servidor)\n")
+
+        df = descargar_resultado_appeears(task_id=task_id, max_minutos=30)
+
+        if not df.empty:
+            print(f"[OK] Registros descargados : {len(df)}")
+            print(f"     Columnas              : {list(df.columns)}")
+            print(f"     Puntos en resultado   : {sorted(df['punto'].unique().tolist())}")
+            print(f"     Años en resultado     : {sorted(df['anio'].unique().tolist())}")
+            print(f"\nDistribución de clases IGBP:")
+            for lc, cnt in df["lc_descripcion"].value_counts().items():
+                print(f"  {cnt:>5} registros  →  {lc}")
+            print(f"\nPrimeras 10 filas:")
+            print(df.head(10).to_string(index=False))
+        else:
+            print("[ERROR] Sin datos — revisar credenciales o el estado de la tarea.")
+            print(f"  Para consultar manualmente: descargar_resultado_appeears('{task_id}')")
+
+    print("\n" + "=" * 60)
+    print("Extractor MODIS finalizado.")
+    print("=" * 60)

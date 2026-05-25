@@ -1,0 +1,58 @@
+{
+  "generado_en": "2026-05-19T15:51:39.809879+00:00",
+  "alcance": {
+    "paises": [
+      "ARG",
+      "BRA",
+      "CHL",
+      "URY"
+    ],
+    "puntos": 36
+  },
+  "fuentes": {
+    "meteo": {
+      "filas_parquet": 88087,
+      "puntos": 36,
+      "faltantes": []
+    },
+    "cams": {
+      "filas_parquet": 98449,
+      "puntos": 36,
+      "faltantes": []
+    },
+    "precipitacion_mensual": {
+      "filas_parquet": 2886,
+      "puntos": 36,
+      "faltantes": []
+    }
+  },
+  "postgres": {
+    "puntos_activos_por_pais": {
+      "ARG": 4,
+      "BRA": 5,
+      "CHL": 8,
+      "URY": 19
+    },
+    "meteo_diario": {
+      "filas": 88299,
+      "puntos_activos": 36
+    },
+    "calidad_aire_diario": {
+      "filas": 98966,
+      "puntos_activos": 36
+    },
+    "precipitacion_mensual": {
+      "filas": 2886,
+      "puntos_activos": 36
+    }
+  },
+  "mongo": {
+    "alertas": 0,
+    "ejecuciones_etl": 2,
+    "focos_resumen_mes": 36,
+    "focos_resumen_pais": 3,
+    "focos_snapshots": 347
+  },
+  "validacion": "pytest tests/test_calidad_datos.py -v => 20 passed",
+  "dashboard": "http://localhost:8501 verificado en browser integrado"
+}

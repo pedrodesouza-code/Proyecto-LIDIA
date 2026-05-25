@@ -107,7 +107,7 @@ def job_firms_nrt():
         # CDC: ¿hasta qué fecha ya cargamos en PG?
         ultimo_cargado = _get_watermark("focos_calor", "fecha_adq")
         dias_a_pedir   = (date.today() - ultimo_cargado).days + 1  # +1 para incluir hoy
-        dias_a_pedir   = max(1, min(dias_a_pedir, 7))  # entre 1 y 7 días
+        dias_a_pedir   = max(1, min(dias_a_pedir, 5))  # FIRMS NRT acepta rango [1..5]
 
         logger.info(
             f"JOB FIRMS NRT — watermark={ultimo_cargado}, pidiendo {dias_a_pedir} día(s)",
@@ -226,7 +226,7 @@ def job_cams():
             return
 
         logger.info(
-            f"JOB CAMS — watermark={ultimo_cams}, pidiendo {fecha_inicio} → {fecha_fin}",
+            f"JOB CAMS — watermark={ultimo_cams}, pidiendo {fecha_inicio} -> {fecha_fin}",
             extra={"etl_stage": "scheduler", "source": "cams"},
         )
 
@@ -271,7 +271,7 @@ def job_cams():
 
 def job_chirps_mensual():
     """
-    Descarga precipitación mensual CHIRPS para los 18 puntos SA y
+    Descarga precipitación mensual CHIRPS para los 36 puntos del alcance final y
     la carga en precipitacion_mensual (PostgreSQL).
 
     Se ejecuta mensualmente porque CHIRPS tiene latencia de ~1 mes.

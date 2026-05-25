@@ -1,0 +1,16 @@
+{
+  "generado_en": "2026-05-15T22:14:37.261786+00:00",
+  "destino": {
+    "pg_host": "10.200.245.40",
+    "pg_database": "grp03db",
+    "mongo_host": "10.200.245.40",
+    "mongo_database": "grp03db"
+  },
+  "mongo": {
+    "snapshots_guardados": 352,
+    "snapshots_historicos": 347,
+    "snapshots_nrt": 5,
+    "filas_firms_historico": 1836537,
+    "filas_firms_nrt": 5283
+  }
+}

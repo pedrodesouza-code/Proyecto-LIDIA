@@ -22,8 +22,6 @@
 #   docker compose down -v   ← DESTRUYE DATOS
 # =============================================================================
 
-version: "3.9"
-
 services:
 
   # ---------------------------------------------------------------------------
@@ -37,6 +35,8 @@ services:
       POSTGRES_DB:       ${PG_DATABASE:-sinia_uy}
       POSTGRES_USER:     ${PG_SUPERUSER:-postgres}
       POSTGRES_PASSWORD: ${PG_SUPERPASS:-postgres_super_2026}
+      PG_PASSWORD:       ${PG_PASSWORD:-sinia_etl_2026}
+      PG_DASH_PASSWORD:  ${PG_DASH_PASSWORD:-sinia_dash_2026}
     ports:
       - "${PG_PORT:-5432}:5432"
     volumes:
@@ -44,6 +44,7 @@ services:
       - pg_data:/var/lib/postgresql/data
       # Scripts de inicialización (se ejecutan en orden alfabético en primer arranque)
       - ../sql/ddl/01_roles.sql:/docker-entrypoint-initdb.d/01_roles.sql:ro
+      - ./postgres/02_set_app_passwords.sh:/docker-entrypoint-initdb.d/02_set_app_passwords.sh:ro
       - ../sql/ddl/02_schema.sql:/docker-entrypoint-initdb.d/02_schema.sql:ro
       - ../sql/ddl/03_indices.sql:/docker-entrypoint-initdb.d/03_indices.sql:ro
       - ../sql/ddl/04_vistas.sql:/docker-entrypoint-initdb.d/04_vistas.sql:ro
@@ -74,7 +75,11 @@ services:
       - mongo_config:/data/configdb
       - ../nosql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet --username \"$${MONGO_INITDB_ROOT_USERNAME}\" --password \"$${MONGO_INITDB_ROOT_PASSWORD}\" --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" | grep 1"
+        ]
       interval: 10s
       timeout: 5s
       retries: 5

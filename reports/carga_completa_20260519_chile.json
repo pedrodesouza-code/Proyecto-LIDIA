@@ -1,0 +1,95 @@
+{
+  "generado_en": "2026-05-19T16:29:25.596997+00:00",
+  "alcance": [
+    "CHL",
+    "URY",
+    "BRA",
+    "ARG"
+  ],
+  "parquet": {
+    "firms_procesado_filas": 1946361,
+    "focos_por_pais": {
+      "ARG": 96232,
+      "BRA": 1737010,
+      "CHL": 109824,
+      "URY": 3295
+    }
+  },
+  "postgres_focos_calor": {
+    "ARG": 1039964,
+    "BRA": 9257301,
+    "CHL": 109824,
+    "URY": 46317
+  },
+  "postgres_mv_focos_por_pais": {
+    "ARG": 1039964,
+    "BRA": 9257301,
+    "CHL": 109824,
+    "URY": 46317
+  },
+  "postgres_meteo": {
+    "ARG": {
+      "puntos": 4,
+      "filas": 10316
+    },
+    "BRA": {
+      "puntos": 5,
+      "filas": 12895
+    },
+    "CHL": {
+      "puntos": 8,
+      "filas": 20778
+    },
+    "URY": {
+      "puntos": 19,
+      "filas": 59836
+    }
+  },
+  "postgres_cams": {
+    "ARG": {
+      "puntos": 4,
+      "filas": 10484
+    },
+    "BRA": {
+      "puntos": 5,
+      "filas": 13105
+    },
+    "CHL": {
+      "puntos": 8,
+      "filas": 24080
+    },
+    "URY": {
+      "puntos": 19,
+      "filas": 51297
+    }
+  },
+  "postgres_precipitacion": {
+    "ARG": {
+      "puntos": 4,
+      "filas": 312
+    },
+    "BRA": {
+      "puntos": 5,
+      "filas": 390
+    },
+    "CHL": {
+      "puntos": 8,
+      "filas": 624
+    },
+    "URY": {
+      "puntos": 19,
+      "filas": 1638
+    }
+  },
+  "mongo": {
+    "focos_snapshots": 799,
+    "focos_resumen_pais_docs": 4,
+    "focos_resumen_mes_docs": 63,
+    "focos_resumen_pais": {
+      "ARG": 96232,
+      "BRA": 1737010,
+      "CHL": 109824,
+      "URY": 3295
+    }
+  }
+}

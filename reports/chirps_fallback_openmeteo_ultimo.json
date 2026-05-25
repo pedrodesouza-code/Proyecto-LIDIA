@@ -1,0 +1,22 @@
+{
+  "generado_en": "2026-05-19T15:38:17.738213+00:00",
+  "fuente_fallback": "Open-Meteo Archive agregado mensual",
+  "puntos_faltantes_entrada": [
+    "Durazno",
+    "Florida",
+    "Fray_Bentos",
+    "Maldonado",
+    "Mercedes",
+    "Minas",
+    "Paysandu",
+    "Rocha",
+    "Salto",
+    "San_Jose_de_Mayo",
+    "Tacuarembo",
+    "Treinta_y_Tres",
+    "Trinidad"
+  ],
+  "filas_agregadas": 1092,
+  "puntos_consolidados": 36,
+  "puntos_faltantes_salida": []
+}

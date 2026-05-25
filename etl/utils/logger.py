@@ -16,7 +16,7 @@
 import logging    # Módulo estándar de Python para manejo de logs
 import json       # Para serializar los logs en formato JSON
 import sys        # Para escribir en la salida estándar (consola)
-from datetime import datetime   # Para agregar marca de tiempo a cada log
+from datetime import datetime, timezone   # Para agregar marca de tiempo a cada log
 from pathlib import Path        # Para manejar rutas de archivos
 
 
@@ -51,7 +51,7 @@ class FormateadorJSON(logging.Formatter):
         """
         # Construimos el diccionario base con los campos siempre presentes
         entrada_log = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",  # Fecha/hora en UTC formato ISO 8601
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "nivel":     registro.levelname,    # Nivel: DEBUG, INFO, WARNING, ERROR, CRITICAL
             "modulo":    registro.module,        # Nombre del archivo Python que generó el log
             "funcion":   registro.funcName,      # Nombre de la función donde se llamó al logger

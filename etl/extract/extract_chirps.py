@@ -219,7 +219,7 @@ def extraer_chirps_todos_los_puntos(
     pausa: float = 2.0,
 ) -> pd.DataFrame:
     """
-    Extrae precipitación mensual CHIRPS para los 18 puntos de monitoreo SA.
+    Extrae precipitación mensual CHIRPS para los 36 puntos del alcance final.
 
     Args:
         anio_inicio: Año de inicio
@@ -263,9 +263,51 @@ if __name__ == "__main__":
     print("=" * 60)
     print("SINIA-SA — Extractor CHIRPS Precipitación")
     print("=" * 60)
-    print("\nDescargando precipitación mensual para Cuiabá (2018-2020)...\n")
+    print(f"Fuente      : CHIRPS vía ClimateSERV (SERVIR Global / NASA)")
+    print(f"Endpoint    : {CHIRPS_BASE_URL}")
+    print(f"Resolución  : 0.05° (~5 km), mensual agregado")
+    print(f"Puntos conf : {list(PUNTOS_METEO_SA.keys())}")
+
+    # ── Prueba 1: un punto específico ───────────────────────────────────
+    print("\n" + "-" * 60)
+    print("PRUEBA 1 — Precipitación mensual para Cuiabá (2018-2020)")
+    print("-" * 60)
+    print("Punto      : Cuiabá")
+    print("Período    : 2018  →  2020")
+    print("Descargando (puede tardar ~30s por el proceso asíncrono)...\n")
+
     df = extraer_chirps_punto(punto="Cuiabá", anio_inicio=2018, anio_fin=2020)
+
     if not df.empty:
-        print(df.head(12).to_string())
+        print(f"[OK] Meses descargados     : {len(df)}")
+        print(f"     Columnas              : {list(df.columns)}")
+        print(f"     Rango fechas          : {df['fecha'].min().date()}  →  {df['fecha'].max().date()}")
+        print(f"     Precipitación total   : {df['precipitacion_mm'].sum():.1f} mm")
+        print(f"     Precipitación promedio: {df['precipitacion_mm'].mean():.1f} mm/mes")
+        print(f"     Mes más lluvioso      : {df.loc[df['precipitacion_mm'].idxmax(), 'fecha'].strftime('%Y-%m')} "
+              f"({df['precipitacion_mm'].max():.1f} mm)")
+        print(f"     Mes más seco          : {df.loc[df['precipitacion_mm'].idxmin(), 'fecha'].strftime('%Y-%m')} "
+              f"({df['precipitacion_mm'].min():.1f} mm)")
+        print(f"\nPrimeros 12 meses:")
+        print(df.head(12).to_string(index=False))
     else:
-        print("Sin datos — verificar conectividad con ClimateSERV.")
+        print("[ERROR] Sin datos — verificar conectividad con ClimateSERV.")
+
+    # ── Prueba 2: segundo punto de control ──────────────────────────────
+    SEGUNDO_PUNTO = list(PUNTOS_METEO_SA.keys())[1] if len(PUNTOS_METEO_SA) > 1 else None
+    if SEGUNDO_PUNTO:
+        print("\n" + "-" * 60)
+        print(f"PRUEBA 2 — Control rápido para {SEGUNDO_PUNTO} (2023)")
+        print("-" * 60)
+        print("Descargando...\n")
+
+        df2 = extraer_chirps_punto(punto=SEGUNDO_PUNTO, anio_inicio=2023, anio_fin=2023)
+        if not df2.empty:
+            print(f"[OK] Meses descargados : {len(df2)}")
+            print(f"     Precipitación total: {df2['precipitacion_mm'].sum():.1f} mm (anual)")
+        else:
+            print("[INFO] Sin datos para este punto.")
+
+    print("\n" + "=" * 60)
+    print("Extractor CHIRPS finalizado.")
+    print("=" * 60)

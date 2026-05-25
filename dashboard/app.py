@@ -1,5 +1,5 @@
 """
-SINIA-SA — Dashboard de Monitoreo de Incendios Forestales (Sudamérica)
+SINIA-UY — Dashboard de Monitoreo de Incendios Forestales
 Ejecutar con: streamlit run dashboard/app.py
 
 Fuente de datos: PostgreSQL (primario) con fallback a Parquet.
@@ -18,8 +18,10 @@ import streamlit as st
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from config.settings import PUNTOS_METEO_SA
+
 st.set_page_config(
-    page_title="SINIA-SA | Monitor de Incendios Sudamérica",
+    page_title="SINIA-UY | Monitor de Incendios Regional",
     page_icon="🔥",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -29,7 +31,10 @@ PROCESSED = PROJECT_ROOT / "data" / "processed"
 RAW_METEO = PROJECT_ROOT / "data" / "raw" / "meteo"
 
 from dashboard.db import (
+    calcular_estadisticas_focos,
+    contar_focos,
     cargar_focos,
+    cargar_focos_por_dia,
     cargar_focos_nrt,
     cargar_meteo,
     cargar_forecast,
@@ -38,6 +43,7 @@ from dashboard.db import (
     cargar_dias_criticos,
     cargar_riesgo_por_pais,
     cargar_focos_por_pais_mes,
+    obtener_rango_focos,
     _pg_disponible,
 )
 
@@ -51,10 +57,102 @@ COLORES_RIESGO = {
 UMBRAL_ALERTA_RIESGO = 0.65
 UMBRAL_FOCOS_ALERTA  = 10
 
+MAPA_FOCOS = {
+    None: {"lat": -20.0, "lon": -58.0, "zoom": 3.0},
+    "BRA": {"lat": -14.0, "lon": -52.0, "zoom": 3.2},
+    "ARG": {"lat": -38.0, "lon": -64.0, "zoom": 3.5},
+    "URY": {"lat": -32.7, "lon": -56.0, "zoom": 6.2},
+    "CHL": {"lat": -38.8, "lon": -72.2, "zoom": 4.2},
+}
+
+
+def _render_mapa_focos(
+    df: pd.DataFrame,
+    pais: str | None,
+    color_por_confianza: bool,
+    height: int = 460,
+    centro_override: dict[str, float] | None = None,
+):
+    """Mapa reutilizable para focos historicos y NRT."""
+    df_map = df.dropna(subset=["latitud", "longitud"]) if not df.empty else df
+    if df_map.empty:
+        return None
+    centro = centro_override or MAPA_FOCOS.get(pais, MAPA_FOCOS[None])
+    columna_color = "confianza_num" if color_por_confianza and "confianza_num" in df_map.columns else "potencia_radiativa"
+    fig = px.scatter_mapbox(
+        df_map,
+        lat="latitud",
+        lon="longitud",
+        color=columna_color if columna_color in df_map.columns else None,
+        size="potencia_radiativa" if "potencia_radiativa" in df_map.columns else None,
+        size_max=18,
+        color_continuous_scale=["yellow", "orange", "red"],
+        hover_data={
+            "latitud": ":.4f",
+            "longitud": ":.4f",
+            "fecha_adq": True,
+            "potencia_radiativa": ":.2f",
+            "pais": True,
+        },
+        mapbox_style="carto-positron",
+        center={"lat": centro["lat"], "lon": centro["lon"]},
+        zoom=centro["zoom"],
+        height=height,
+    )
+    fig.update_layout(
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        coloraxis_colorbar_title="Confianza" if columna_color == "confianza_num" else "FRP",
+    )
+    return fig
+
+
+def _distancia_km(lat1: pd.Series, lon1: pd.Series, lat2: float, lon2: float) -> pd.Series:
+    """Distancia haversine entre una serie de coordenadas y un punto."""
+    import numpy as np
+
+    radio_tierra = 6371.0
+    lat1_rad = np.radians(lat1.astype(float))
+    lon1_rad = np.radians(lon1.astype(float))
+    lat2_rad = np.radians(lat2)
+    lon2_rad = np.radians(lon2)
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlon / 2) ** 2
+    return 2 * radio_tierra * np.arcsin(np.sqrt(a))
+
+
+def _filtrar_focos_por_ciudades(df: pd.DataFrame, ciudades: list[str], radio_km: int) -> pd.DataFrame:
+    if df.empty or not ciudades or not {"latitud", "longitud"}.issubset(df.columns):
+        return df
+    masks = []
+    for ciudad in ciudades:
+        info = PUNTOS_METEO_SA.get(ciudad)
+        if not info:
+            continue
+        masks.append(_distancia_km(df["latitud"], df["longitud"], info["lat"], info["lon"]) <= radio_km)
+    if not masks:
+        return df.iloc[0:0].copy()
+    mask = masks[0]
+    for extra in masks[1:]:
+        mask = mask | extra
+    return df[mask].copy()
+
+
+def _centro_ciudades(ciudades: list[str], pais: str | None) -> dict[str, float] | None:
+    infos = [PUNTOS_METEO_SA[c] for c in ciudades if c in PUNTOS_METEO_SA]
+    if not infos:
+        return None
+    zoom = 7.0 if len(infos) == 1 else MAPA_FOCOS.get(pais, MAPA_FOCOS[None])["zoom"]
+    return {
+        "lat": sum(i["lat"] for i in infos) / len(infos),
+        "lon": sum(i["lon"] for i in infos) / len(infos),
+        "zoom": zoom,
+    }
+
 # ── Sidebar — filtros (se definen ANTES de cargar datos) ─────────────────────
-st.sidebar.title("SINIA-SA")
-st.sidebar.caption("Sistema de Monitoreo de Incendios Forestales · Sudamérica")
-st.sidebar.caption("6 países · 18 puntos · 2018-2025")
+st.sidebar.title("SINIA-UY")
+st.sidebar.caption("Sistema de Monitoreo de Incendios Forestales · UY / BRA / ARG / CHL")
+st.sidebar.caption("4 países · 36 puntos · Uruguay completo + Chile volcánico")
 st.sidebar.caption("UTEC · Ingeniería de Datos · 2026")
 st.sidebar.divider()
 
@@ -72,42 +170,76 @@ pagina = st.sidebar.radio(
     ],
 )
 
-# Filtro de año (determina qué datos se cargan desde PG)
+# Filtro de período (determina qué datos se cargan desde PG)
 st.sidebar.divider()
-anio_sel = st.sidebar.selectbox(
-    "Año",
-    list(range(2023, 2017, -1)),
+rango_focos = obtener_rango_focos()
+opciones_periodo = ["Todo el período"] + list(range(int(rango_focos["anio_max"]), int(rango_focos["anio_min"]) - 1, -1))
+periodo_sel = st.sidebar.selectbox(
+    "Período",
+    opciones_periodo,
     index=0,
-    help="Seleccioná el año a analizar. Los datos se cargan desde PostgreSQL.",
+    help="Seleccioná todo el rango real disponible o un año puntual. Los datos se cargan desde PostgreSQL.",
 )
-fecha_inicio_sel = f"{anio_sel}-01-01"
-fecha_fin_sel    = f"{anio_sel}-12-31"
+if periodo_sel == "Todo el período":
+    fecha_inicio_sel = str(rango_focos["fecha_min"])
+    fecha_fin_sel = str(rango_focos["fecha_max"])
+    periodo_label = f"{rango_focos['fecha_min']} a {rango_focos['fecha_max']}"
+else:
+    anio_sel = int(periodo_sel)
+    fecha_inicio_sel = f"{anio_sel}-01-01"
+    fecha_fin_sel = f"{anio_sel}-12-31"
+    periodo_label = str(anio_sel)
 
 # Filtro de país
 PAISES_DISP = {
     "Todos": None,
-    "Brasil (BRA)":    "BRA",
-    "Bolivia (BOL)":   "BOL",
-    "Paraguay (PRY)":  "PRY",
-    "Argentina (ARG)": "ARG",
     "Chile (CHL)":     "CHL",
-    "Perú (PER)":      "PER",
+    "Uruguay (URY)":   "URY",
+    "Brasil (BRA)":    "BRA",
+    "Argentina (ARG)": "ARG",
 }
 pais_sel_label = st.sidebar.selectbox("País", list(PAISES_DISP.keys()))
 pais_sel = PAISES_DISP[pais_sel_label]
+alcance_nrt_label = "ARG/BRA/URY/CHL" if pais_sel is None else pais_sel
+
+ciudades_disponibles = [
+    nombre for nombre, info in PUNTOS_METEO_SA.items()
+    if pais_sel is None or info["pais"] == pais_sel
+]
+ciudades_disponibles = sorted(ciudades_disponibles)
+ciudades_sel = st.sidebar.multiselect(
+    "Ciudades / puntos",
+    ciudades_disponibles,
+    default=[],
+    help="Filtra meteorología, calidad del aire y focos cercanos a los puntos seleccionados.",
+)
+radio_focos_km = st.sidebar.slider(
+    "Radio focos por ciudad (km)",
+    min_value=25,
+    max_value=300,
+    value=100,
+    step=25,
+    help="Los focos FIRMS no vienen asociados a una ciudad; se muestran los que caen dentro de este radio.",
+)
+alcance_ciudades_label = ", ".join(ciudades_sel) if ciudades_sel else alcance_nrt_label
+centro_ciudades = _centro_ciudades(ciudades_sel, pais_sel)
 
 # ── Carga de datos (con filtros ya seleccionados) ─────────────────────────────
-firms  = cargar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
-nrt    = cargar_focos_nrt()
+ciudades_tuple = tuple(ciudades_sel)
+firms  = cargar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel, ciudades_tuple, radio_focos_km)
+focos_diarios = cargar_focos_por_dia(fecha_inicio_sel, fecha_fin_sel, pais_sel)
+total_focos_periodo = contar_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
+stats_focos = calcular_estadisticas_focos(fecha_inicio_sel, fecha_fin_sel, pais_sel)
+nrt    = cargar_focos_nrt(ciudades_tuple, radio_focos_km)
 meteo  = cargar_meteo("historico")
 fc     = cargar_forecast()
 cams   = cargar_cams()
 
-# Filtro de fechas adicional dentro del año
-if not firms.empty and pagina != "Tiempo Real":
+# Filtro de fechas adicional dentro del período
+if pagina != "Tiempo Real":
     st.sidebar.divider()
-    fecha_min = firms["fecha_adq"].min().date()
-    fecha_max = firms["fecha_adq"].max().date()
+    fecha_min = pd.to_datetime(fecha_inicio_sel).date()
+    fecha_max = pd.to_datetime(fecha_fin_sel).date()
     rango = st.sidebar.date_input(
         "Rango de fechas",
         value=(fecha_min, fecha_max),
@@ -115,16 +247,52 @@ if not firms.empty and pagina != "Tiempo Real":
         max_value=fecha_max,
     )
     if isinstance(rango, (list, tuple)) and len(rango) == 2:
-        firms = firms[firms["fecha_adq"].dt.date.between(rango[0], rango[1])]
+        if not firms.empty:
+            firms = firms[firms["fecha_adq"].dt.date.between(rango[0], rango[1])]
+        focos_diarios = cargar_focos_por_dia(str(rango[0]), str(rango[1]), pais_sel)
+        total_focos_periodo = contar_focos(str(rango[0]), str(rango[1]), pais_sel)
+        stats_focos = calcular_estadisticas_focos(str(rango[0]), str(rango[1]), pais_sel)
+        periodo_label = f"{rango[0]} a {rango[1]}"
 
 # Aplicar filtro de país a meteo/forecast/cams (focos ya vienen filtrados de PG)
 if pais_sel:
+    if not firms.empty and "pais" in firms.columns:
+        firms = firms[firms["pais"] == pais_sel]
+    if not nrt.empty and "pais" in nrt.columns:
+        nrt = nrt[nrt["pais"] == pais_sel]
     if not meteo.empty and "pais" in meteo.columns:
         meteo = meteo[meteo["pais"] == pais_sel]
     if not fc.empty and "pais" in fc.columns:
         fc = fc[fc["pais"] == pais_sel]
     if not cams.empty and "pais" in cams.columns:
         cams = cams[cams["pais"] == pais_sel]
+
+if ciudades_sel:
+    firms = _filtrar_focos_por_ciudades(firms, ciudades_sel, radio_focos_km)
+    nrt = _filtrar_focos_por_ciudades(nrt, ciudades_sel, radio_focos_km)
+    if not meteo.empty and "punto" in meteo.columns:
+        meteo = meteo[meteo["punto"].isin(ciudades_sel)]
+    if not fc.empty and "punto" in fc.columns:
+        fc = fc[fc["punto"].isin(ciudades_sel)]
+    if not cams.empty and "punto" in cams.columns:
+        cams = cams[cams["punto"].isin(ciudades_sel)]
+
+    total_focos_periodo = int(len(firms))
+    if not firms.empty and "fecha_adq" in firms.columns:
+        focos_diarios = (
+            firms.groupby(firms["fecha_adq"].dt.date)
+            .size()
+            .reset_index(name="focos")
+            .rename(columns={"fecha_adq": "fecha"})
+        )
+        focos_diarios["fecha"] = pd.to_datetime(focos_diarios["fecha"])
+    else:
+        focos_diarios = pd.DataFrame(columns=["fecha", "focos"])
+    stats_focos = {
+        "total": total_focos_periodo,
+        "frp_promedio": float(firms["potencia_radiativa"].mean()) if not firms.empty and "potencia_radiativa" in firms.columns else 0,
+        "frp_maximo": float(firms["potencia_radiativa"].max()) if not firms.empty and "potencia_radiativa" in firms.columns else 0,
+    }
 
 # Auto-refresh
 st.sidebar.divider()
@@ -164,19 +332,20 @@ if auto_refresh:
 # ════════════════════════════════════════════════════════════════════════════
 if pagina == "Resumen General":
 
-    st.title("SINIA-SA — Sistema de Monitoreo de Incendios Forestales · Sudamérica")
-    st.caption("6 países núcleo · 18 puntos de monitoreo · 2018–2025 · Fuentes: NASA FIRMS · Open-Meteo · CAMS · CHIRPS · MODIS")
+    st.title("SINIA-UY — Sistema de Monitoreo de Incendios Forestales")
+    st.caption("Uruguay completo por departamentos + Brasil/Argentina estratégicos + Chile volcánico · 36 puntos · 2018–2025 · Fuentes: NASA FIRMS · Open-Meteo · CAMS · CHIRPS · MODIS")
 
     # ── Explicación del sistema ───────────────────────────────────────────────
     st.info(
         "**¿Qué hace este sistema?**  \n"
-        "SINIA-SA integra cinco fuentes de datos satelitales y meteorológicas para responder "
-        "una pregunta central: **¿cuándo, dónde y por qué ocurren incendios forestales en Sudamérica?**  \n\n"
-        "Cubre los 6 países con mayor actividad histórica de incendios (2018-2025): "
-        "**Brasil, Bolivia, Paraguay, Argentina, Chile y Perú** — 18 ciudades de monitoreo. "
-        "Cada fuente aporta una capa de información distinta. Combinadas, permiten detectar incendios activos, "
-        "anticipar condiciones de riesgo, medir impacto en calidad del aire y "
-        "correlacionar con precipitación y tipo de cobertura vegetal."
+        "SINIA-UY integra cinco fuentes de datos satelitales y meteorológicas para responder "
+        "una pregunta central: **¿cuándo, dónde y por qué ocurren incendios forestales y eventos atmosféricos "
+        "transfronterizos que pueden afectar a Uruguay?**  \n\n"
+        "El alcance regional se concentra en **Uruguay como país núcleo**, más **Brasil y Argentina** "
+        "como fuentes principales de humo e incendios transfronterizos, y **Chile** como fuente de ceniza "
+        "volcánica y aerosoles de eventos reales como Puyehue-Cordón Caulle y Calbuco. Cada fuente aporta una capa de "
+        "información distinta. Combinadas, permiten detectar incendios activos, anticipar condiciones de "
+        "riesgo, medir impacto en calidad del aire y correlacionar con precipitación y tipo de cobertura vegetal."
     )
 
     # ── Arquitectura: flujo de las 5 fuentes ─────────────────────────────────
@@ -190,13 +359,14 @@ if pagina == "Resumen General":
             **NASA FIRMS**
             🛰️ *Detección satelital de incendios*
 
-            El satélite VIIRS (Suomi NPP) barre Sudamérica
+            El satélite VIIRS (Suomi NPP) monitorea el
+            corredor regional Uruguay-Brasil-Argentina
             varias veces al día detectando puntos con temperatura
             anormalmente alta en la superficie.
 
             **Responde:** ¿Hubo un incendio? ¿Dónde? ¿Qué tan intenso?
 
-            → *18 países cubiertos por bbox SA*
+            → *4 países analizados en el modelo final*
             """
         )
 
@@ -206,7 +376,7 @@ if pagina == "Resumen General":
             **Open-Meteo + CAMS**
             🌡️ *Clima y calidad del aire*
 
-            API meteorológica open-source para los 18 puntos SA.
+            API meteorológica open-source para 36 puntos de monitoreo.
             Temperatura, humedad, viento y sequía calculan el
             **Índice de Riesgo de Incendio**.
 
@@ -244,7 +414,7 @@ if pagina == "Resumen General":
     if not nrt.empty:
         focos_hoy = nrt[nrt["fecha_adq"].dt.date == datetime.now().date()] if "fecha_adq" in nrt.columns else nrt
         if len(focos_hoy) >= UMBRAL_FOCOS_ALERTA:
-            alertas.append(f"{len(focos_hoy)} focos detectados HOY por satélite NRT")
+            alertas.append(f"{len(focos_hoy)} focos detectados HOY por satélite NRT en {alcance_nrt_label}")
 
     for alerta in alertas:
         st.error(f"ALERTA: {alerta}", icon="🚨")
@@ -252,12 +422,12 @@ if pagina == "Resumen General":
         st.success("Sin alertas activas — condiciones normales.", icon="✅")
 
     # ── KPIs con explicación ──────────────────────────────────────────────────
-    st.subheader(f"Indicadores principales del período analizado ({anio_sel})")
+    st.subheader(f"Indicadores principales del período analizado ({periodo_label})")
 
     c1, c2, c3, c4 = st.columns(4)
 
-    total_focos = len(firms)
-    frp_max = firms["potencia_radiativa"].max() if not firms.empty and "potencia_radiativa" in firms.columns else 0
+    total_focos = total_focos_periodo
+    frp_max = stats_focos.get("frp_maximo", 0)
     dias_alto = meteo["nivel_riesgo"].isin(["alto", "muy_alto"]).sum() if not meteo.empty and "nivel_riesgo" in meteo.columns else 0
     nivel_actual = str(meteo.sort_values("fecha").iloc[-1]["nivel_riesgo"]).upper() \
         if not meteo.empty and "nivel_riesgo" in meteo.columns and "fecha" in meteo.columns else "N/D"
@@ -266,7 +436,8 @@ if pagina == "Resumen General":
         "Focos de calor detectados",
         f"{total_focos:,}",
         help="Puntos donde el satélite VIIRS detectó temperatura anormalmente alta. "
-             "Cada punto representa un posible foco de incendio.",
+             "Cada punto representa un posible foco de incendio. La tarjeta muestra el conteo real; "
+             "mapas y graficos usan una muestra acotada por rendimiento visual.",
     )
     c2.metric(
         "FRP máximo registrado",
@@ -279,7 +450,7 @@ if pagina == "Resumen General":
         "Días de riesgo ALTO o MUY ALTO",
         f"{dias_alto}",
         help="Días en que el Índice de Riesgo superó 0.50. "
-             "Se calculó combinando temperatura, humedad, viento y sequía de los 18 puntos SA.",
+             "Se calculó combinando temperatura, humedad, viento y sequía de los 36 puntos del alcance regional.",
     )
     c4.metric(
         "Último nivel de riesgo registrado",
@@ -294,40 +465,50 @@ if pagina == "Resumen General":
 
     with col_mapa:
         st.subheader("Distribución geográfica de focos")
-        st.caption(
-            "Cada punto en el mapa es un foco detectado por satélite. "
-            "El tamaño indica la intensidad (FRP) y el color el nivel de confianza. "
-            "Los focos se concentran principalmente en Brasil, Bolivia y Paraguay (agosto–octubre)."
+        modo_mapa_resumen = st.radio(
+            "Vista del mapa",
+            ["Actuales (NRT últimas 24h)", "Período seleccionado"],
+            horizontal=True,
+            key="modo_mapa_resumen",
         )
-        if not firms.empty and "latitud" in firms.columns:
-            df_map = firms.dropna(subset=["latitud", "longitud"])
-            fig_map = px.scatter_mapbox(
-                df_map, lat="latitud", lon="longitud",
-                color="confianza_num" if "confianza_num" in df_map.columns else "potencia_radiativa",
-                size="potencia_radiativa", size_max=18,
-                color_continuous_scale=["yellow", "orange", "red"],
-                hover_data={"latitud": ":.4f", "longitud": ":.4f",
-                             "fecha_adq": True, "potencia_radiativa": ":.2f"},
-                mapbox_style="carto-positron",
-                center={"lat": -20.0, "lon": -58.0},
-                zoom=3.0, height=460,
+        if modo_mapa_resumen.startswith("Actuales"):
+            datos_mapa = nrt
+            color_por_confianza = False
+            st.caption(
+                f"Focos recientes NRT de las últimas 24 horas en {alcance_ciudades_label}. "
+                "Respeta el país y las ciudades seleccionadas en el sidebar."
             )
-            fig_map.update_layout(
-                margin={"r": 0, "t": 0, "l": 0, "b": 0},
-                coloraxis_colorbar_title="Confianza",
-            )
-            st.plotly_chart(fig_map, use_container_width=True)
         else:
-            st.info("Sin datos de focos para el período seleccionado.")
+            datos_mapa = firms
+            color_por_confianza = True
+            st.caption(
+                f"Focos del período {periodo_label} en {alcance_ciudades_label}. "
+                "El mapa usa una muestra acotada para mantener la navegacion agil."
+            )
+
+        if not datos_mapa.empty and "latitud" in datos_mapa.columns:
+            fig_map = _render_mapa_focos(
+                datos_mapa,
+                pais_sel,
+                color_por_confianza,
+                height=460,
+                centro_override=centro_ciudades,
+            )
+            if fig_map is not None:
+                st.plotly_chart(fig_map, use_container_width=True)
+            else:
+                st.info("Sin coordenadas disponibles para la vista seleccionada.")
+        else:
+            st.info("Sin datos de focos para la vista seleccionada.")
 
     with col_graf:
         st.subheader("Focos por semana")
         st.caption("Evolución temporal de la actividad de incendios. Picos = semanas críticas.")
-        if not firms.empty:
+        if not focos_diarios.empty:
             semanal = (
-                firms.set_index("fecha_adq").resample("W")["latitud"]
-                .count().reset_index()
-                .rename(columns={"fecha_adq": "semana", "latitud": "focos"})
+                focos_diarios.set_index("fecha").resample("W")["focos"]
+                .sum().reset_index()
+                .rename(columns={"fecha": "semana"})
             )
             fig_sem = px.bar(
                 semanal, x="semana", y="focos",
@@ -340,7 +521,7 @@ if pagina == "Resumen General":
 
         st.subheader("¿Cuántos días hubo riesgo alto?")
         st.caption(
-            "Distribución del índice de riesgo calculado con datos meteorológicos de los 18 puntos SA."
+            "Distribución del índice de riesgo calculado con datos meteorológicos de los 36 puntos del alcance regional."
         )
         if not meteo.empty and "nivel_riesgo" in meteo.columns:
             dist = meteo["nivel_riesgo"].value_counts().reset_index()
@@ -363,14 +544,15 @@ if pagina == "Resumen General":
             """
             **¿Qué nos dicen estas 3 fuentes combinadas?**
 
-            - La actividad de incendios se concentra en **Brasil (47%), Bolivia (15%) y Paraguay (10%)**,
-              con picos en agosto–octubre (estación seca del hemisferio sur).
-            - **2020 fue el año más crítico**: 3.38M focos, con el peor día histórico el 1° de octubre
-              de 2020 con 56,604 focos detectados — coincide con las grandes quemas del Pantanal.
-            - Los días de **riesgo muy_alto** concentran 2.3× más focos que los días de riesgo moderado,
-              validando el índice meteorológico como predictor de actividad de incendios.
-            - La integración de CAMS permite saber si los incendios **afectaron la calidad del aire**:
-              Santiago superó el límite OMS de PM10 en 285 días; Trinidad alcanzó 704 µg/m³ (15× el límite).
+            - La actividad de incendios se concentra en **Brasil** y en corredores críticos del
+              **noreste y centro de Argentina**, mientras **Uruguay** funciona como país núcleo de análisis
+              y receptor de parte del humo transfronterizo.
+            - Los picos de focos y de riesgo suelen alinearse con los meses más secos y cálidos,
+              especialmente cuando coinciden temperatura alta, humedad baja y viento fuerte.
+            - Los días de **riesgo alto o muy alto** tienden a concentrar más focos que los días moderados,
+              lo que vuelve útil al índice meteorológico como herramienta de alerta temprana.
+            - La integración de CAMS permite verificar si los incendios **impactan la calidad del aire**
+              y cruzar ese efecto con puntos de monitoreo concretos del alcance regional.
 
             Este sistema demuestra el valor de la **ingeniería de datos**: el dato individual no responde
             la pregunta. La respuesta emerge cuando integramos 5 fuentes heterogéneas en una sola vista.
@@ -384,7 +566,7 @@ if pagina == "Resumen General":
 elif pagina == "Focos de Calor":
 
     st.title("Focos de Calor — NASA FIRMS VIIRS")
-    st.caption(f"Satélite: VIIRS Suomi NPP (Standard Processing) · Período: {anio_sel} · 6 países SA")
+    st.caption(f"Satélite: VIIRS Suomi NPP (Standard Processing) · Período: {periodo_label} · Uruguay, Brasil, Argentina y Chile")
 
     st.info(
         "**¿Qué es un foco de calor?**  \n"
@@ -405,30 +587,67 @@ elif pagina == "Focos de Calor":
         c1, c2, c3 = st.columns(3)
         c1.metric(
             "Total de focos detectados",
-            f"{len(firms):,}",
-            help="Cantidad de hotspots satelitales detectados en el período seleccionado.",
+            f"{total_focos_periodo:,}",
+            help="Cantidad real de hotspots satelitales detectados en el período seleccionado.",
         )
         c2.metric(
             "FRP promedio",
-            f"{firms['potencia_radiativa'].mean():.2f} MW" if "potencia_radiativa" in firms.columns else "N/D",
+            f"{stats_focos.get('frp_promedio', 0):.2f} MW",
             help="Intensidad promedio de los focos. Valores > 100 MW indican incendios grandes.",
         )
         c3.metric(
             "FRP máximo registrado",
-            f"{firms['potencia_radiativa'].max():.2f} MW" if "potencia_radiativa" in firms.columns else "N/D",
+            f"{stats_focos.get('frp_maximo', 0):.2f} MW",
             help="El foco más intenso del período. Representa el incendio de mayor envergadura.",
         )
+        st.caption(
+            "Totales, FRP y evolución temporal usan agregaciones reales de PostgreSQL. "
+            "Mapa, tabla y graficos de detalle usan una muestra acotada para mantener el dashboard agil."
+        )
+
+        st.subheader("Mapa de focos")
+        modo_mapa_focos = st.radio(
+            "Vista del mapa",
+            ["Actuales (NRT últimas 24h)", "Período seleccionado"],
+            horizontal=True,
+            key="modo_mapa_focos",
+        )
+        if modo_mapa_focos.startswith("Actuales"):
+            datos_mapa = nrt
+            color_por_confianza = False
+            st.caption(
+                f"Focos recientes NRT de las últimas 24 horas en {alcance_ciudades_label}. "
+                "Cambia el país o las ciudades en el sidebar para ajustar el mapa."
+            )
+        else:
+            datos_mapa = firms
+            color_por_confianza = True
+            st.caption(
+                f"Focos del período {periodo_label} en {alcance_ciudades_label}. "
+                "Para el periodo completo se visualiza una muestra priorizada por intensidad FRP."
+            )
+
+        if not datos_mapa.empty and "latitud" in datos_mapa.columns:
+            fig_map_focos = _render_mapa_focos(
+                datos_mapa,
+                pais_sel,
+                color_por_confianza,
+                height=430,
+                centro_override=centro_ciudades,
+            )
+            if fig_map_focos is not None:
+                st.plotly_chart(fig_map_focos, use_container_width=True)
+            else:
+                st.info("Sin coordenadas disponibles para la vista seleccionada.")
+        else:
+            st.info("Sin focos disponibles para la vista seleccionada.")
 
         st.subheader("Evolución diaria de focos detectados")
         st.caption(
             "Cada barra es un día. Los picos corresponden a eventos de incendios activos. "
             "La tendencia muestra si la actividad aumenta o disminuye en el período."
         )
-        diario = (
-            firms.set_index("fecha_adq").resample("D")["latitud"]
-            .count().reset_index()
-            .rename(columns={"fecha_adq": "fecha", "latitud": "focos"})
-        )
+        diario = focos_diarios.copy()
         fig_line = px.line(
             diario, x="fecha", y="focos",
             labels={"fecha": "Fecha", "focos": "Focos detectados por día"},
@@ -499,8 +718,8 @@ elif pagina == "Índice de Riesgo":
         "| Humedad mínima (%) | **30%** | Menos humedad → más riesgo (ambiente seco) |\n"
         "| Velocidad del viento (km/h) | **20%** | Más viento → incendio se propaga más rápido |\n"
         "| Evapotranspiración / sequía (mm/día) | **25%** | Mayor sequía acumulada → más riesgo |\n\n"
-        "Cada componente se normaliza con umbrales basados en la climatología histórica de Uruguay "
-        "(ej: temperatura de referencia máxima = 42°C)."
+        "Cada componente se normaliza con umbrales regionales definidos para el alcance "
+        "Uruguay-Brasil-Argentina (ej: temperatura de referencia máxima = 42°C)."
     )
 
     st.markdown(
@@ -514,7 +733,7 @@ elif pagina == "Índice de Riesgo":
     )
     st.divider()
 
-    tab_hist, tab_fc = st.tabs([f"Histórico ({anio_sel})", "Pronóstico 7 días"])
+    tab_hist, tab_fc = st.tabs([f"Histórico ({periodo_label})", "Pronóstico 7 días"])
 
     with tab_hist:
         if meteo.empty:
@@ -650,10 +869,24 @@ elif pagina == "Índice de Riesgo":
                     line=dict(color="#e74c3c", width=2.5), marker=dict(size=9),
                     text=df_fc["indice_riesgo"].round(2), textposition="top center",
                 ))
-            fig_fc.add_vline(
-                x=datetime.now().strftime("%Y-%m-%d"),
-                line_dash="dash", line_color="gray",
-                annotation_text="Hoy", annotation_position="top",
+            hoy = pd.Timestamp(datetime.now().date())
+            fig_fc.add_shape(
+                type="line",
+                x0=hoy,
+                x1=hoy,
+                y0=0,
+                y1=1,
+                yref="paper",
+                line=dict(color="gray", dash="dash"),
+            )
+            fig_fc.add_annotation(
+                x=hoy,
+                y=1,
+                yref="paper",
+                text="Hoy",
+                showarrow=False,
+                yanchor="bottom",
+                font=dict(color="gray", size=11),
             )
             fig_fc.update_layout(
                 yaxis=dict(range=[0, 1.1], title="Índice de riesgo (0–1)"),
@@ -814,7 +1047,7 @@ elif pagina == "Tiempo Real":
     if not nrt.empty and "fecha_adq" in nrt.columns:
         focos_hoy = nrt[nrt["fecha_adq"].dt.date == datetime.now().date()]
         if len(focos_hoy) >= UMBRAL_FOCOS_ALERTA:
-            alertas.append(f"{len(focos_hoy)} focos detectados HOY por satélite NRT")
+            alertas.append(f"{len(focos_hoy)} focos detectados HOY por satélite NRT en {alcance_nrt_label}")
 
     if alertas:
         for a in alertas:
@@ -871,10 +1104,20 @@ elif pagina == "Tiempo Real":
                 line=dict(color="#e74c3c", width=2.5), marker=dict(size=9),
                 text=df_fc["indice_riesgo"].round(2), textposition="top center",
             ))
-        fig_fc.add_vline(
-            x=datetime.now().strftime("%Y-%m-%d"),
-            line_dash="dash", line_color="gray",
-            annotation_text="Hoy", annotation_position="top",
+        hoy = pd.Timestamp(datetime.now().date())
+        fig_fc.add_shape(
+            type="line",
+            x0=hoy, x1=hoy,
+            y0=0, y1=1,
+            xref="x", yref="paper",
+            line=dict(color="gray", dash="dash"),
+        )
+        fig_fc.add_annotation(
+            x=hoy, y=1,
+            xref="x", yref="paper",
+            text="Hoy",
+            showarrow=False,
+            yanchor="bottom",
         )
         fig_fc.update_layout(
             yaxis=dict(range=[0, 1.1], title="Índice de riesgo"),
@@ -886,17 +1129,18 @@ elif pagina == "Tiempo Real":
     if nrt.empty:
         st.info("Sin focos NRT disponibles. El scheduler los actualiza cada 3 horas.")
     else:
-        df_nrt = nrt.dropna(subset=["latitud", "longitud"])
-        fig_nrt = px.scatter_mapbox(
-            df_nrt, lat="latitud", lon="longitud",
-            color="potencia_radiativa" if "potencia_radiativa" in df_nrt.columns else None,
-            size="potencia_radiativa" if "potencia_radiativa" in df_nrt.columns else None,
-            size_max=20, color_continuous_scale=["yellow", "orange", "red"],
-            mapbox_style="carto-positron",
-            center={"lat": -32.5, "lon": -56.0}, zoom=5.5, height=400,
+        st.caption(f"Vista NRT filtrada por país/ciudad: {alcance_ciudades_label}.")
+        fig_nrt = _render_mapa_focos(
+            nrt,
+            pais_sel,
+            color_por_confianza=False,
+            height=400,
+            centro_override=centro_ciudades,
         )
-        fig_nrt.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
-        st.plotly_chart(fig_nrt, use_container_width=True)
+        if fig_nrt is not None:
+            st.plotly_chart(fig_nrt, use_container_width=True)
+        else:
+            st.info("Sin coordenadas NRT disponibles para el país seleccionado.")
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -911,7 +1155,7 @@ elif pagina == "Análisis de Riesgo":
         "**¿Qué responde esta sección?**  \n"
         "Esta es la capa de valor analítico del proyecto. Con los datos ya integrados en PostgreSQL, "
         "respondemos preguntas que no pueden responderse mirando una sola fuente:  \n\n"
-        "- **¿Qué zona de Uruguay tiene más riesgo histórico?** → Ranking de zonas  \n"
+        "- **¿Qué punto del sistema tiene más riesgo histórico?** → Ranking de zonas  \n"
         "- **¿En qué época del año hay más incendios?** → Análisis estacional  \n"
         "- **¿Hubo días con condiciones excepcionalmente peligrosas?** → Detección de anomalías  \n"
         "- **¿El índice que calculamos realmente predice incendios?** → Correlación focos-riesgo  \n"
@@ -929,17 +1173,11 @@ elif pagina == "Análisis de Riesgo":
     except ImportError:
         _analytics_ok = False
 
-    tab_rank, tab_estac, tab_anom, tab_corr, tab_criticos = st.tabs([
-        "Ranking de Zonas",
-        "Estacionalidad",
-        "Anomalías",
-        "Correlación Focos-Riesgo",
-        "Días Críticos",
-    ])
+    st.caption("La seccion se muestra completa en bloques abiertos para defensa: ranking, estacionalidad, anomalias, correlacion y dias criticos.")
 
     # ── Tab 1: Ranking de zonas ───────────────────────────────────────────────
-    with tab_rank:
-        st.subheader("¿Qué departamento tiene mayor exposición histórica al riesgo?")
+    with st.expander("Ranking de Zonas", expanded=True):
+        st.subheader("¿Qué punto de monitoreo tiene mayor exposición histórica al riesgo?")
         st.caption(
             "**Cómo se calcula el score:** 50% índice de riesgo promedio del período "
             "+ 50% proporción de días en nivel ALTO o MUY ALTO.  \n"
@@ -989,18 +1227,18 @@ elif pagina == "Análisis de Riesgo":
                 score_top = df_rank.iloc[0]["score_riesgo"]
                 st.success(
                     f"**Conclusión:** La zona con mayor exposición histórica al riesgo es **{zona_top}** "
-                    f"con un score de {score_top:.3f}. Este departamento debería tener prioridad "
+                    f"con un score de {score_top:.3f}. Este punto debería tener prioridad "
                     "en los planes de prevención y vigilancia de incendios forestales."
                 )
         else:
             st.warning("No hay datos meteorológicos suficientes.")
 
     # ── Tab 2: Análisis estacional ────────────────────────────────────────────
-    with tab_estac:
+    with st.expander("Estacionalidad", expanded=True):
         st.subheader("¿En qué época del año hay más riesgo de incendio?")
         st.caption(
             "Esta pregunta es clave para la gestión preventiva: si sabemos que el riesgo "
-            "aumenta en verano (enero-febrero en Uruguay), podemos activar planes de "
+            "aumenta en los meses más cálidos del corredor regional, podemos activar planes de "
             "emergencia con anticipación."
         )
         if not meteo.empty and "indice_riesgo" in meteo.columns:
@@ -1056,7 +1294,7 @@ elif pagina == "Análisis de Riesgo":
             st.warning("Sin datos para análisis estacional.")
 
     # ── Tab 3: Anomalías ──────────────────────────────────────────────────────
-    with tab_anom:
+    with st.expander("Anomalias", expanded=True):
         st.subheader("¿Hubo días con condiciones excepcionalmente peligrosas?")
         st.caption(
             "Se usa **Isolation Forest**, un algoritmo de Machine Learning no supervisado que "
@@ -1127,7 +1365,7 @@ elif pagina == "Análisis de Riesgo":
             st.warning("Sin datos para análisis de anomalías.")
 
     # ── Tab 4: Correlación focos-riesgo ───────────────────────────────────────
-    with tab_corr:
+    with st.expander("Correlacion Focos-Riesgo", expanded=True):
         st.subheader("¿El índice de riesgo realmente predice la ocurrencia de incendios?")
         st.caption(
             "Esta es la **validación del modelo**: si el índice que calculamos es útil, "
@@ -1201,7 +1439,7 @@ elif pagina == "Análisis de Riesgo":
             st.warning("Se necesitan datos de focos y meteorología simultáneamente.")
 
     # ── Tab 5: Días críticos ──────────────────────────────────────────────────
-    with tab_criticos:
+    with st.expander("Dias Criticos", expanded=True):
         st.subheader("Días históricos con riesgo ALTO o MUY ALTO")
         st.caption(
             "Registro de todos los días en que al menos un punto de monitoreo superó el "
@@ -1248,17 +1486,16 @@ elif pagina == "Análisis de Riesgo":
 # ════════════════════════════════════════════════════════════════════════════
 elif pagina == "Comparativo por País":
 
-    st.title("Comparativo por País — Sudamérica")
-    st.caption("Análisis comparativo del índice de riesgo y actividad de incendios entre los 6 países núcleo")
+    st.title("Comparativo por País")
+    st.caption("Análisis comparativo del índice de riesgo y actividad de incendios entre Uruguay, Brasil, Argentina y Chile")
 
     st.info(
         "**¿Para qué sirve esta página?**  \n"
         "Permite comparar la evolución del riesgo de incendio y la cantidad de focos detectados "
-        "entre Brasil, Bolivia, Paraguay, Argentina, Chile y Perú.  \n"
+        "entre Uruguay, Brasil, Argentina y Chile.  \n"
         "Los datos se agregan mensualmente promediando los puntos de monitoreo de cada país. "
         "Esto permite identificar **qué países tienen mayor riesgo estacional** y en qué períodos.  \n\n"
-        "Nota: esta vista requiere datos históricos cargados para los 18 puntos SA. "
-        "Con datos 2018–2024 cargados para los 6 países SA."
+        "Nota: esta vista requiere datos históricos cargados para los 36 puntos del alcance regional."
     )
 
     df_riesgo_pais  = cargar_riesgo_por_pais()
@@ -1302,7 +1539,7 @@ elif pagina == "Comparativo por País":
         else:
             st.warning(
                 "Sin datos de riesgo por país disponibles. "
-                "Ejecuta el ETL para los 18 puntos SA para ver esta comparación."
+                "Ejecuta el ETL para los 36 puntos del alcance regional para ver esta comparación."
             )
 
     # ── Tab 2: Focos por país ─────────────────────────────────────────────────
@@ -1310,7 +1547,7 @@ elif pagina == "Comparativo por País":
         st.subheader("Total de focos de calor por país y mes")
         st.caption(
             "Cantidad de focos FIRMS detectados por mes en cada país. "
-            "Brasil y Bolivia suelen concentrar la mayor actividad en el período agosto-octubre (seca)."
+            "Brasil suele concentrar la mayor actividad y Argentina muestra estacionalidad más marcada en meses secos."
         )
         if not df_focos_pais.empty:
             fig_f = px.bar(
@@ -1338,7 +1575,7 @@ elif pagina == "Comparativo por País":
         else:
             st.warning(
                 "Sin datos de focos por país. "
-                "Verificá que el ETL histórico haya corrido para los 18 puntos SA."
+                "Verificá que el ETL histórico haya corrido para los 36 puntos del alcance regional."
             )
 
     # ── Tab 3: Tabla comparativa ──────────────────────────────────────────────
@@ -1412,7 +1649,7 @@ elif pagina == "Fuentes y Datos Crudos":
         total_firms = sum(1 for f in firms_files)
         st.metric("Archivos CSV descargados", total_firms)
         st.metric("Años cubiertos", "2018–2024")
-        st.metric("Países cubiertos", "6 SA + Uruguay")
+        st.metric("Países cubiertos", "4")
 
     st.markdown("**Columnas del dato crudo:**")
     col_firms = {
@@ -1460,13 +1697,13 @@ elif pagina == "Fuentes y Datos Crudos":
 **Acceso:** API REST completamente gratuita, sin clave
 **Granularidad:** Diaria por punto geográfico
 **Cobertura temporal:** Desde 1940 hasta ayer
-**Puntos monitoreados:** 18 ciudades de 6 países SA + Rivera (Uruguay)
+**Puntos monitoreados:** 36 puntos: 19 departamentos de Uruguay + ciudades estratégicas de Brasil, Argentina y Chile + puntos volcánicos
 **Archivo ETL:** `etl/extract/extract_meteo.py`
         """)
     with col2:
         meteo_files = _glob.glob(str(RAW / "meteo" / "*.csv"))
         st.metric("Archivos CSV descargados", len(meteo_files))
-        st.metric("Ciudades/puntos", "18 SA + Rivera")
+        st.metric("Ciudades/puntos", "36")
         st.metric("Años cubiertos", "2018–2024")
 
     st.markdown("**Columnas del dato crudo:**")
@@ -1510,7 +1747,7 @@ elif pagina == "Fuentes y Datos Crudos":
 **Acceso:** Proxy gratuito vía Open-Meteo Air Quality API, sin clave
 **Granularidad:** Horaria por punto (se agrega a diaria en ETL)
 **Cobertura temporal:** 2018–2024
-**Puntos monitoreados:** 18 ciudades SA + Rivera
+**Puntos monitoreados:** 36 puntos: Uruguay completo por departamentos + Brasil/Argentina estratégicos + Chile volcánico
 **Archivo ETL:** `etl/extract/extract_cams.py`
         """)
     with col2:
@@ -1560,7 +1797,7 @@ elif pagina == "Fuentes y Datos Crudos":
 **Acceso:** API gratuita vía ClimateSERV (NASA SERVIR)
 **Granularidad:** Mensual por punto geográfico
 **Cobertura temporal:** 1981–presente
-**Puntos monitoreados:** 18 ciudades SA
+**Puntos monitoreados:** 36 puntos: Uruguay completo por departamentos + Brasil/Argentina estratégicos + Chile volcánico
 **Archivo ETL:** `etl/extract/extract_chirps.py`
         """)
     with col2:

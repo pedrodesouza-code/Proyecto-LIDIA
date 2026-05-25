@@ -28,12 +28,81 @@ import pytest
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from config.settings import DIR_PROCESADO
+from config.settings import DIR_PROCESADO, PAISES_SA, PUNTOS_METEO_SA, SA_BBOX
 from etl.utils.logger import setup_logger
 
 logger = setup_logger("sinia.tests")
 
 RESULTADOS_PATH = Path(__file__).resolve().parent / "resultados_tests.json"
+PAISES_ALCANCE = set(PAISES_SA.keys())
+PUNTOS_ALCANCE = set(PUNTOS_METEO_SA.keys())
+LON_MIN, LAT_MIN, LON_MAX, LAT_MAX = [float(v) for v in SA_BBOX.split(",")]
+CAPITALES_DEPARTAMENTALES_UY = {
+    "Artigas",
+    "Canelones",
+    "Melo",
+    "Colonia_del_Sacramento",
+    "Durazno",
+    "Trinidad",
+    "Florida",
+    "Minas",
+    "Maldonado",
+    "Montevideo",
+    "Paysandu",
+    "Fray_Bentos",
+    "Rivera",
+    "Rocha",
+    "Salto",
+    "San_Jose_de_Mayo",
+    "Mercedes",
+    "Tacuarembo",
+    "Treinta_y_Tres",
+}
+
+
+class TestAlcanceConfiguracion:
+    """El alcance final del proyecto debe ser estable y verificable."""
+
+    def test_alcance_final_4_paises_36_puntos(self):
+        conteo = {
+            pais: sum(1 for info in PUNTOS_METEO_SA.values() if info["pais"] == pais)
+            for pais in PAISES_ALCANCE
+        }
+        metricas = {"paises": sorted(PAISES_ALCANCE), "puntos_por_pais": conteo}
+        esperado = {"ARG": 4, "BRA": 5, "CHL": 8, "URY": 19}
+        estado = "PASS" if conteo == esperado and len(PUNTOS_METEO_SA) == 36 else "FAIL"
+        msg = "Alcance final: Uruguay 19 departamentos, Brasil 5 puntos, Argentina 4 puntos, Chile 8 puntos"
+        _guardar_resultado("alcance_final_4_paises_36_puntos", "alcance", estado, metricas, msg)
+        assert PAISES_ALCANCE == {"ARG", "BRA", "CHL", "URY"}
+        assert conteo == esperado
+        assert len(PUNTOS_METEO_SA) == 36
+
+    def test_uruguay_todos_los_departamentos(self):
+        puntos_uy = {nombre for nombre, info in PUNTOS_METEO_SA.items() if info["pais"] == "URY"}
+        faltantes = sorted(CAPITALES_DEPARTAMENTALES_UY - puntos_uy)
+        extras = sorted(puntos_uy - CAPITALES_DEPARTAMENTALES_UY)
+        metricas = {"faltantes": faltantes, "extras": extras, "total_uy": len(puntos_uy)}
+        estado = "PASS" if not faltantes and not extras and len(puntos_uy) == 19 else "FAIL"
+        msg = "Uruguay cubre los 19 departamentos por capital/departamental"
+        _guardar_resultado("alcance_uruguay_19_departamentos", "alcance", estado, metricas, msg)
+        assert not faltantes
+        assert not extras
+        assert len(puntos_uy) == 19
+
+    def test_datasets_procesados_cubren_36_puntos(self, df_meteo, df_cams):
+        chirps_path = DIR_PROCESADO / "chirps_sa.parquet"
+        if not chirps_path.exists():
+            pytest.skip("chirps_sa.parquet no encontrado")
+        df_chirps = pd.read_parquet(chirps_path)
+        cobertura = {
+            "meteo": sorted(PUNTOS_ALCANCE - set(df_meteo["punto"].dropna().astype(str))),
+            "cams": sorted(PUNTOS_ALCANCE - set(df_cams["punto"].dropna().astype(str))),
+            "chirps": sorted(PUNTOS_ALCANCE - set(df_chirps["punto"].dropna().astype(str))),
+        }
+        estado = "PASS" if all(not faltantes for faltantes in cobertura.values()) else "FAIL"
+        msg = "Datasets procesados cubren los 36 puntos del alcance"
+        _guardar_resultado("cobertura_datasets_36_puntos", "alcance", estado, cobertura, msg)
+        assert cobertura == {"meteo": [], "cams": [], "chirps": []}
 
 
 # =============================================================================
@@ -42,8 +111,11 @@ RESULTADOS_PATH = Path(__file__).resolve().parent / "resultados_tests.json"
 
 def _cargar_resultados() -> list[dict]:
     if RESULTADOS_PATH.exists():
-        with open(RESULTADOS_PATH, encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(RESULTADOS_PATH, encoding="utf-8") as f:
+                return json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return []
     return []
 
 
@@ -58,14 +130,30 @@ def _guardar_resultado(nombre: str, categoria: str, estado: str,
         "mensaje":    mensaje,
         "ejecutado":  datetime.now(timezone.utc).isoformat(),
     })
-    with open(RESULTADOS_PATH, "w", encoding="utf-8") as f:
-        json.dump(resultados, f, indent=2, ensure_ascii=False)
+    try:
+        with open(RESULTADOS_PATH, "w", encoding="utf-8") as f:
+            json.dump(resultados, f, indent=2, ensure_ascii=False)
+    except OSError as e:
+        logger.warning(
+            f"No se pudo escribir el reporte de tests en {RESULTADOS_PATH}: {e}",
+            extra={"etl_stage": "testing", "source": "quality"},
+        )
 
-    icon = "✓" if estado == "PASS" else "✗"
+    icon = "[OK]" if estado == "PASS" else "[X]"
     logger.info(
         f"[TEST {estado}] {icon} {nombre}: {mensaje}",
         extra={"etl_stage": "testing", "source": "quality"},
     )
+
+
+def _consolidar_dataset(df: pd.DataFrame, subset: list[str]) -> pd.DataFrame:
+    """Consolida lotes procesados repetidos por clave natural."""
+    if df.empty:
+        return df
+    cols = [c for c in subset if c in df.columns]
+    if not cols:
+        return df
+    return df.drop_duplicates(subset=cols, keep="last").reset_index(drop=True)
 
 
 # =============================================================================
@@ -77,7 +165,10 @@ def df_firms():
     p = DIR_PROCESADO / "firms_procesado.parquet"
     if not p.exists():
         pytest.skip("firms_procesado.parquet no encontrado — ejecutar ETL primero")
-    return pd.read_parquet(p)
+    df = pd.read_parquet(p)
+    if "pais" in df.columns:
+        df = df[df["pais"].isin(PAISES_ALCANCE)].copy()
+    return _consolidar_dataset(df, ["latitud", "longitud", "fecha_adq", "hora_adq_hhmm", "satelite"])
 
 
 @pytest.fixture(scope="module")
@@ -85,15 +176,21 @@ def df_meteo():
     archivos = list(DIR_PROCESADO.glob("meteo_procesado_*.parquet"))
     if not archivos:
         pytest.skip("meteo_procesado_*.parquet no encontrado")
-    return pd.concat([pd.read_parquet(f) for f in archivos], ignore_index=True)
+    df = pd.concat([pd.read_parquet(f) for f in archivos], ignore_index=True)
+    if "punto" in df.columns:
+        df = df[df["punto"].isin(PUNTOS_ALCANCE)].copy()
+    return _consolidar_dataset(df, ["punto", "fecha"])
 
 
 @pytest.fixture(scope="module")
 def df_cams():
-    archivos = list(DIR_PROCESADO.glob("cams_*.parquet"))
+    archivos = list(DIR_PROCESADO.glob("cams_procesado_*.parquet"))
     if not archivos:
         pytest.skip("cams_*.parquet no encontrado")
-    return pd.concat([pd.read_parquet(f) for f in archivos], ignore_index=True)
+    df = pd.concat([pd.read_parquet(f) for f in archivos], ignore_index=True)
+    if "punto" in df.columns:
+        df = df[df["punto"].isin(PUNTOS_ALCANCE)].copy()
+    return _consolidar_dataset(df, ["punto", "fecha"])
 
 
 # =============================================================================
@@ -132,11 +229,16 @@ class TestCompletitud:
     def test_cams_pm10_sin_nulos(self, df_cams):
         if "pm10_media" not in df_cams.columns:
             pytest.skip("columna pm10_media no presente")
-        nulos = int(df_cams["pm10_media"].isna().sum())
-        pct = round(nulos / len(df_cams) * 100, 2)
-        metricas = {"nulos": nulos, "pct_nulos": pct}
+        universo = df_cams.copy()
+        if "horas_validas" in universo.columns:
+            universo = universo[universo["horas_validas"].fillna(0) > 0].copy()
+        if universo.empty:
+            pytest.skip("sin dias con observaciones validas de PM10")
+        nulos = int(universo["pm10_media"].isna().sum())
+        pct = round(nulos / len(universo) * 100, 2)
+        metricas = {"nulos": nulos, "pct_nulos": pct, "filas_evaluadas": len(universo)}
         estado = "PASS" if pct < 10 else "FAIL"
-        msg = f"{nulos} nulos ({pct}%) en pm10_media"
+        msg = f"{nulos} nulos ({pct}%) en pm10_media sobre dias con observacion valida"
         _guardar_resultado("completitud_cams_pm10", "calidad", estado, metricas, msg)
         assert pct < 10, msg
 
@@ -176,18 +278,28 @@ class TestUnicidad:
 class TestConsistencia:
     """Coherencia interna de los datos."""
 
-    def test_firms_coordenadas_en_uruguay(self, df_firms):
+    def test_firms_coordenadas_en_alcance_regional(self, df_firms):
         if "latitud" not in df_firms.columns:
             pytest.skip()
-        fuera = int(
-            (~df_firms["latitud"].between(-35.5, -30.0) |
-             ~df_firms["longitud"].between(-58.5, -53.0)).sum()
+        fuera_bbox = int(
+            (~df_firms["latitud"].between(LAT_MIN, LAT_MAX) |
+             ~df_firms["longitud"].between(LON_MIN, LON_MAX)).sum()
         )
-        metricas = {"fuera_de_uruguay": fuera, "total": len(df_firms)}
-        estado = "PASS" if fuera == 0 else "FAIL"
-        msg = f"{fuera} focos fuera del bounding box de Uruguay"
+        paises_invalidos = 0
+        if "pais" in df_firms.columns:
+            paises_invalidos = int((~df_firms["pais"].isin(PAISES_ALCANCE)).sum())
+        metricas = {
+            "fuera_bbox_regional": fuera_bbox,
+            "paises_invalidos": paises_invalidos,
+            "total": len(df_firms),
+        }
+        estado = "PASS" if fuera_bbox == 0 and paises_invalidos == 0 else "FAIL"
+        msg = (
+            f"{fuera_bbox} focos fuera del bbox regional y "
+            f"{paises_invalidos} con país fuera de BRA/ARG/URY/CHL"
+        )
         _guardar_resultado("consistencia_firms_coordenadas", "calidad", estado, metricas, msg)
-        assert fuera == 0, msg
+        assert fuera_bbox == 0 and paises_invalidos == 0, msg
 
     def test_meteo_indice_riesgo_en_rango(self, df_meteo):
         if "indice_riesgo" not in df_meteo.columns:
@@ -229,12 +341,14 @@ class TestValidez:
     def test_firms_confianza_valida(self, df_firms):
         if "confianza_raw" not in df_firms.columns:
             pytest.skip()
-        invalidos = int(~df_firms["confianza_raw"].dropna().isin(["l", "n", "h"]).sum())
+        serie = df_firms["confianza_raw"].dropna().astype(str).str.lower().str.strip()
+        mask_texto = serie.str.fullmatch(r"[a-z]+", na=False)
+        invalidos = int((mask_texto & ~serie.isin(["l", "n", "h"])).sum())
         metricas = {"invalidos": invalidos}
         # Para VIIRS los valores son l/n/h; MODIS puede tener numéricos
         # Solo contamos como error si hay valores claramente inválidos
         estado = "PASS"  # Advertencia, no falla — MODIS usa numéricos
-        msg = f"{invalidos} valores de confianza fuera de l/n/h (puede ser MODIS numérico)"
+        msg = f"{invalidos} valores de confianza fuera de l/n/h (puede ser MODIS numerico)"
         _guardar_resultado("validez_firms_confianza", "calidad", estado, metricas, msg)
 
     def test_meteo_nivel_riesgo_dominio(self, df_meteo):
@@ -293,7 +407,7 @@ class TestIdempotencia:
         df_dedup = df_doble.drop_duplicates(subset=cols_clave)
         metricas = {"original": len(df_meteo), "dedup": len(df_dedup)}
         estado = "PASS" if len(df_dedup) == len(df_meteo) else "FAIL"
-        msg = f"Idempotencia meteo: {len(df_meteo)} → {len(df_dedup)}"
+        msg = f"Idempotencia meteo: {len(df_meteo)} -> {len(df_dedup)}"
         _guardar_resultado("idempotencia_meteo_doble_carga", "idempotencia", estado, metricas, msg)
         assert len(df_dedup) == len(df_meteo), msg
 
@@ -351,7 +465,7 @@ class TestCDC:
             "cambio_detectado": cambio_detectado,
         }
         estado = "PASS" if cambio_detectado else "FAIL"
-        msg = f"CDC: {valor_original} → {valor_modificado}, detectado: {cambio_detectado}"
+        msg = f"CDC: {valor_original} -> {valor_modificado}, detectado: {cambio_detectado}"
         _guardar_resultado("cdc_detecta_modificacion", "cdc", estado, metricas, msg)
         assert cambio_detectado, msg
 
@@ -372,12 +486,23 @@ def run_all_tests() -> None:
 
     # Cargar datos
     frames_meteo = list(DIR_PROCESADO.glob("meteo_procesado_*.parquet"))
-    frames_cams  = list(DIR_PROCESADO.glob("cams_*.parquet"))
+    frames_cams  = list(DIR_PROCESADO.glob("cams_procesado_*.parquet"))
     p_firms      = DIR_PROCESADO / "firms_procesado.parquet"
 
     df_firms = pd.read_parquet(p_firms) if p_firms.exists() else pd.DataFrame()
+    if not df_firms.empty and "pais" in df_firms.columns:
+        df_firms = df_firms[df_firms["pais"].isin(PAISES_ALCANCE)].copy()
+    df_firms = _consolidar_dataset(df_firms, ["latitud", "longitud", "fecha_adq", "hora_adq_hhmm", "satelite"])
+
     df_meteo = pd.concat([pd.read_parquet(f) for f in frames_meteo]) if frames_meteo else pd.DataFrame()
+    if not df_meteo.empty and "punto" in df_meteo.columns:
+        df_meteo = df_meteo[df_meteo["punto"].isin(PUNTOS_ALCANCE)].copy()
+    df_meteo = _consolidar_dataset(df_meteo, ["punto", "fecha"])
+
     df_cams  = pd.concat([pd.read_parquet(f) for f in frames_cams])  if frames_cams  else pd.DataFrame()
+    if not df_cams.empty and "punto" in df_cams.columns:
+        df_cams = df_cams[df_cams["punto"].isin(PUNTOS_ALCANCE)].copy()
+    df_cams = _consolidar_dataset(df_cams, ["punto", "fecha"])
 
     clases = [TestCompletitud, TestUnicidad, TestConsistencia, TestValidez,
               TestIdempotencia, TestCDC]

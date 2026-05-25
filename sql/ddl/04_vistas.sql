@@ -1,12 +1,12 @@
 -- =============================================================================
--- SINIA-SA — Vistas analíticas (Sudamérica)
+-- SINIA-UY — Vistas analíticas regionales
 -- =============================================================================
 -- Las vistas cumplen dos roles:
 --   1. Seguridad: el usuario dashboard (readonly) consulta vistas, no tablas base
 --   2. Analítica: queries complejas pre-calculadas y reutilizables
 --
 -- Todas las vistas incluyen la columna `pais` para permitir
--- comparaciones entre los 6 países núcleo de Sudamérica.
+-- comparaciones entre Uruguay, Brasil, Argentina y Chile.
 -- =============================================================================
 
 -- ── Vista 1: v_riesgo_actual ──────────────────────────────────────────────────
@@ -25,6 +25,8 @@ SELECT
 FROM meteo_diario m
 JOIN puntos_monitoreo p ON p.id = m.id_punto
 WHERE m.tipo_dato = 'historico'
+  AND p.activo = TRUE
+  AND p.pais IN ('ARG', 'BRA', 'CHL', 'URY')
   AND m.fecha = (
       SELECT MAX(fecha) FROM meteo_diario
       WHERE id_punto = m.id_punto AND tipo_dato = 'historico'
@@ -55,6 +57,7 @@ SELECT
 FROM meteo_diario m
 JOIN puntos_monitoreo p ON p.id = m.id_punto
 WHERE p.activo = TRUE
+  AND p.pais IN ('ARG', 'BRA', 'CHL', 'URY')
 ORDER BY p.nombre, m.fecha;
 
 -- ── Vista 3: v_focos_resumen_diario ───────────────────────────────────────────
@@ -88,6 +91,8 @@ SELECT
 FROM calidad_aire_diario c
 JOIN puntos_monitoreo p ON p.id = c.id_punto
 WHERE c.supera_oms_pm10 = TRUE
+  AND p.activo = TRUE
+  AND p.pais IN ('ARG', 'BRA', 'CHL', 'URY')
 ORDER BY c.fecha DESC, c.pm10_media DESC;
 
 -- ── Vista 5: v_dias_criticos ──────────────────────────────────────────────────
@@ -104,6 +109,8 @@ FROM meteo_diario m
 JOIN puntos_monitoreo p ON p.id = m.id_punto
 WHERE m.nivel_riesgo IN ('alto', 'muy_alto')
   AND m.tipo_dato = 'historico'
+  AND p.activo = TRUE
+  AND p.pais IN ('ARG', 'BRA', 'CHL', 'URY')
 GROUP BY m.fecha
 ORDER BY m.fecha DESC;
 
@@ -123,6 +130,8 @@ SELECT
 FROM meteo_diario m
 JOIN puntos_monitoreo p ON p.id = m.id_punto
 WHERE m.tipo_dato = 'forecast'
+  AND p.activo = TRUE
+  AND p.pais IN ('ARG', 'BRA', 'CHL', 'URY')
   AND m.fecha >= CURRENT_DATE
 ORDER BY p.nombre, m.fecha;
 
@@ -140,10 +149,12 @@ SELECT
 FROM meteo_diario m
 JOIN puntos_monitoreo p ON p.id = m.id_punto
 WHERE m.tipo_dato = 'historico'
+  AND p.activo = TRUE
+  AND p.pais IN ('ARG', 'BRA', 'CHL', 'URY')
 GROUP BY p.pais, DATE_TRUNC('month', m.fecha)
 ORDER BY p.pais, mes;
 
-COMMENT ON VIEW v_riesgo_por_pais IS 'Riesgo de incendio mensual agregado por país — permite comparación entre los 6 países núcleo';
+COMMENT ON VIEW v_riesgo_por_pais IS 'Riesgo de incendio mensual agregado por país — permite comparación entre Uruguay, Brasil, Argentina y Chile';
 
 -- ── Vista 8: v_focos_por_pais_mes ─────────────────────────────────────────────
 -- Cantidad de focos de calor por país y mes (para análisis comparativo)
@@ -156,11 +167,11 @@ SELECT
     ROUND(MAX(potencia_radiativa)::NUMERIC, 2) AS frp_maximo,
     SUM(CASE WHEN confianza_num = 3 THEN 1 ELSE 0 END) AS focos_alta_confianza
 FROM focos_calor
-WHERE pais IS NOT NULL
+WHERE pais IN ('ARG', 'BRA', 'CHL', 'URY')
 GROUP BY pais, DATE_TRUNC('month', fecha_adq)
 ORDER BY pais, mes;
 
-COMMENT ON VIEW v_focos_por_pais_mes IS 'Actividad de incendios mensual por país — base para análisis comparativo Sudamérica';
+COMMENT ON VIEW v_focos_por_pais_mes IS 'Actividad de incendios mensual por país — base para análisis comparativo regional';
 
 -- ── Otorgar acceso a las vistas al rol readonly ───────────────────────────────
 GRANT SELECT ON v_riesgo_actual        TO sinia_readonly;
