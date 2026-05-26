@@ -1,185 +1,66 @@
--- =============================================================================
--- SINIA-SA — Vistas analíticas (Sudamérica)
--- =============================================================================
--- Las vistas cumplen dos roles:
---   1. Seguridad: el usuario dashboard (readonly) consulta vistas, no tablas base
---   2. Analítica: queries complejas pre-calculadas y reutilizables
---
--- Todas las vistas incluyen la columna `pais` para permitir
--- comparaciones entre los 6 países núcleo de Sudamérica.
--- =============================================================================
+-- Proyecto LIDIA - vistas que alimentan Streamlit.
+CREATE OR REPLACE VIEW dw.v_incendios_pais_periodo AS
+SELECT u.pais_codigo, u.pais_nombre, fch.anio, fch.mes,
+       COUNT(*)::bigint AS focos,
+       ROUND(AVG(i.frp_mw), 3) AS frp_promedio_mw,
+       ROUND(SUM(i.frp_mw), 3) AS frp_total_mw
+FROM dw.fact_incendio i
+JOIN dw.dim_fecha fch ON fch.fecha_id = i.fecha_id
+JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+GROUP BY u.pais_codigo, u.pais_nombre, fch.anio, fch.mes;
 
--- ── Vista 1: v_riesgo_actual ──────────────────────────────────────────────────
--- KPI del dashboard: último nivel de riesgo por punto
-CREATE OR REPLACE VIEW v_riesgo_actual AS
-SELECT
-    p.nombre           AS punto,
-    p.pais,
-    m.fecha,
-    m.indice_riesgo,
-    m.nivel_riesgo,
-    m.temperature_2m_max       AS temp_max,
-    m.relative_humidity_2m_min AS humedad_min,
-    m.wind_speed_10m_max       AS viento_max,
-    m.precipitation_sum        AS precipitacion
-FROM meteo_diario m
-JOIN puntos_monitoreo p ON p.id = m.id_punto
-WHERE m.tipo_dato = 'historico'
-  AND m.fecha = (
-      SELECT MAX(fecha) FROM meteo_diario
-      WHERE id_punto = m.id_punto AND tipo_dato = 'historico'
-  );
+CREATE OR REPLACE VIEW dw.v_incendios_region AS
+SELECT u.pais_codigo, COALESCE(u.region, u.ubicacion, 'Sin region') AS region,
+       COUNT(*)::bigint AS focos, ROUND(AVG(i.frp_mw), 3) AS frp_promedio_mw
+FROM dw.fact_incendio i
+JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+GROUP BY u.pais_codigo, COALESCE(u.region, u.ubicacion, 'Sin region');
 
-COMMENT ON VIEW v_riesgo_actual IS 'Último registro histórico de riesgo de incendio por punto';
+CREATE OR REPLACE VIEW dw.v_incendios_clima AS
+SELECT u.pais_codigo, fch.fecha, COUNT(*)::bigint AS focos,
+       ROUND(AVG(i.frp_mw), 3) AS frp_promedio_mw,
+       ROUND(AVG(c.temperatura_c), 2) AS temperatura_media_c,
+       ROUND(AVG(c.humedad_pct), 2) AS humedad_media_pct
+FROM dw.fact_incendio i
+JOIN dw.dim_fecha fch ON fch.fecha_id = i.fecha_id
+JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+LEFT JOIN dw.dim_clima c ON c.clima_id = i.clima_id
+GROUP BY u.pais_codigo, fch.fecha;
 
--- ── Vista 2: v_riesgo_historico ────────────────────────────────────────────────
--- Serie temporal completa de riesgo para todos los puntos
-CREATE OR REPLACE VIEW v_riesgo_historico AS
-SELECT
-    p.nombre    AS punto,
-    p.pais,
-    m.fecha,
-    m.tipo_dato,
-    m.indice_riesgo,
-    m.nivel_riesgo,
-    m.temperature_2m_max,
-    m.temperature_2m_min,
-    m.relative_humidity_2m_min,
-    m.wind_speed_10m_max,
-    m.precipitation_sum,
-    m.et0_fao_evapotranspiration,
-    m.riesgo_temp,
-    m.riesgo_humedad,
-    m.riesgo_viento,
-    m.riesgo_sequia
-FROM meteo_diario m
-JOIN puntos_monitoreo p ON p.id = m.id_punto
-WHERE p.activo = TRUE
-ORDER BY p.nombre, m.fecha;
+CREATE OR REPLACE VIEW dw.v_incendios_precipitacion AS
+SELECT u.pais_codigo, fch.anio, fch.mes, COUNT(*)::bigint AS focos,
+       ROUND(AVG(p.precipitacion_mm), 3) AS precipitacion_mm_promedio
+FROM dw.fact_incendio i
+JOIN dw.dim_fecha fch ON fch.fecha_id = i.fecha_id
+JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+LEFT JOIN dw.dim_precipitacion p ON p.precipitacion_id = i.precipitacion_id
+GROUP BY u.pais_codigo, fch.anio, fch.mes;
 
--- ── Vista 3: v_focos_resumen_diario ───────────────────────────────────────────
--- Agregación de focos por día y país: cantidad, FRP promedio, FRP máximo
-CREATE OR REPLACE VIEW v_focos_resumen_diario AS
-SELECT
-    fecha_adq                  AS fecha,
-    pais,
-    COUNT(*)                   AS total_focos,
-    ROUND(AVG(potencia_radiativa)::NUMERIC, 2) AS frp_promedio,
-    ROUND(MAX(potencia_radiativa)::NUMERIC, 2) AS frp_maximo,
-    SUM(CASE WHEN confianza_num = 3 THEN 1 ELSE 0 END) AS focos_alta_confianza,
-    SUM(CASE WHEN es_diurno THEN 1 ELSE 0 END)         AS focos_diurnos
-FROM focos_calor
-GROUP BY fecha_adq, pais
-ORDER BY fecha_adq DESC, total_focos DESC;
+CREATE OR REPLACE VIEW dw.v_incendios_cobertura AS
+SELECT u.pais_codigo, COALESCE(c.descripcion_cobertura, 'Sin dato MODIS') AS cobertura,
+       COUNT(*)::bigint AS focos, ROUND(AVG(i.frp_mw), 3) AS frp_promedio_mw
+FROM dw.fact_incendio i
+JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+LEFT JOIN dw.dim_cobertura_vegetal c ON c.cobertura_id = i.cobertura_id
+GROUP BY u.pais_codigo, COALESCE(c.descripcion_cobertura, 'Sin dato MODIS');
 
--- ── Vista 4: v_alertas_calidad_aire ──────────────────────────────────────────
--- Días con calidad del aire comprometida (sobre límite OMS)
-CREATE OR REPLACE VIEW v_alertas_calidad_aire AS
-SELECT
-    p.nombre AS punto,
-    p.pais,
-    c.fecha,
-    c.pm10_media,
-    c.pm10_max,
-    c.pm2_5_media,
-    c.nivel_pm10,
-    c.european_aqi_media,
-    c.horas_validas
-FROM calidad_aire_diario c
-JOIN puntos_monitoreo p ON p.id = c.id_punto
-WHERE c.supera_oms_pm10 = TRUE
-ORDER BY c.fecha DESC, c.pm10_media DESC;
+CREATE OR REPLACE VIEW dw.v_calidad_aire_alta_actividad AS
+SELECT u.pais_codigo, fch.fecha, COUNT(*)::bigint AS focos,
+       ROUND(AVG(a.pm25), 3) AS pm25, ROUND(AVG(a.pm10), 3) AS pm10,
+       CASE WHEN COUNT(a.calidad_aire_id) = 0 THEN 'Pendiente de fuente validada' ELSE 'Disponible' END AS estado_dato
+FROM dw.fact_incendio i
+JOIN dw.dim_fecha fch ON fch.fecha_id = i.fecha_id
+JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+LEFT JOIN dw.dim_calidad_aire a ON a.calidad_aire_id = i.calidad_aire_id
+GROUP BY u.pais_codigo, fch.fecha
+HAVING COUNT(*) >= 10;
 
--- ── Vista 5: v_dias_criticos ──────────────────────────────────────────────────
--- Días con riesgo ALTO o MUY ALTO en al menos un punto (para alertas)
-CREATE OR REPLACE VIEW v_dias_criticos AS
-SELECT
-    m.fecha,
-    COUNT(DISTINCT m.id_punto)                    AS puntos_en_alerta,
-    COUNT(DISTINCT p.pais)                        AS paises_en_alerta,
-    MAX(m.indice_riesgo)                          AS indice_maximo,
-    STRING_AGG(DISTINCT p.pais, ', ' ORDER BY p.pais) AS paises_afectados,
-    STRING_AGG(p.nombre, ', ' ORDER BY p.nombre) AS puntos_afectados
-FROM meteo_diario m
-JOIN puntos_monitoreo p ON p.id = m.id_punto
-WHERE m.nivel_riesgo IN ('alto', 'muy_alto')
-  AND m.tipo_dato = 'historico'
-GROUP BY m.fecha
-ORDER BY m.fecha DESC;
+CREATE OR REPLACE VIEW dw.v_calidad_pipeline AS
+SELECT fuente, estado, iniciado_en, finalizado_en, duracion_segundos,
+       filas_leidas, filas_insertadas, filas_actualizadas, filas_rechazadas
+FROM audit.etl_runs
+ORDER BY iniciado_en DESC;
 
--- ── Vista 6: v_forecast_riesgo ────────────────────────────────────────────────
--- Pronóstico de riesgo próximos 7 días (para el dashboard de tiempo real)
-CREATE OR REPLACE VIEW v_forecast_riesgo AS
-SELECT
-    p.nombre AS punto,
-    p.pais,
-    m.fecha,
-    m.indice_riesgo,
-    m.nivel_riesgo,
-    m.temperature_2m_max,
-    m.relative_humidity_2m_min,
-    m.wind_speed_10m_max,
-    m.precipitation_probability_max
-FROM meteo_diario m
-JOIN puntos_monitoreo p ON p.id = m.id_punto
-WHERE m.tipo_dato = 'forecast'
-  AND m.fecha >= CURRENT_DATE
-ORDER BY p.nombre, m.fecha;
-
--- ── Vista 7: v_riesgo_por_pais ────────────────────────────────────────────────
--- Agregación de riesgo a nivel país (KPI comparativo entre naciones)
-CREATE OR REPLACE VIEW v_riesgo_por_pais AS
-SELECT
-    p.pais,
-    DATE_TRUNC('month', m.fecha)::DATE          AS mes,
-    ROUND(AVG(m.indice_riesgo)::NUMERIC, 4)     AS riesgo_promedio,
-    ROUND(MAX(m.indice_riesgo)::NUMERIC, 4)     AS riesgo_maximo,
-    COUNT(*) FILTER (WHERE m.nivel_riesgo IN ('alto','muy_alto'))
-                                                 AS dias_criticos,
-    COUNT(*)                                     AS total_registros
-FROM meteo_diario m
-JOIN puntos_monitoreo p ON p.id = m.id_punto
-WHERE m.tipo_dato = 'historico'
-GROUP BY p.pais, DATE_TRUNC('month', m.fecha)
-ORDER BY p.pais, mes;
-
-COMMENT ON VIEW v_riesgo_por_pais IS 'Riesgo de incendio mensual agregado por país — permite comparación entre los 6 países núcleo';
-
--- ── Vista 8: v_focos_por_pais_mes ─────────────────────────────────────────────
--- Cantidad de focos de calor por país y mes (para análisis comparativo).
--- La agregación pesada vive en una vista materializada para millones de focos.
-DROP VIEW IF EXISTS v_focos_por_pais_mes;
-DROP MATERIALIZED VIEW IF EXISTS mv_focos_por_pais_mes;
-
-CREATE MATERIALIZED VIEW mv_focos_por_pais_mes AS
-SELECT
-    pais,
-    DATE_TRUNC('month', fecha_adq)::DATE AS mes,
-    COUNT(*)                             AS total_focos,
-    ROUND(AVG(potencia_radiativa)::NUMERIC, 2) AS frp_promedio,
-    ROUND(MAX(potencia_radiativa)::NUMERIC, 2) AS frp_maximo,
-    SUM(CASE WHEN confianza_num = 3 THEN 1 ELSE 0 END) AS focos_alta_confianza
-FROM focos_calor
-WHERE pais IS NOT NULL
-GROUP BY pais, DATE_TRUNC('month', fecha_adq)
-WITH NO DATA;
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_focos_por_pais_mes_pk
-    ON mv_focos_por_pais_mes (pais, mes);
-
-CREATE OR REPLACE VIEW v_focos_por_pais_mes AS
-SELECT *
-FROM mv_focos_por_pais_mes
-ORDER BY pais, mes;
-
-COMMENT ON VIEW v_focos_por_pais_mes IS 'Actividad de incendios mensual por país — base para análisis comparativo Sudamérica';
-
--- ── Otorgar acceso a las vistas al rol readonly ───────────────────────────────
-GRANT SELECT ON v_riesgo_actual        TO sinia_readonly;
-GRANT SELECT ON v_riesgo_historico     TO sinia_readonly;
-GRANT SELECT ON v_focos_resumen_diario TO sinia_readonly;
-GRANT SELECT ON v_alertas_calidad_aire TO sinia_readonly;
-GRANT SELECT ON v_dias_criticos        TO sinia_readonly;
-GRANT SELECT ON v_forecast_riesgo      TO sinia_readonly;
-GRANT SELECT ON v_riesgo_por_pais      TO sinia_readonly;
-GRANT SELECT ON v_focos_por_pais_mes   TO sinia_readonly;
+GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
+    dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
+    dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline TO lidia_dashboard;

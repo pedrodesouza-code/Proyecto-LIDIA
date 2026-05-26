@@ -1,136 +1,58 @@
-# =============================================================================
-# SINIA-UY — Docker Compose
-# =============================================================================
-# Arquitectura híbrida:
-#   - PostgreSQL: base de datos relacional analítica (Data Warehouse)
-#   - MongoDB:    base de datos documental operacional (logs, alertas, snapshots)
-#   - Streamlit:  dashboard de visualización (capa analítica)
-#
-# Levantamiento completo:
-#   docker compose up -d
-#
-# Solo bases de datos (sin dashboard):
-#   docker compose up -d postgres mongo
-#
-# Ver logs:
-#   docker compose logs -f
-#
-# Detener y preservar datos:
-#   docker compose stop
-#
-# Detener y borrar TODO (incluyendo volúmenes):
-#   docker compose down -v   ← DESTRUYE DATOS
-# =============================================================================
-
-version: "3.9"
-
 services:
-
-  # ---------------------------------------------------------------------------
-  # POSTGRESQL — Base de datos relacional analítica
-  # ---------------------------------------------------------------------------
   postgres:
-    image: postgis/postgis:16-3.4-alpine
-    container_name: sinia_postgres
-    restart: unless-stopped
+    image: postgis/postgis:16-3.4
     environment:
-      POSTGRES_DB:       ${PG_DATABASE:-sinia_uy}
-      POSTGRES_USER:     ${PG_SUPERUSER:-postgres}
-      POSTGRES_PASSWORD: ${PG_SUPERPASS:-CAMBIAR}
+      POSTGRES_DB: ${POSTGRES_DB:-lidia_ec3}
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:-CAMBIAR}
+      POSTGRES_ETL_PASSWORD: ${POSTGRES_ETL_PASSWORD:-CAMBIAR}
+      POSTGRES_DASHBOARD_PASSWORD: ${POSTGRES_DASHBOARD_PASSWORD:-CAMBIAR}
     ports:
-      - "${PG_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      # Persistencia de datos
-      - pg_data:/var/lib/postgresql/data
-      # Scripts de inicialización (se ejecutan en orden alfabético en primer arranque)
-      - ../docker/init_roles.sh:/docker-entrypoint-initdb.d/00_roles.sh:ro
+      - lidia_pg_data:/var/lib/postgresql/data
+      - ./init_roles.sh:/docker-entrypoint-initdb.d/00_users.sh:ro
       - ../sql/ddl/00_schemas.sql:/docker-entrypoint-initdb.d/01_schemas.sql:ro
       - ../sql/ddl/01_roles.sql:/docker-entrypoint-initdb.d/02_roles.sql:ro
-      - ../sql/ddl/02_schema.sql:/docker-entrypoint-initdb.d/03_schema.sql:ro
+      - ../sql/ddl/02_Schema.sql:/docker-entrypoint-initdb.d/03_schema.sql:ro
       - ../sql/ddl/03_indices.sql:/docker-entrypoint-initdb.d/04_indices.sql:ro
       - ../sql/ddl/04_vistas.sql:/docker-entrypoint-initdb.d/05_vistas.sql:ro
-      - ../sql/dml/01_seed_puntos.sql:/docker-entrypoint-initdb.d/06_seed.sql:ro
+      - ../sql/ddl/06_postgis_firms_migracion.sql:/docker-entrypoint-initdb.d/06_postgis.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PG_SUPERUSER:-postgres} -d ${PG_DATABASE:-sinia_uy}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_ADMIN_USER:-postgres} -d ${POSTGRES_DB:-lidia_ec3}"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - sinia_net
 
-  # ---------------------------------------------------------------------------
-  # MONGODB — Base de datos documental operacional
-  # ---------------------------------------------------------------------------
   mongo:
     image: mongo:7.0
-    container_name: sinia_mongo
-    restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-mongo_admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS:-CAMBIAR}
-      MONGO_INITDB_DATABASE:      ${MONGO_DATABASE:-sinia_uy}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-lidia_admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-CAMBIAR}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-lidia_ec3}
     ports:
       - "${MONGO_PORT:-27017}:27017"
     volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/configdb
-      - ../nosql/init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - sinia_net
+      - lidia_mongo_data:/data/db
 
-  # ---------------------------------------------------------------------------
-  # STREAMLIT — Dashboard de visualización
-  # ---------------------------------------------------------------------------
   streamlit:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.streamlit
-    container_name: sinia_dashboard
-    restart: unless-stopped
+    image: python:3.12-slim
+    working_dir: /app
+    command: sh -c "pip install -q -r requirements-utec.txt && streamlit run dashboard/streamlit_app.py --server.address 0.0.0.0"
+    volumes:
+      - ..:/app:ro
     environment:
-      PG_HOST:       postgres
-      PG_PORT:       5432
-      PG_DATABASE:   ${PG_DATABASE:-sinia_uy}
-      PG_USER:       ${PG_USER:-sinia_etl_user}
-      PG_PASSWORD:   ${PG_PASSWORD:-CAMBIAR}
-      MONGO_HOST:    mongo
-      MONGO_PORT:    27017
-      MONGO_DATABASE: ${MONGO_DATABASE:-sinia_uy}
-      MONGO_USER:    ${MONGO_USER:-sinia_etl_user}
-      MONGO_PASSWORD: ${MONGO_PASSWORD:-CAMBIAR}
-      FIRMS_MAP_KEY: ${FIRMS_MAP_KEY:-}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-lidia_ec3}
+      POSTGRES_USER: lidia_dashboard_user
+      POSTGRES_PASSWORD: ${POSTGRES_DASHBOARD_PASSWORD:-CAMBIAR}
     ports:
       - "8501:8501"
-    volumes:
-      # Montar datos procesados para acceso directo (fallback si DB no responde)
-      - ../data:/app/data:ro
-      - ../logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy
-      mongo:
-        condition: service_healthy
-    networks:
-      - sinia_net
-
-# =============================================================================
-# REDES Y VOLÚMENES
-# =============================================================================
-
-networks:
-  sinia_net:
-    driver: bridge
-    name: sinia_network
 
 volumes:
-  pg_data:
-    name: sinia_pg_data
-  mongo_data:
-    name: sinia_mongo_data
-  mongo_config:
-    name: sinia_mongo_config
+  lidia_pg_data:
+  lidia_mongo_data:

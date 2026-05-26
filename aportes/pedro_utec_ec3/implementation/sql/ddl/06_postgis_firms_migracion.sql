@@ -1,36 +1,15 @@
--- =============================================================================
--- SINIA-SA — Migración FIRMS geoespacial/PostGIS
--- =============================================================================
--- Usar en bases existentes creadas antes de incorporar shapefile/PostGIS.
--- Agrega geometría puntual, adapta confianza MODIS 0-100 y crea índices.
--- =============================================================================
-
+-- Proyecto LIDIA - capacidad geoespacial opcional para la tabla de hechos FIRMS.
+-- Ejecutar solo en una instalacion PostgreSQL que disponga de PostGIS.
 CREATE EXTENSION IF NOT EXISTS postgis;
 
-ALTER TABLE focos_calor
-    ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326),
-    ADD COLUMN IF NOT EXISTS tipo_foco SMALLINT;
+ALTER TABLE dw.fact_incendio
+    ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);
 
-ALTER TABLE focos_calor
-    ALTER COLUMN confianza_raw TYPE VARCHAR(10);
+UPDATE dw.fact_incendio f
+SET geom = ST_SetSRID(ST_MakePoint(u.longitud::double precision, u.latitud::double precision), 4326)
+FROM dw.dim_ubicacion u
+WHERE u.ubicacion_id = f.ubicacion_id AND f.geom IS NULL;
 
-ALTER TABLE focos_calor
-    DROP CONSTRAINT IF EXISTS focos_calor_confianza_num_check;
-
-ALTER TABLE focos_calor
-    ADD CONSTRAINT focos_calor_confianza_num_check
-    CHECK (confianza_num BETWEEN 0 AND 100);
-
-UPDATE focos_calor
-SET geom = ST_SetSRID(ST_MakePoint(longitud::double precision, latitud::double precision), 4326)
-WHERE geom IS NULL
-  AND longitud IS NOT NULL
-  AND latitud IS NOT NULL;
-
-CREATE INDEX IF NOT EXISTS idx_focos_geom_gist
-    ON focos_calor USING GIST (geom)
+CREATE INDEX IF NOT EXISTS idx_fact_incendio_geom_gist
+    ON dw.fact_incendio USING GIST (geom)
     WHERE geom IS NOT NULL;
-
-CREATE INDEX IF NOT EXISTS idx_focos_pais_fecha
-    ON focos_calor (pais, fecha_adq DESC)
-    WHERE pais IS NOT NULL;

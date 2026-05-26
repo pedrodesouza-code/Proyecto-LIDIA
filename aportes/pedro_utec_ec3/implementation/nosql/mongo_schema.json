@@ -1,0 +1,41 @@
+{
+  "collections": {
+    "ingesta_metadata": {
+      "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["run_id", "fuente", "estado", "metricas", "registrado_en"],
+        "properties": {
+          "run_id": {"bsonType": "string"},
+          "fuente": {"enum": ["INUMET", "FIRMS", "CHIRPS", "FORECAST", "METEO", "MODIS"]},
+          "estado": {"enum": ["ok", "parcial", "error"]},
+          "metricas": {"bsonType": "object"},
+          "registrado_en": {"bsonType": "date"}
+        }
+      }
+    },
+    "rechazos_etl": {
+      "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["run_id", "fuente", "motivo", "registro", "registrado_en"],
+        "properties": {
+          "fuente": {"enum": ["INUMET", "FIRMS", "CHIRPS", "FORECAST", "METEO", "MODIS"]},
+          "motivo": {"bsonType": "string"},
+          "registro": {"bsonType": "object"},
+          "registrado_en": {"bsonType": "date"}
+        }
+      }
+    },
+    "snapshots_firms": {
+      "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["fecha", "pais_codigo", "total_focos", "resumen"],
+        "properties": {
+          "fecha": {"bsonType": "date"},
+          "pais_codigo": {"enum": ["URY", "ARG", "BRA"]},
+          "total_focos": {"bsonType": "int", "minimum": 0},
+          "resumen": {"bsonType": "object"}
+        }
+      }
+    }
+  }
+}

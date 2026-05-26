@@ -1,0 +1,22 @@
+Validacion local de la implementacion EC3
+Fecha: 2026-05-26
+Rama: ec3-pedro-utec-ajustes
+
+Comandos ejecutados:
+- Analisis sintactico AST sobre archivos Python del aporte: OK (23 archivos).
+- PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests
+
+Resultado:
+- 6 tests ejecutados.
+- 6 tests aprobados.
+- 0 tests fallidos.
+
+Cobertura comprobada:
+- Calidad y rechazo de filas invalidas FIRMS.
+- Restriccion INUMET a Uruguay.
+- Contrato de integridad referencial, unicidad y rangos del modelo estrella.
+- Idempotencia por clave natural y hash.
+- CDC con alta, modificacion y sin cambio.
+
+Pendiente:
+- Validacion integrada con PostgreSQL/MongoDB y archivos institucionales configurados localmente.

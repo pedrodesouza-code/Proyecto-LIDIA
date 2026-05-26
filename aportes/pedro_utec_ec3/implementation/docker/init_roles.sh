@@ -1,32 +1,27 @@
-#!/usr/bin/env sh
+#!/bin/sh
 set -eu
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<SQL
-DO \$\$
+psql --set=ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \
+  --set=etl_password="${POSTGRES_ETL_PASSWORD:-CAMBIAR}" \
+  --set=dashboard_password="${POSTGRES_DASHBOARD_PASSWORD:-CAMBIAR}" <<'SQL'
+DO $block$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'sinia_readonly') THEN
-        CREATE ROLE sinia_readonly NOLOGIN;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'lidia_etl') THEN
+        CREATE ROLE lidia_etl NOLOGIN;
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'sinia_etl') THEN
-        CREATE ROLE sinia_etl NOLOGIN;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'lidia_dashboard') THEN
+        CREATE ROLE lidia_dashboard NOLOGIN;
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'sinia_admin') THEN
-        CREATE ROLE sinia_admin NOLOGIN;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'lidia_etl_user') THEN
+        CREATE USER lidia_etl_user;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'lidia_dashboard_user') THEN
+        CREATE USER lidia_dashboard_user;
     END IF;
 END
-\$\$;
-
-DO \$\$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'sinia_dash_user') THEN
-        CREATE USER sinia_dash_user WITH PASSWORD '${PG_DASH_PASSWORD:-CAMBIAR}';
-    END IF;
-    GRANT sinia_readonly TO sinia_dash_user;
-
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '${PG_USER:-sinia_etl_user}') THEN
-        CREATE USER ${PG_USER:-sinia_etl_user} WITH PASSWORD '${PG_PASSWORD:-CAMBIAR}';
-    END IF;
-    GRANT sinia_etl TO ${PG_USER:-sinia_etl_user};
-END
-\$\$;
+$block$;
+ALTER USER lidia_etl_user PASSWORD :'etl_password';
+ALTER USER lidia_dashboard_user PASSWORD :'dashboard_password';
+GRANT lidia_etl TO lidia_etl_user;
+GRANT lidia_dashboard TO lidia_dashboard_user;
 SQL
