@@ -7,6 +7,8 @@ numpy>=1.24.0
 pyarrow>=14.0.0          # lectura/escritura Parquet
 requests>=2.31.0         # llamadas a APIs REST
 python-dotenv>=1.0.0     # carga de variables de entorno
+geopandas>=1.0.0         # clasificacion territorial controlada de puntos FIRMS
+shapely>=2.0.0           # operacion punto-en-poligono para alcance geografico
 
 # Base de datos relacional
 psycopg2-binary>=2.9.9   # driver PostgreSQL (binary = sin compilar)

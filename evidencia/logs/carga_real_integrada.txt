@@ -1,0 +1,101 @@
+CARGA REAL INTEGRADA - PROYECTO LIDIA EC3
+Fecha de ejecucion: 2026-05-27
+Entorno: Jupyter/UTEC, base PostgreSQL proyecto_lidia
+
+Preparacion
+- Se recreo proyecto_lidia antes de la carga para no mezclar datos smoke.
+- DDL ejecutados: sql/ddl/00_schemas.sql, 02_Schema.sql, 03_indices.sql y 04_vistas.sql.
+- 01_roles.sql se omitio en la conexion remota, segun la instruccion de no requerir privilegios de roles.
+- Las rutas de archivos se configuraron en config/utec.env mediante rutas relativas al proyecto.
+
+Fuentes reales cargadas
+- FIRMS (CSV): leidas 3.672.055; insertadas 2.585.805.
+  Por pais: ARG 462.017, BRA 2.116.305, URY 7.483.
+  Rechazos trazables: 1.086.249 fuera de URY/ARG/BRA y 1 invalido o fuera de periodo.
+  brightness fue cargado exclusivamente como brillo_termico.
+- CHIRPS (CSV): leidas 1.404; insertadas 702; rechazadas 702 fuera de alcance.
+  Por pais cargado: ARG 312, BRA 390. El archivo real no contiene filas URY.
+- METEO (API, historico horario 2018-2025): leidas e insertadas 420.768; rechazadas 0.
+- FORECAST (API, snapshot operativo 2026-05-27 a 2026-06-02): leidas e insertadas 1.008; rechazadas 0.
+  Se conserva identificado como FORECAST y no se interpreta como historico 2018-2025.
+- MODIS (CSV real anual): leidas 266; staging/dimension consolidados en 133 claves
+  naturales URY por anio y ubicacion; rechazadas 0. Duplicados del archivo quedaron trazados
+  como actualizaciones CDC.
+- INUMET (CSV reales de temperatura y humedad): leidas e insertadas 224.369; rechazadas 0.
+  Incluye siete estaciones de Uruguay con datos disponibles entre 2020-01-01 y 2025-12-31.
+
+Conteos finales
+- staging.stg_firms: 2.585.805
+- staging.stg_chirps: 702
+- staging.stg_meteo: METEO 420.768; FORECAST 1.008; INUMET 224.369
+- staging.stg_modis: 133
+- dw.fact_incendio: 2.585.805
+- dw.dim_clima: 646.145
+- dw.dim_precipitacion: 702
+- dw.dim_cobertura_vegetal: 133
+
+Vistas del dashboard verificadas
+- dw.v_incendios_pais_periodo: 254 filas
+- dw.v_incendios_clima: 6.409 filas
+- dw.v_incendios_precipitacion: 254 filas
+- dw.v_incendios_cobertura: 3 filas
+- dw.v_calidad_pipeline: 31 filas
+
+Validacion ejecutada
+- python -m compileall -q .: OK
+- python -m pytest -q tests: OK, 15 passed
+- python /app/streamlit/app.py: OK, sin error SQL; los avisos observados corresponden al modo bare de Streamlit.
+- grep exacto solicitado sobre "." fue terminado por el entorno al recorrer datos raw voluminosos (returncode -9).
+- grep equivalente sobre codigo/documentacion excluyendo data/ termino sin coincidencias (returncode 1).
+
+Incidencias resueltas durante la corrida
+- La primera corrida integrada fue terminada por memoria al cargar observaciones horarias.
+  Se ajusto la carga de METEO e INUMET a lotes de 25.000 y se completaron ambas fuentes.
+- MODIS fallo inicialmente porque un NaN del payload no era JSON valido para PostgreSQL.
+  Se normalizo como null y la carga se completo.
+
+Limitaciones documentadas
+- La fuente FIRMS se clasifica territorialmente por coordenadas y no trae pais_codigo original.
+- FORECAST es un snapshot operativo posterior al periodo historico; permanece separado por fuente.
+
+CORRECCION DE INTEGRACION ESPACIAL
+Fecha de ejecucion: 2026-05-27
+
+Regla implementada
+- Metodo: nearest neighbor mediante `dw.distancia_haversine_km`, sin interpolar valores.
+- Restriccion geografica: candidato y foco deben pertenecer al mismo pais.
+- Clima: misma fecha; se toma el punto mas cercano y la observacion horaria mas cercana
+  al horario de adquisicion FIRMS. Umbral METEO/FORECAST: 100 km; INUMET: 150 km.
+- CHIRPS: mismo anio y mes, punto mas cercano dentro de 100 km.
+- MODIS: mismo anio, punto mas cercano dentro de 100 km.
+- Cuando no existe candidato valido el identificador permanece NULL.
+
+Antes de asociar
+- dw.fact_incendio: 2.585.805
+- clima_id no nulos: 0
+- precipitacion_id no nulos: 0
+- cobertura_id no nulos: 0
+
+Despues de asociar
+- dw.fact_incendio: 2.585.805
+- clima_id no nulos: 23.753; sin asociar: 2.562.052
+  - METEO: 21.071, distancia maxima 99,993 km
+  - INUMET: 2.682, distancia maxima 149,996 km
+- precipitacion_id no nulos: 47.576; sin asociar: 2.538.229;
+  distancia maxima 99,998 km
+- cobertura_id no nulos: 7.108; sin asociar: 2.578.697;
+  distancia maxima 99,908 km
+- La auditoria reproducible se guarda en `audit.asociacion_espacial_runs`.
+
+Verificaciones de integridad
+- Asociaciones de clima fuera de pais/fecha/umbral: 0
+- Asociaciones de precipitacion fuera de pais/anio-mes/umbral: 0
+- Asociaciones de cobertura fuera de pais/anio/umbral: 0
+- dw.v_incendios_clima con datos ambientales no nulos: 4.098 filas
+- dw.v_incendios_precipitacion con datos ambientales no nulos: 156 filas
+- dw.v_incendios_cobertura con datos MODIS asociados: 3 filas
+
+Validacion posterior a la correccion
+- python -m compileall -q .: OK
+- python -m pytest -q tests: OK, 16 passed
+- python /app/streamlit/app.py: OK, sin error SQL; los avisos corresponden al modo bare.
