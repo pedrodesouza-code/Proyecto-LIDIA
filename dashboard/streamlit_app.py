@@ -24,9 +24,11 @@ st.set_page_config(page_title="Proyecto LIDIA - EC3", layout="wide")
 st.title("Proyecto LIDIA | Incendios y variables ambientales")
 st.caption("Uruguay, Argentina y Brasil | 2018-2025 | Data Warehouse PostgreSQL")
 
-countries = pd.DataFrame(
-    [("URY", "Uruguay"), ("ARG", "Argentina"), ("BRA", "Brasil")],
-    columns=["pais_codigo", "pais_nombre"],
+countries = query(
+    """SELECT DISTINCT pais_codigo, pais_nombre
+       FROM dw.v_incendios_pais_periodo
+       WHERE pais_codigo IN ('URY', 'ARG', 'BRA')
+       ORDER BY pais_nombre"""
 )
 selected = st.sidebar.multiselect(
     "Paises", countries["pais_codigo"].tolist(), default=countries["pais_codigo"].tolist()
@@ -41,11 +43,16 @@ monthly = query(
        ORDER BY anio, mes, pais_codigo""",
     params,
 )
-focos = int(monthly["focos"].sum()) if not monthly.empty else 0
-frp_total = float(monthly["frp_total_mw"].sum()) if not monthly.empty else 0.0
-frp_promedio = frp_total / focos if focos else 0.0
-paises = int(monthly["pais_codigo"].nunique()) if not monthly.empty else 0
-meses = int(monthly[["anio", "mes"]].drop_duplicates().shape[0]) if not monthly.empty else 0
+summary = query(
+    """SELECT COALESCE(SUM(focos), 0)::bigint AS focos,
+              COALESCE(SUM(frp_total_mw), 0) AS frp_total,
+              COALESCE(SUM(frp_total_mw) / NULLIF(SUM(focos), 0), 0) AS frp_promedio,
+              COUNT(DISTINCT pais_codigo) AS paises,
+              COUNT(DISTINCT (anio, mes)) AS meses
+       FROM dw.v_incendios_pais_periodo
+       WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s""",
+    params,
+).iloc[0]
 quality = query(
     """SELECT COALESCE(SUM(filas_insertadas), 0)::bigint AS altas,
               COALESCE(SUM(filas_actualizadas), 0)::bigint AS modificaciones,
@@ -54,18 +61,18 @@ quality = query(
 ).iloc[0]
 
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Focos FIRMS", f"{focos:,}")
-c2.metric("FRP total (MW)", f"{frp_total:,.1f}")
-c3.metric("FRP promedio (MW)", f"{frp_promedio:,.2f}")
-c4.metric("Paises con datos", paises)
+c1.metric("Focos FIRMS", f"{int(summary.focos):,}")
+c2.metric("FRP total (MW)", f"{float(summary.frp_total):,.1f}")
+c3.metric("FRP promedio (MW)", f"{float(summary.frp_promedio):,.2f}")
+c4.metric("Paises con datos", int(summary.paises))
 c5, c6, c7, c8 = st.columns(4)
-c5.metric("Meses cubiertos", meses)
+c5.metric("Meses cubiertos", int(summary.meses))
 c6.metric("Altas CDC", f"{int(quality.altas):,}")
 c7.metric("Modificaciones CDC", f"{int(quality.modificaciones):,}")
 c8.metric("Rechazos ETL", f"{int(quality.rechazos):,}")
 
-section = st.radio("Analisis", ["Actividad", "Ambiente", "Calidad y CDC"], horizontal=True)
-if section == "Actividad":
+activity, environment, tracking = st.tabs(["Actividad", "Ambiente", "Calidad y CDC"])
+with activity:
     st.subheader("Evolucion mensual de focos por pais")
     if not monthly.empty:
         chart = monthly.assign(
@@ -84,7 +91,7 @@ if section == "Actividad":
     st.subheader("Regiones con mayor actividad")
     st.dataframe(region, width="stretch", hide_index=True)
 
-elif section == "Ambiente":
+with environment:
     climate = query(
         """SELECT pais_codigo, fecha, focos, frp_promedio_mw, temperatura_media_c, humedad_media_pct
            FROM dw.v_incendios_clima
@@ -114,7 +121,7 @@ elif section == "Ambiente":
     st.subheader("Focos por cobertura vegetal MODIS")
     st.bar_chart(cover.set_index("cobertura")["focos"] if not cover.empty else cover)
 
-else:
+with tracking:
     air = query(
         """SELECT pais_codigo, fecha, focos, pm25, pm10, estado_dato
            FROM dw.v_calidad_aire_alta_actividad

@@ -61,12 +61,6 @@ SELECT fuente, estado, iniciado_en, finalizado_en, duracion_segundos,
 FROM audit.etl_runs
 ORDER BY iniciado_en DESC;
 
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'lidia_dashboard') THEN
-        GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
-            dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
-            dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline TO lidia_dashboard;
-    END IF;
-END
-$$;
+GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
+    dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
+    dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline TO lidia_dashboard;

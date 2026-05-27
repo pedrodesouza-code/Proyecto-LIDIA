@@ -61,7 +61,6 @@ INUMET. `audit` registra corridas y eventos CDC.
 ```bash
 python -m etl.main --source FIRMS
 python -m etl.main --source METEO
-python -m etl.load.real_integrated
 python -m etl.main --source ALL
 ```
 
@@ -96,14 +95,11 @@ esta documentado en `docker/README.md`.
 
 ## 3.4 Procedimientos De Analisis De Datos
 
-La integracion parte de FIRMS como hecho central y enlaza dimensiones mediante
-nearest neighbor Haversine dentro del mismo pais: clima en la misma fecha y
-hora disponible mas cercana, CHIRPS por anio/mes y MODIS por anio. Se aplican
-umbrales documentados y el hecho queda sin enlace cuando no existe candidato
-compatible. Las vistas responden preguntas de cantidad y FRP por periodo/pais,
-actividad regional, relacion con temperatura/humedad, precipitacion CHIRPS y
-cobertura MODIS. Las asociaciones describen co-ocurrencias observadas; no
-prueban causalidad.
+La integracion parte de FIRMS como hecho central y enlaza dimensiones por
+fecha y ubicacion. Las vistas responden preguntas de cantidad y FRP por
+periodo/pais, actividad regional, relacion con temperatura/humedad,
+precipitacion CHIRPS y cobertura MODIS. Las asociaciones describen
+co-ocurrencias observadas; no prueban causalidad.
 
 ## 3.5 Etica, Seguridad Y Gobernanza
 
@@ -123,5 +119,4 @@ criticas. PostGIS agrega geometria de FIRMS de forma opcional y separada.
 - Ejecutar DDL y ETL contra la instancia UTEC con variables locales validas.
 - Registrar conteos reales de una segunda corrida y capturas del dashboard.
 - Cargar calidad del aire solo si el equipo confirma una fuente permitida.
-- Validar con el equipo los umbrales documentados del enlace nearest neighbor:
-  100 km para METEO, FORECAST, CHIRPS y MODIS, y 150 km para INUMET.
+- Revisar el enlace espacial/temporal de dimensiones con el volumen real FIRMS.

@@ -9,17 +9,6 @@ Los tests unitarios validan reglas de calidad, idempotencia y CDC sin requerir
 datos pesados. El resultado de la ejecucion realizada para preparar el aporte
 se registra en `logs/validacion_local.txt`.
 
-## Evidencia De Carga Real
-
-`logs/carga_real_integrada.txt` registra la carga controlada ejecutada en UTEC
-con archivos reales para FIRMS, CHIRPS, MODIS e INUMET, y APIs reales para
-METEO y FORECAST. La geometria territorial usada para asignar pais a puntos
-es un insumo auxiliar de transformacion y no se incorpora como fuente
-analitica.
-
-`logs/carga_real_firms_chirps.txt` corresponde a una corrida preliminar
-reemplazada por la carga integrada y no describe el estado actual de la base.
-
 ## Evidencia Pendiente En UTEC
 
 Tras configurar las conexiones y datos institucionales:

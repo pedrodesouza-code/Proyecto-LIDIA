@@ -1,0 +1,228 @@
+38951d0 Corrige implementación EC3 Proyecto LIDIA
+ .gitignore                                         |   75 +-
+ MANUAL_ARRANQUE.md                                 |  148 -
+ Proyecto_EC1_EC2_LIDIA_FINAL.docx                  |  Bin 1557256 -> 0 bytes
+ README.md                                          |  198 +-
+ analytics/__init__.py                              |    1 -
+ analytics/riesgo_analytics.py                      |  241 -
+ aportes/pedro_utec_ec3/.gitignore                  |   12 -
+ aportes/pedro_utec_ec3/README.md                   |  122 -
+ .../implementation/config/settings.py              |   67 -
+ .../implementation/dashboard/streamlit_app.py      |  283 -
+ .../implementation/docker/.env.example             |   12 -
+ .../implementation/docker/docker-compose.yml       |   58 -
+ .../pedro_utec_ec3/implementation/etl/__init__.py  |    1 -
+ .../implementation/etl/extract/__init__.py         |    1 -
+ .../implementation/etl/extract/extract_chirps.py   |    5 -
+ .../implementation/etl/extract/extract_firms.py    |    6 -
+ .../implementation/etl/extract/extract_forecast.py |    5 -
+ .../implementation/etl/extract/extract_meteo.py    |    5 -
+ .../implementation/etl/extract/extract_modis.py    |    5 -
+ .../implementation/etl/load/__init__.py            |    1 -
+ .../implementation/etl/transform/__init__.py       |    1 -
+ .../implementation/etl/utils/__init__.py           |    1 -
+ .../implementation/etl/utils/logger.py             |   20 -
+ .../implementation/sql/ddl/01_roles.sql            |   32 -
+ .../implementation/sql/ddl/03_indices.sql          |   11 -
+ .../implementation/sql/ddl/04_vistas.sql           |   66 -
+ .../implementation/tests/test_data_quality.py      |   39 -
+ .../implementation/config => config}/.env.example  |    6 +-
+ config/settings.py                                 |  310 +-
+ dashboard/app.py                                   | 1876 -------
+ dashboard/db.py                                    |  794 ---
+ dashboard/streamlit_app.py                         |  139 +
+ docker/.env.example                                |   43 +-
+ docker/Dockerfile.streamlit                        |   29 -
+ .../implementation/docker => docker}/README.md     |    0
+ docker/docker-compose.yml                          |  145 +-
+ .../implementation/docker => docker}/init_roles.sh |    0
+ docker/postgres/02_set_app_passwords.sh            |   14 -
+ docs/ANEXO_A_DDL_MYSQL.md                          |   92 -
+ docs/ANEXO_B_JSON_SCHEMA_MONGODB.md                |  200 -
+ docs/CIERRE_ENTREGA_2026-05-22.md                  |   60 -
+ ...ORRESPONDENCIA_PREGUNTAS_CONSULTAS_DASHBOARD.md |   63 -
+ docs/DESPLIEGUE_HIBRIDO.md                         |   82 -
+ docs/ENTREGA_EC3_IMPLEMENTACION.md                 |  184 -
+ docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md          |   57 -
+ docs/GUIA_DEFENSA_FINAL.md                         |  155 -
+ docs/GUIA_DEFENSA_TECNICA_COMPLETA_2026-05-22.md   |  789 ---
+ docs/MATRIZ_CUMPLIMIENTO_CONSIGNA_2026.md          |   95 -
+ docs/README.md                                     |   52 -
+ docs/REPLICACION_Y_SHARDING.md                     |  135 -
+ docs/SEGURIDAD_BACKUP_GOBERNANZA.md                |   96 -
+ docs/SLA_Y_RENDIMIENTO.md                          |   77 -
+ .../UNIFICACION_EC1_EC2_EC3_FOCO_EC3_2026-05-22.md |  282 -
+ docs/_archivo/README.md                            |   27 -
+ docs/_archivo/desarrollo/00_INDICE.md              |   56 -
+ docs/_archivo/desarrollo/01_NAVEGACION_RAPIDA.md   |   63 -
+ docs/_archivo/desarrollo/02_GUIA_ETL_SEPARADA.md   |  131 -
+ .../desarrollo/03_GUIA_MODELO_ER_TABLAS.md         |  133 -
+ .../desarrollo/04_GUIA_DASHBOARD_SEPARADA.md       |   35 -
+ .../desarrollo/05_GUIA_PRUEBAS_TRIBUNAL.md         |   71 -
+ docs/_archivo/desarrollo/06_EVIDENCIA_CDC_EC3.md   |   71 -
+ .../07_AUDITORIA_EC3_Y_TERCERA_ENTREGA.md          |  359 --
+ .../desarrollo/08_EVIDENCIA_DASHBOARD_EC3.md       |  152 -
+ .../desarrollo/09_EVIDENCIA_RENDIMIENTO_Y_MONGO.md |  227 -
+ .../10_EXPLICACION_PROYECTO_PASO_A_PASO.md         |  216 -
+ docs/_archivo/desarrollo/11_SETUP_LOCAL.md         |  316 --
+ docs/_archivo/desarrollo/12_WORKFLOW_GIT.md        |  278 -
+ .../_archivo/desarrollo/13_DEPLOY_SERVIDOR_UTEC.md |  461 --
+ .../desarrollo/14_PLAN_DOCUMENTACION_PARALELA.md   |  295 --
+ docs/_archivo/desarrollo/15_CHECKLIST_DIARIO.md    |   78 -
+ .../desarrollo/16_DEPLOY_STREAMLIT_CLOUD.md        |  139 -
+ .../desarrollo/17_LAB_DEFENSA_PRUEBAS_TRIBUNAL.md  |  385 --
+ .../desarrollo/18_DEFENSA_DASHBOARD_SECCIONES.md   |  506 --
+ .../19_GUION_DEMO_ORAL_TERCERA_ENTREGA.md          |  291 --
+ docs/_archivo/docx/Entrega_EC3_Implementacion.docx |  Bin 43473 -> 0 bytes
+ .../Entrega_EC3_Implementacion_Desarrollada.docx   |  Bin 48631 -> 0 bytes
+ ...ega_EC3_Implementacion_Desarrollada_Citada.docx |  Bin 50446 -> 0 bytes
+ docs/_archivo/historico/ARQUITECTURA.md            |  358 --
+ .../historico/AUDITORIA_Y_CRONOGRAMA_2026-05-11.md |  355 --
+ .../historico/CHECKLIST_CUMPLIMIENTO_EC1_EC2.md    |   50 -
+ docs/_archivo/historico/DEFENSA.md                 |  460 --
+ docs/_archivo/historico/DOC_01_CONFIG_Y_LOGGING.md |  416 --
+ .../ENTREGA_EC3_IMPLEMENTACION_DESARROLLADA.md     |  630 ---
+ .../EVIDENCIA_CUMPLIMIENTO_REAL_2026-05-15.md      |  177 -
+ docs/_archivo/historico/FLUJO_LOCAL_UTEC_GIT.md    |   75 -
+ docs/_archivo/historico/FUENTES_Y_DATOS.md         |  330 --
+ docs/_archivo/historico/GUIA_COMPLETA.md           |  519 --
+ .../GUIA_ESTUDIO_DEFENSA_PROCESO_COMPLETO.md       |  878 ----
+ docs/_archivo/historico/INFORME_EC1.md             |  657 ---
+ docs/_archivo/historico/MIGRACION_SA.md            |  215 -
+ docs/_archivo/historico/PROYECTO_FINAL_EC1_EC2.md  |  546 --
+ .../REVISION_OPERATIVA_TIEMPO_REAL_2026-05-15.md   |  125 -
+ .../historico/REVISION_UTEC_SYNC_2026-05-15.md     |  103 -
+ docs/figures/figura_1_actores.svg                  |   89 -
+ docs/figures/figura_3_modelo_integrado.svg         |  102 -
+ docs/figures/figura_4_esquema_estrella.svg         |   73 -
+ docs/figures/figura_5_arquitectura_detallada.svg   |  100 -
+ .../implementation/etl => etl}/README.md           |    0
+ etl/__init__.py                                    |    1 +
+ etl/carga_historica.py                             |  326 --
+ etl/extract/__init__.py                            |    1 +
+ .../implementation/etl => etl}/extract/base.py     |    0
+ etl/extract/extract_cams.py                        |  316 --
+ etl/extract/extract_chirps.py                      |  314 +-
+ etl/extract/extract_firms.py                       |  472 +-
+ etl/extract/extract_forecast.py                    |  269 +-
+ .../etl => etl}/extract/extract_inumet.py          |    0
+ etl/extract/extract_meteo.py                       |  378 +-
+ etl/extract/extract_modis.py                       |  391 +-
+ etl/load/__init__.py                               |    1 +
+ etl/load/load_mongo.py                             |  458 --
+ etl/load/load_postgres.py                          |  810 ---
+ .../implementation/etl => etl}/load/mongo.py       |   24 +
+ .../implementation/etl => etl}/load/postgres.py    |   45 +-
+ .../implementation/etl => etl}/main.py             |    5 +
+ etl/scheduler.py                                   |  427 --
+ etl/sincronizar_mongo_historico.py                 |  279 -
+ etl/transform/__init__.py                          |    1 +
+ .../etl => etl}/transform/normalize.py             |   28 +-
+ etl/transform/transform_cams.py                    |  241 -
+ etl/transform/transform_chirps.py                  |  136 -
+ etl/transform/transform_firms.py                   |  260 -
+ etl/transform/transform_meteo.py                   |  361 --
+ etl/transform/transform_modis.py                   |  154 -
+ etl/utils/__init__.py                              |    1 +
+ etl/utils/logger.py                                |  181 +-
+ .../evidencia => evidencia}/README.md              |    0
+ .../evidencia => evidencia}/capturas/README.md     |    0
+ .../logs/validacion_local.txt                      |    0
+ .../implementation/nosql => nosql}/README.md       |    4 +-
+ nosql/init/01_setup_mongo.js                       |   39 -
+ .../nosql => nosql}/mongo_queries.js               |   10 +
+ .../nosql => nosql}/mongo_schema.json              |   25 +
+ nosql/queries/01_consultas.js                      |   67 -
+ nosql/queries/02_limpiar_paises_excluidos.js       |   80 -
+ nosql/schemas/alertas_schema.json                  |   68 -
+ nosql/schemas/ejecuciones_etl_schema.json          |   79 -
+ nosql/schemas/focos_snapshot_schema.json           |   59 -
+ pytest.ini                                         |    1 -
+ reports/backfill_datos_reales_20260519_011016.json |  120 -
+ reports/backfill_datos_reales_20260519_120052.json |   94 -
+ reports/backfill_datos_reales_20260519_122016.json |   24 -
+ reports/backfill_datos_reales_20260519_123920.json |   21 -
+ reports/backfill_datos_reales_ultimo.json          |   21 -
+ reports/backup_restore_ultimo.json                 |   51 -
+ reports/carga_completa_20260519_chile.json         |   95 -
+ reports/carga_completa_20260519_final.json         |   58 -
+ reports/carga_completa_ultimo.json                 |   95 -
+ reports/cdc_ec3_20260517_205358.json               |   53 -
+ reports/cdc_ec3_20260517_222432.json               |   65 -
+ reports/cdc_ec3_20260517_222926.json               |   65 -
+ reports/cdc_ec3_ultimo.json                        |   65 -
+ reports/chirps_fallback_openmeteo_ultimo.json      |   22 -
+ reports/dashboard_evidencia_ultimo.png             |  Bin 148679 -> 0 bytes
+ reports/firms_nrt_reclasificacion_20260522.json    |   27 -
+ reports/firms_nrt_reclasificacion_ultimo.json      |   27 -
+ reports/limpieza_alcance_20260515_185512.json      |  111 -
+ reports/limpieza_alcance_ultimo.json               |  111 -
+ reports/mongo_resumenes_20260515_191916.json       |   12 -
+ reports/mongo_resumenes_20260517_222907.json       |   12 -
+ reports/mongo_resumenes_20260519_132831.json       |   13 -
+ reports/mongo_resumenes_ultimo.json                |   13 -
+ reports/rendimiento_20260515_101445.json           |  130 -
+ reports/rendimiento_20260517_213053.json           |  134 -
+ reports/rendimiento_20260520_093420.json           |  138 -
+ reports/rendimiento_ultimo.json                    |  138 -
+ reports/sharding_simulado_20260515_101451.json     |   50 -
+ reports/sharding_simulado_20260520_093426.json     |   51 -
+ reports/sharding_simulado_ultimo.json              |   51 -
+ reports/sql_vs_nosql_real_20260517_213124.json     |   56 -
+ reports/sql_vs_nosql_real_20260517_222433.json     |   99 -
+ reports/sql_vs_nosql_real_20260517_222956.json     |  107 -
+ reports/sql_vs_nosql_real_20260519_132947.json     |  112 -
+ reports/sql_vs_nosql_real_ultimo.json              |  112 -
+ reports/utec_sync_20260515_191426.json             |   15 -
+ reports/utec_sync_20260515_191916.json             |   16 -
+ reports/utec_sync_ultimo.json                      |   16 -
+ reports/utec_verificacion_20260515_183220.json     |  385 --
+ reports/utec_verificacion_20260515_191325.json     |   73 -
+ reports/utec_verificacion_20260515_191943.json     |   80 -
+ reports/utec_verificacion_ultimo.json              |   80 -
+ .../requirements-utec.txt => requirements-utec.txt |    0
+ requirements.txt                                   |    2 +-
+ scripts/abrir_dashboard_local.bat                  |   29 -
+ scripts/backfill_datos_reales_alcance.py           |  394 --
+ scripts/backfill_firms_chile.py                    |  105 -
+ scripts/backup_restore_real.py                     |  257 -
+ scripts/comparar_sql_nosql_real.py                 |  187 -
+ scripts/completar_chirps_con_meteo_fallback.py     |   84 -
+ scripts/crear_bases_datos.bat                      |   26 -
+ scripts/crear_bases_datos.py                       |  551 --
+ scripts/deploy.sh                                  |   58 -
+ scripts/evidenciar_cdc_ec3.py                      |  324 --
+ scripts/generar_docx_ec3.py                        |  343 --
+ scripts/levantar_mongo_local.bat                   |   30 -
+ scripts/levantar_mongo_nativo.ps1                  |   46 -
+ scripts/limpiar_alcance_real.py                    |  251 -
+ scripts/medir_rendimiento.py                       |  174 -
+ scripts/optimizar_mongo_resumenes.py               |  109 -
+ scripts/simular_sharding.py                        |  118 -
+ scripts/sincronizar_utec_real.py                   |  210 -
+ scripts/verificar_bases_locales.py                 |  104 -
+ scripts/verificar_utec.py                          |  196 -
+ .../implementation/sql => sql}/ddl/00_schemas.sql  |    0
+ sql/ddl/01_roles.sql                               |   82 +-
+ .../implementation/sql => sql}/ddl/02_Schema.sql   |   10 +-
+ sql/ddl/02_schema.sql                              |  273 -
+ sql/ddl/03_indices.sql                             |   90 +-
+ sql/ddl/04_vistas.sql                              |  236 +-
+ .../sql => sql}/ddl/05_migracion_Sa.sql            |    0
+ sql/ddl/05_migracion_sa.sql                        |  184 -
+ .../sql => sql}/ddl/06_postgis_firms_migracion.sql |    0
+ sql/ddl/06_schema_mysql_dw.sql                     |  370 --
+ sql/ddl/07_optimizacion_materializada.sql          |   54 -
+ sql/dml/01_seed_puntos.sql                         |   64 -
+ sql/dml/02_limpiar_paises_excluidos.sql            |  115 -
+ sql/queries/01_analiticas.sql                      |  161 -
+ sql/queries_defensa.sql                            |  292 --
+ .../implementation/tests => tests}/README.md       |    0
+ .../implementation/tests => tests}/conftest.py     |    0
+ tests/resultados_tests.json                        | 5437 --------------------
+ tests/test_calidad_datos.py                        |  536 --
+ .../implementation/tests => tests}/test_cdc.py     |    9 +
+ tests/test_data_quality.py                         |   91 +
+ .../tests => tests}/test_idempotencia.py           |    0
+ .../utec.env.example => utec.env.example           |    6 +-
+ 226 files changed, 698 insertions(+), 37979 deletions(-)

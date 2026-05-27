@@ -36,13 +36,7 @@ def _digest(value: Any) -> str:
 
 
 def _jsonsafe(value: Any) -> Any:
-    if isinstance(value, dict):
-        return {key: _jsonsafe(item) for key, item in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [_jsonsafe(item) for item in value]
-    if pd.isna(value):
-        return None
-    return json.loads(json.dumps(value, default=str, allow_nan=False))
+    return json.loads(json.dumps(value, default=str))
 
 
 def _reject(raw: dict[str, Any], reason: str) -> dict[str, Any]:
@@ -149,12 +143,7 @@ def _normalize_record(source: str, raw: dict[str, Any]) -> dict[str, Any]:
         if not fecha or not location or precip is None or precip < 0:
             raise ValueError("CHIRPS requiere fecha, ubicacion y precipitacion no negativa")
         natural = "|".join([fecha, country, location])
-        record = {
-            "natural_key": natural, "fecha": fecha, "pais_codigo": country, "ubicacion": location,
-            "latitud": _number(_value(raw, "latitud", "latitude", "lat")),
-            "longitud": _number(_value(raw, "longitud", "longitude", "lon")),
-            "precipitacion_mm": precip,
-        }
+        record = {"natural_key": natural, "fecha": fecha, "pais_codigo": country, "ubicacion": location, "precipitacion_mm": precip}
     else:  # MODIS
         year = _value(raw, "anio", "year")
         location = str(_value(raw, "ubicacion", "punto") or "")
@@ -167,8 +156,6 @@ def _normalize_record(source: str, raw: dict[str, Any]) -> dict[str, Any]:
         natural = "|".join([str(year), country, location])
         record = {
             "natural_key": natural, "anio": year, "pais_codigo": country, "ubicacion": location,
-            "latitud": _number(_value(raw, "latitud", "latitude", "lat")),
-            "longitud": _number(_value(raw, "longitud", "longitude", "lon")),
             "codigo_cobertura": _value(raw, "codigo_cobertura", "valor", "lc_type1"),
             "descripcion_cobertura": _value(raw, "descripcion_cobertura", "lc_descripcion"),
         }

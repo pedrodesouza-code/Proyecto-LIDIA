@@ -1,63 +1,12 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-.eggs/
-dist/
-build/
-*.egg
-.venv/
-venv/
-env/
-
-# Variables de entorno y secretos
-.env
-.env.*
-!.env.example
-config/secrets.yml
-config/credentials.json
-
-# Datos (pueden ser grandes o generados)
-data/raw/
-# data/processed/ — versionamos los parquets para que el dashboard funcione
-# sin BD en Streamlit Cloud. Ver docs/desarrollo/16_DEPLOY_STREAMLIT_CLOUD.md.
-# Excluimos solo staging y backups dentro de processed/.
-data/processed/_backup_scope_*/
-data/processed/_staging/
-data/*.json
-data/mongo_local/
-backups/
-
-# Logs
-logs/
-*.log
-
-# Docker volumes locales
-docker/volumes/
-
-# IDEs
-.vscode/
-.idea/
-*.iml
-
-# Sistema operativo
-.DS_Store
-Thumbs.db
-
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb
-
-# Pytest
-.pytest_cache/
-pytest-cache-files-*/
-
-# Archivos temporales
-tmp/
-*.tmp
-*.bak
-~$*.docx
-
-# Archivos personales fuera del alcance del proyecto
-CV_*.docx
-CV_*.pdf
+implementation/config/.env
+implementation/config/utec.env
+implementation/docker/.env
+implementation/data/
+implementation/logs/
+evidencia/logs/*.jsonl
+!evidencia/logs/
+!evidencia/logs/validacion_local.txt
+*.parquet
+*.shp
+*.shx
+*.dbf
