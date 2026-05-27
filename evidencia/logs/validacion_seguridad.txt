@@ -1,0 +1,11 @@
+# Validacion seguridad/configuracion
+
+.env.example o utec.env.example existe: True
+config/utec.env existe en runtime: True
+config/utec.env no debe subirse si contiene secretos; se usa solo en Jupyter/UTEC.
+
+## Roles detectados
+lidia_admin, lidia_dashboard, lidia_etl
+
+## Credenciales hardcodeadas en codigo versionable
+Sin hallazgos fuera de ejemplos/placeholders.

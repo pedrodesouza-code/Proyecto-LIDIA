@@ -1,0 +1,127 @@
+# Validacion SQL final EC3
+
+## Esquemas
+| schema_name |
+| --- |
+| audit |
+| dw |
+| staging |
+
+## Tablas principales
+| schema | tabla |
+| --- | --- |
+| audit | asociacion_espacial_runs |
+| audit | cdc_eventos |
+| audit | etl_runs |
+| dw | dim_calidad_aire |
+| dw | dim_clima |
+| dw | dim_cobertura_vegetal |
+| dw | dim_estacion_meteorologica |
+| dw | dim_fecha |
+| dw | dim_precipitacion |
+| dw | dim_ubicacion |
+| dw | fact_incendio |
+| staging | ingesta_metadata |
+| staging | rechazos_etl |
+| staging | stg_chirps |
+| staging | stg_firms |
+| staging | stg_meteo |
+| staging | stg_modis |
+
+## Vistas dw
+| schema | vista |
+| --- | --- |
+| dw | v_calidad_aire_alta_actividad |
+| dw | v_calidad_pipeline |
+| dw | v_incendios_clima |
+| dw | v_incendios_cobertura |
+| dw | v_incendios_pais_periodo |
+| dw | v_incendios_precipitacion |
+| dw | v_incendios_region |
+
+## Conteos por fuente en staging
+| fuente | filas |
+| --- | --- |
+| FIRMS | 2585805 |
+| CHIRPS | 702 |
+| MODIS | 133 |
+| FORECAST | 1008 |
+| INUMET | 224369 |
+| METEO | 420768 |
+
+## Conteos DW
+| tabla | filas |
+| --- | --- |
+| dw.fact_incendio | 2585805 |
+| dw.dim_clima | 646145 |
+| dw.dim_precipitacion | 702 |
+| dw.dim_cobertura_vegetal | 133 |
+| dw.dim_fecha | 2929 |
+| dw.dim_ubicacion | 2584801 |
+| dw.dim_estacion_meteorologica | 7 |
+
+## Asociaciones ambientales
+| fact_incendio | clima_id | precipitacion_id | cobertura_id |
+| --- | --- | --- | --- |
+| 2585805 | 23753 | 47576 | 7108 |
+
+## Auditoria asociacion espacial
+| variable | umbral_km | total | asociados | sin_asociar | dist_max_km | ejecutado_en |
+| --- | --- | --- | --- | --- | --- | --- |
+| clima | 150.00 | 2585805 | 23753 | 2562052 | 149.996 | 2026-05-27 19:01:02.484230+00:00 |
+| cobertura | 100.00 | 2585805 | 7108 | 2578697 | 99.908 | 2026-05-27 19:01:02.484230+00:00 |
+| precipitacion | 100.00 | 2585805 | 47576 | 2538229 | 99.998 | 2026-05-27 19:01:02.484230+00:00 |
+
+## Duplicados por natural_key
+| tabla | claves_duplicadas |
+| --- | --- |
+| staging.stg_firms | 0 |
+| staging.stg_chirps | 0 |
+| staging.stg_meteo | 0 |
+| staging.stg_modis | 0 |
+| dw.fact_incendio | 0 |
+
+## Rangos invalidos
+| check | filas_invalidas |
+| --- | --- |
+| stg_firms_lat_lon | 0 |
+| stg_firms_frp_negativo | 0 |
+| stg_firms_confianza | 0 |
+| stg_meteo_humedad | 0 |
+| stg_meteo_viento | 0 |
+| stg_meteo_direccion | 0 |
+| stg_meteo_presion | 0 |
+| stg_chirps_precip | 0 |
+| stg_modis_anio | 0 |
+
+## Paises fuera de alcance
+| tabla | filas_fuera_alcance |
+| --- | --- |
+| staging.stg_firms | 0 |
+| staging.stg_chirps | 0 |
+| staging.stg_meteo | 0 |
+| staging.stg_modis | 0 |
+| dw.dim_ubicacion | 0 |
+
+## Rechazos por fuente
+| fuente | registros | filas_representadas |
+| --- | --- | --- |
+| CHIRPS | 702 | 702 |
+| FIRMS | 2 | 1086250 |
+
+## CDC por tipo_evento
+| tipo_evento | eventos |
+| --- | --- |
+| alta | 864 |
+| modificacion | 133 |
+| rechazo | 704 |
+
+## Corridas ETL por fuente
+| fuente | estado | corridas | leidas | insertadas | actualizadas | rechazadas |
+| --- | --- | --- | --- | --- | --- | --- |
+| CHIRPS | ok | 1 | 1404 | 702 | 0 | 702 |
+| FIRMS | ok | 1 | 3672055 | 2585805 | 0 | 1086250 |
+| FORECAST | ok | 1 | 1008 | 1008 | 0 | 0 |
+| INUMET | ok | 9 | 224369 | 224369 | 0 | 0 |
+| METEO | ok | 18 | 420768 | 420768 | 0 | 0 |
+| MODIS | ok | 1 | 266 | 133 | 133 | 0 |

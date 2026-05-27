@@ -1,0 +1,9 @@
+# Rendimiento consultas dashboard
+
+| vista | filas | segundos |
+| --- | --- | --- |
+| dw.v_incendios_pais_periodo | 254 | 7.6597 |
+| dw.v_incendios_clima | 6409 | 5.2945 |
+| dw.v_incendios_precipitacion | 254 | 5.1123 |
+| dw.v_incendios_cobertura | 6 | 4.7951 |
+| dw.v_calidad_pipeline | 32 | 0.0022 |

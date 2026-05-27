@@ -1,0 +1,36 @@
+# Validacion dashboard
+
+## Vistas usadas
+| vista | existe | filas |
+| --- | --- | --- |
+| dw.v_calidad_aire_alta_actividad | True | 5187 |
+| dw.v_calidad_pipeline | True | 32 |
+| dw.v_incendios_clima | True | 6409 |
+| dw.v_incendios_cobertura | True | 6 |
+| dw.v_incendios_pais_periodo | True | 254 |
+| dw.v_incendios_precipitacion | True | 254 |
+| dw.v_incendios_region | True | 3 |
+
+Lecturas manuales de archivos detectadas en dashboard: ninguna
+
+## Ejecucion bare
+returncode=0 segundos=49.089
+stderr_tail:
+t! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:12.982 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:12.982 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:12.982 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:12.982 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+/root/.local/lib/python3.11/site-packages/altair/utils/core.py:268: UserWarning: I don't know how to infer vegalite type from 'decimal'.  Defaulting to nominal.
+  warnings.warn(
+2026-05-27 20:12:12.992 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:12.992 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:12.992 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:12.992 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:35.736 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:35.736 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:35.736 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:35.738 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:35.739 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-05-27 20:12:35.739 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+

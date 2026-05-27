@@ -1,0 +1,27 @@
+# Validacion NoSQL MongoDB
+
+MONGO_ENABLED=False
+
+MongoDB disponible: SI
+
+| coleccion | documentos |
+| --- | --- |
+| focos_snapshots | 352 |
+| raw_snapshots | 4 |
+| pipeline_logs | 916 |
+| devops_probe | 0 |
+| ejecuciones_etl | 3 |
+| eventos | 2 |
+| focos_resumen_mes | 39 |
+| cdc_control | 1 |
+| alertas | 0 |
+| focos_resumen_pais | 3 |
+| etl_runs | 6 |
+| data_quality_results | 36 |
+
+Consultas representativas evaluadas:
+- ingesta_metadata_FIRMS: OK, resultados=0
+- rechazos_por_fuente_motivo: OK, resultados=0
+- raw_payloads_fuentes_validas: OK, resultados=0
+- pipeline_logs_error: OK, resultados=0
+- snapshots_firms_alcance: OK, resultados=0

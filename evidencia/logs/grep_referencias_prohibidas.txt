@@ -1,0 +1,13 @@
+# Grep referencias prohibidas
+
+Alcance: codigo, SQL, dashboard, tests, nosql y documentacion versionable.
+Se excluyen data/, datasets/ y evidencia/logs/ para no recorrer raw ni el propio archivo de evidencia.
+
+Comando: grep -Rni --exclude-dir=.git --exclude-dir=__pycache__ --exclude-dir=data --exclude-dir=datasets --exclude-dir=logs --exclude-dir=scripts --exclude=*.sqlite SINIA\|sinia\|AQICN\|ERA5\|NASA POWER\|Copernicus\|CAMS .
+returncode=1
+Interpretacion: returncode 1 significa sin coincidencias.
+
+STDOUT:
+
+STDERR:
+

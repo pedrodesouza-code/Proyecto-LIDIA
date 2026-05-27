@@ -1,0 +1,21 @@
+# Validacion CDC
+
+## Antes
+| tipo_evento | eventos |
+| --- | --- |
+| alta | 864 |
+| modificacion | 133 |
+| rechazo | 704 |
+
+## Accion controlada
+run_id_test=70fe4e33-12e9-4ab6-b1f8-d8223aaab27f
+tipos_faltantes_cubiertos=['sin_cambio']
+No se modificaron datos reales de staging ni dw.fact_incendio.
+
+## Despues
+| tipo_evento | eventos |
+| --- | --- |
+| alta | 864 |
+| modificacion | 133 |
+| rechazo | 704 |
+| sin_cambio | 1 |

@@ -1,0 +1,19 @@
+# Validacion tests
+
+## compileall
+{
+  "cmd": "/usr/local/bin/python3.11 -m compileall -q .",
+  "returncode": 0,
+  "seconds": 0.064,
+  "stdout": "",
+  "stderr": ""
+}
+
+## pytest
+{
+  "cmd": "/usr/local/bin/python3.11 -m pytest -q tests",
+  "returncode": 0,
+  "seconds": 1.254,
+  "stdout": "\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m                                                         [100%]\u001b[0m\n\u001b[32m\u001b[32m\u001b[1m16 passed\u001b[0m\u001b[32m in 0.76s\u001b[0m\u001b[0m\n",
+  "stderr": ""
+}

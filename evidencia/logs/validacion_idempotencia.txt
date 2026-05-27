@@ -1,0 +1,18 @@
+# Validacion idempotencia
+
+Se usa prueba automatizada existente y verificacion SQL de claves naturales sin duplicados.
+
+## pytest tests/test_idempotencia.py
+returncode=0 segundos=1.111
+[32m.[0m[32m                                                                        [100%][0m
+[32m[32m[1m1 passed[0m[32m in 0.65s[0m[0m
+
+
+## Conteos SQL
+| tabla | filas | natural_key_distintas | duplicados |
+| --- | --- | --- | --- |
+| staging.stg_firms | 2585805 | 2585805 | 0 |
+| staging.stg_chirps | 702 | 702 | 0 |
+| staging.stg_meteo | 646145 | 646145 | 0 |
+| staging.stg_modis | 133 | 133 | 0 |
+| dw.fact_incendio | 2585805 | 2585805 | 0 |
