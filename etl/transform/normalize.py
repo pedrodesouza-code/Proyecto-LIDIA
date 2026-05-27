@@ -36,7 +36,13 @@ def _digest(value: Any) -> str:
 
 
 def _jsonsafe(value: Any) -> Any:
-    return json.loads(json.dumps(value, default=str))
+    if isinstance(value, dict):
+        return {key: _jsonsafe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonsafe(item) for item in value]
+    if pd.isna(value):
+        return None
+    return json.loads(json.dumps(value, default=str, allow_nan=False))
 
 
 def _reject(raw: dict[str, Any], reason: str) -> dict[str, Any]:
@@ -161,6 +167,8 @@ def _normalize_record(source: str, raw: dict[str, Any]) -> dict[str, Any]:
         natural = "|".join([str(year), country, location])
         record = {
             "natural_key": natural, "anio": year, "pais_codigo": country, "ubicacion": location,
+            "latitud": _number(_value(raw, "latitud", "latitude", "lat")),
+            "longitud": _number(_value(raw, "longitud", "longitude", "lon")),
             "codigo_cobertura": _value(raw, "codigo_cobertura", "valor", "lc_type1"),
             "descripcion_cobertura": _value(raw, "descripcion_cobertura", "lc_descripcion"),
         }

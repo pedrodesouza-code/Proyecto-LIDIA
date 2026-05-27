@@ -28,24 +28,13 @@ LEFT JOIN dw.dim_clima c ON c.clima_id = i.clima_id
 GROUP BY u.pais_codigo, fch.fecha;
 
 CREATE OR REPLACE VIEW dw.v_incendios_precipitacion AS
-WITH incendios AS (
-    SELECT u.pais_codigo, fch.anio, fch.mes, COUNT(*)::bigint AS focos
-    FROM dw.fact_incendio i
-    JOIN dw.dim_fecha fch ON fch.fecha_id = i.fecha_id
-    JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
-    GROUP BY u.pais_codigo, fch.anio, fch.mes
-), lluvia AS (
-    SELECT u.pais_codigo, fch.anio, fch.mes,
-           ROUND(AVG(p.precipitacion_mm), 3) AS precipitacion_mm_promedio
-    FROM dw.dim_precipitacion p
-    JOIN dw.dim_fecha fch ON fch.fecha_id = p.fecha_id
-    JOIN dw.dim_ubicacion u ON u.ubicacion_id = p.ubicacion_id
-    GROUP BY u.pais_codigo, fch.anio, fch.mes
-)
-SELECT i.pais_codigo, i.anio, i.mes, i.focos, l.precipitacion_mm_promedio
-FROM incendios i
-LEFT JOIN lluvia l ON l.pais_codigo = i.pais_codigo
- AND l.anio = i.anio AND l.mes = i.mes;
+SELECT u.pais_codigo, fch.anio, fch.mes, COUNT(*)::bigint AS focos,
+       ROUND(AVG(p.precipitacion_mm), 3) AS precipitacion_mm_promedio
+FROM dw.fact_incendio i
+JOIN dw.dim_fecha fch ON fch.fecha_id = i.fecha_id
+JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+LEFT JOIN dw.dim_precipitacion p ON p.precipitacion_id = i.precipitacion_id
+GROUP BY u.pais_codigo, fch.anio, fch.mes;
 
 CREATE OR REPLACE VIEW dw.v_incendios_cobertura AS
 SELECT u.pais_codigo, COALESCE(c.descripcion_cobertura, 'Sin dato MODIS') AS cobertura,
@@ -72,6 +61,12 @@ SELECT fuente, estado, iniciado_en, finalizado_en, duracion_segundos,
 FROM audit.etl_runs
 ORDER BY iniciado_en DESC;
 
-GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
-    dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
-    dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline TO lidia_dashboard;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'lidia_dashboard') THEN
+        GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
+            dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
+            dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline TO lidia_dashboard;
+    END IF;
+END
+$$;

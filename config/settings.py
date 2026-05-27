@@ -47,6 +47,13 @@ SOURCE_FILES = {
     "INUMET": os.getenv("INUMET_FILE", ""),
 }
 FIRMS_COUNTRY_BOUNDARIES_FILE = os.getenv("FIRMS_COUNTRY_BOUNDARIES_FILE", "")
+METEO_API_URL = os.getenv("METEO_API_URL", "https://archive-api.open-meteo.com/v1/archive")
+METEO_START_DATE = os.getenv("METEO_START_DATE", "2018-01-01")
+METEO_END_DATE = os.getenv("METEO_END_DATE", "2025-12-31")
+FORECAST_API_URL = os.getenv("FORECAST_API_URL", "https://api.open-meteo.com/v1/forecast")
+FORECAST_DAYS = int(os.getenv("FORECAST_DAYS", "7"))
+INUMET_TEMPERATURA_FILE = os.getenv("INUMET_TEMPERATURA_FILE", "")
+INUMET_HUMEDAD_FILE = os.getenv("INUMET_HUMEDAD_FILE", "")
 
 PG_CONFIG = {
     "host": os.getenv("POSTGRES_HOST", "localhost"),
