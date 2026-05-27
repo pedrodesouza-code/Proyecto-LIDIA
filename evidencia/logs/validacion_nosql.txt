@@ -4,24 +4,36 @@ MONGO_ENABLED=False
 
 MongoDB disponible: SI
 
+Documentos insertados/actualizados derivados de PostgreSQL real ya cargado; no se insertaron raw masivos ni datos inventados.
+
+## Colecciones esperadas
 | coleccion | documentos |
 | --- | --- |
-| focos_snapshots | 352 |
-| raw_snapshots | 4 |
-| pipeline_logs | 916 |
-| devops_probe | 0 |
-| ejecuciones_etl | 3 |
-| eventos | 2 |
-| focos_resumen_mes | 39 |
-| cdc_control | 1 |
-| alertas | 0 |
-| focos_resumen_pais | 3 |
-| etl_runs | 6 |
-| data_quality_results | 36 |
+| ingesta_metadata | 6 |
+| rechazos_etl | 3 |
+| raw_payloads | 6 |
+| pipeline_logs | 918 |
+| snapshots_firms | 3 |
 
-Consultas representativas evaluadas:
-- ingesta_metadata_FIRMS: OK, resultados=0
-- rechazos_por_fuente_motivo: OK, resultados=0
-- raw_payloads_fuentes_validas: OK, resultados=0
-- pipeline_logs_error: OK, resultados=0
-- snapshots_firms_alcance: OK, resultados=0
+## Consultas representativas
+| consulta | resultados |
+| --- | --- |
+| ingesta_metadata_FIRMS | 1 |
+| rechazos_por_fuente_motivo | 3 |
+| raw_payloads_fuentes_validas | 6 |
+| pipeline_logs_estado | 2 |
+| snapshots_firms_alcance | 3 |
+
+## Snapshots FIRMS por pais
+| pais_codigo | total_focos | frp_total_mw | frp_promedio_mw |
+| --- | --- | --- | --- |
+| ARG | 462017 | 24899081.000 | 53.892 |
+| BRA | 2116305 | 110094059.800 | 52.022 |
+| URY | 7483 | 179083.200 | 23.932 |
+
+## Rechazos agregados
+| fuente | motivo | filas_representadas |
+| --- | --- | --- |
+| CHIRPS | pais fuera del alcance URY/ARG/BRA | 702 |
+| FIRMS | fuera_alcance_geografico | 1086249 |
+| FIRMS | registro_invalido_o_fuera_periodo | 1 |

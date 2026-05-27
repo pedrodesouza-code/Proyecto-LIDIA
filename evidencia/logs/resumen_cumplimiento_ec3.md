@@ -8,7 +8,7 @@
 | Asociacion espacial ambiental | OK | validacion_ec3_final.txt | Nearest neighbor Haversine auditado; sin violaciones de reglas. |
 | CDC | OK | validacion_cdc.txt | Tipos alta, modificacion, sin_cambio y rechazo presentes; si faltaba alguno se completo con corrida test auditada. |
 | Idempotencia | OK | validacion_idempotencia.txt | Prueba automatizada y conteos natural_key sin duplicados. |
-| NoSQL complementario | OK | validacion_nosql.txt | MongoDB complementario; si no esta activo queda documentada limitacion UTEC. |
+| NoSQL complementario | OK | validacion_nosql.txt | Colecciones esperadas pobladas con metadata, rechazos, logs, snapshots y payloads resumidos derivados de la carga real. |
 | Dashboard | OK | validacion_dashboard.txt | Vistas existen, responden y el dashboard no lee archivos exportados. |
 | Seguridad/configuracion | OK | validacion_seguridad.txt | Ejemplos sin secretos; utec.env runtime no versionable; roles documentados segun permisos. |
 | Tests automatizados | OK | validacion_tests.txt | compileall y pytest ejecutados. |
