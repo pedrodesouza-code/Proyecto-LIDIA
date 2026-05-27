@@ -1,134 +1,122 @@
-# SINIA-UY / SONIA-UY
+# Proyecto LIDIA - Aporte EC3 Pedro UTEC
 
-Sistema de Ingenieria de Datos para monitoreo ambiental, focos de calor y riesgo de incendios forestales en Uruguay y la region.
+Implementacion reproducible para analizar incendios forestales y sus
+condiciones ambientales en **Uruguay, Argentina y Brasil** durante
+**2018-2025**. El aporte utiliza exclusivamente las fuentes declaradas del
+proyecto: **INUMET, FIRMS, CHIRPS, FORECAST, METEO y MODIS**.
 
-Estado oficial del proyecto: **2026-05-22**.
+No se versionan datasets crudos, shapefiles, parquets, claves ni contrasenas.
+La dimension de calidad del aire se mantiene nullable y pendiente de carga
+hasta disponer de una fuente aprobada y trazable del proyecto. La base
+PostgreSQL recomendada para una instalacion limpia es `proyecto_lidia`.
+En servidores que inyectan una base compartida, `LIDIA_POSTGRES_DB` selecciona
+explicitamente el Data Warehouse de este proyecto.
 
-## Resumen
+## Contenido Implementado
 
-SINIA-UY integra fuentes reales satelitales, meteorologicas y atmosfericas para construir un pipeline completo de datos:
+- `sql/ddl/`: esquemas `staging`, `dw`, `audit`, roles, modelo
+  estrella, indices, vistas, migracion legacy segura y PostGIS opcional FIRMS.
+- `etl/`: extractores por fuente, validacion, rechazos,
+  promociones al DW y CDC mediante clave natural mas hash SHA-256.
+- `nosql/`: schemas y consultas MongoDB para raw payloads, metadata, logs,
+  rechazos y snapshots; PostgreSQL sigue siendo el Data Warehouse.
+- `dashboard/streamlit_app.py`: dashboard conectado a vistas SQL.
+- `tests/`: calidad, idempotencia y CDC con resultados numericos.
+- `evidencia/`: procedimientos y resultados verificables generados en esta rama.
 
-```text
-Fuentes externas
-  -> ETL Python
-  -> Parquet procesado
-  -> PostgreSQL analitico
-  -> MongoDB operacional
-  -> Tests, reportes y dashboard Streamlit
-```
-
-El sistema permite analizar focos de calor, riesgo meteorologico, calidad del aire, precipitacion y cobertura vegetal.
-
-## Alcance Actual
-
-El alcance vigente del repositorio es:
-
-| Pais | Puntos |
-|---|---:|
-| Uruguay | 19 |
-| Brasil | 5 |
-| Argentina | 4 |
-| Chile | 8 |
-| **Total** | **36** |
-
-Uruguay esta cubierto por sus 19 departamentos. Chile se incorpora por su relevancia en eventos volcanicos y transporte atmosferico regional.
-
-## Fuentes De Datos
-
-| Fuente | Uso en el proyecto |
-|---|---|
-| NASA FIRMS | Focos de calor satelitales historicos y NRT |
-| Open-Meteo | Meteorologia historica y pronostico |
-| CAMS via Open-Meteo | Calidad del aire, PM10, PM2.5 y AQI |
-| CHIRPS | Precipitacion mensual |
-| MODIS / AppEEARS | Cobertura vegetal |
-
-## Componentes Principales
-
-| Componente | Ubicacion |
-|---|---|
-| Configuracion central | `config/settings.py` |
-| Extraccion | `etl/extract/` |
-| Transformacion | `etl/transform/` |
-| Carga PostgreSQL / MongoDB | `etl/load/` |
-| Scheduler incremental | `etl/scheduler.py` |
-| Modelo SQL | `sql/ddl/` |
-| Modelo NoSQL | `nosql/schemas/` |
-| Dashboard | `dashboard/app.py` |
-| Tests | `tests/test_calidad_datos.py` |
-| Reportes de evidencia | `reports/` |
-
-## Evidencia Actual
-
-Ultima validacion local:
+## Configuracion
 
 ```bash
-pytest tests -q
+cp config/.env.example config/.env
+# Completar passwords y rutas locales; config/.env esta ignorado por Git.
+python -m pip install -r requirements-utec.txt
 ```
 
-Resultado validado el `2026-05-22`:
+Las variables `*_FILE` apuntan a archivos locales CSV/Parquet de las fuentes
+reales. `INUMET` se valida solo para Uruguay. En FIRMS, `brillo_termico`
+representa brillo termico satelital, nunca temperatura del aire.
 
-```text
-20 passed in 21.12s
-```
+## Base De Datos
 
-Reportes principales:
-
-- `reports/carga_completa_ultimo.json`
-- `reports/sql_vs_nosql_real_ultimo.json`
-- `reports/rendimiento_ultimo.json`
-- `reports/backup_restore_ultimo.json`
-- `reports/sharding_simulado_ultimo.json`
-
-Metricas destacadas del estado actual:
-
-- FIRMS procesado: `1.946.361` focos.
-- Alcance: `ARG`, `BRA`, `CHL`, `URY`.
-- Puntos de monitoreo: `36`.
-- Tests: `20 PASS / 0 FAIL`.
-
-## Levantamiento Rapido
-
-Instalar dependencias:
+Con PostgreSQL disponible, ejecutar en orden:
 
 ```bash
-pip install -r requirements.txt
+psql "$DATABASE_URL" -f sql/ddl/00_schemas.sql
+psql "$DATABASE_URL" -f sql/ddl/01_roles.sql
+psql "$DATABASE_URL" -f sql/ddl/02_Schema.sql
+psql "$DATABASE_URL" -f sql/ddl/03_indices.sql
+psql "$DATABASE_URL" -f sql/ddl/04_vistas.sql
+# Opcionales segun ambiente:
+psql "$DATABASE_URL" -f sql/ddl/05_migracion_Sa.sql
+psql "$DATABASE_URL" -f sql/ddl/06_postgis_firms_migracion.sql
 ```
 
-Ejecutar tests:
+`staging` conserva metadata, registros normalizados y rechazos. `dw` aplica
+esquema estrella con `fact_incendio` FIRMS y dimensiones de fecha, ubicacion,
+clima, precipitacion, cobertura, calidad del aire nullable y estaciones
+INUMET. `audit` registra corridas y eventos CDC.
+
+## ETL Y CDC
 
 ```bash
-pytest tests -q
+python -m etl.main --source FIRMS
+python -m etl.main --source METEO
+python -m etl.main --source ALL
 ```
 
-Levantar dashboard:
+Cada registro invalido se guarda como rechazo sin impedir la carga de las
+filas validas. Para cada clave natural, el hash de contenido permite contar:
+`alta`, `modificacion` y `sin_cambio`. Los conteos, duracion y ultima fecha
+procesada quedan en `audit.etl_runs`.
+
+## MongoDB
+
+MongoDB complementa al DW con raw payloads por fuente, metadata de ejecucion,
+logs, rechazos y snapshots FIRMS. El contrato esta en `nosql/mongo_schema.json`; no
+reemplaza hechos ni dimensiones PostgreSQL.
+
+## Tests Y Dashboard
 
 ```bash
-streamlit run dashboard/app.py
+python -m pytest -q tests -p no:cacheprovider
+streamlit run dashboard/streamlit_app.py
 ```
 
-Acceso local:
+El dashboard consulta vistas `dw` y presenta ocho KPIs, series temporales,
+comparacion por pais/region y cruces con clima, precipitacion y cobertura.
+Tambien expone metricas de carga, CDC y rechazos.
 
-```text
-http://localhost:8501
-```
+## Docker Y Servidor UTEC
 
-Validar Docker Compose:
+Para validacion local se provee `docker/docker-compose.yml`.
+El servidor institucional debe usar servicios autorizados; este aporte no
+asume Docker ni sharding disponibles. El procedimiento de backup/recuperacion
+esta documentado en `docker/README.md`.
 
-```bash
-docker compose -f docker/docker-compose.yml --env-file docker/.env.example config --quiet
-```
+## 3.4 Procedimientos De Analisis De Datos
 
-## Nota Para Defensa
+La integracion parte de FIRMS como hecho central y enlaza dimensiones por
+fecha y ubicacion. Las vistas responden preguntas de cantidad y FRP por
+periodo/pais, actividad regional, relacion con temperatura/humedad,
+precipitacion CHIRPS y cobertura MODIS. Las asociaciones describen
+co-ocurrencias observadas; no prueban causalidad.
 
-Los documentos con fecha `2026-05-15` reflejan una sincronizacion historica UTEC de alcance anterior. La fuente de verdad actual del repositorio para defensa es:
+## 3.5 Etica, Seguridad Y Gobernanza
 
-- `docs/CIERRE_ENTREGA_2026-05-22.md`
-- `docs/ESTADO_ACTUAL_PROYECTO_2026-05-22.md`
-- `docs/ENTREGA_EC3_IMPLEMENTACION.md`
-- `docs/GUIA_DEFENSA_FINAL.md`
-- `docs/MATRIZ_CUMPLIMIENTO_CONSIGNA_2026.md`
+El aporte minimiza privilegios con roles de dashboard, ETL y administracion;
+excluye secretos y datos pesados de Git; registra origen, fallos y CDC; y
+delimita el alcance geografico. Las localizaciones FIRMS se usan para analisis
+ambiental agregado, evitando atribuciones de causalidad o responsabilidad.
 
-La respuesta corta del proyecto:
+## 4.2 Implementacion
 
-> SINIA-UY implementa un pipeline de ingenieria de datos con fuentes ambientales reales, ETL modular en Python, persistencia PostgreSQL y MongoDB, validaciones de calidad, idempotencia y CDC, dashboard Streamlit y evidencia reproducible para defensa.
+La implementacion incluye DDL ejecutable, pipeline Python modular, persistencia
+documental complementaria, dashboard SQL y tests unitarios de reglas
+criticas. PostGIS agrega geometria de FIRMS de forma opcional y separada.
+
+## Pendientes Verificables
+
+- Ejecutar DDL y ETL contra la instancia UTEC con variables locales validas.
+- Registrar conteos reales de una segunda corrida y capturas del dashboard.
+- Cargar calidad del aire solo si el equipo confirma una fuente permitida.
+- Revisar el enlace espacial/temporal de dimensiones con el volumen real FIRMS.

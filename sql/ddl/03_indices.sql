@@ -1,78 +1,12 @@
--- =============================================================================
--- SINIA-UY — Índices PostgreSQL
--- =============================================================================
--- Estrategia:
---   - Índices en columnas de filtro frecuente (fecha, punto, nivel_riesgo)
---   - Índice compuesto para el patrón de consulta más común: (fecha, id_punto)
---   - Índice en focos_calor por fecha_adq (consultas por rango temporal)
---   - Índice parcial para alertas (supera_oms_pm10 = TRUE) — evita scan completo
---
--- Ejecutar después de 02_schema.sql con datos cargados para medir impacto.
--- =============================================================================
-
--- ── focos_calor ───────────────────────────────────────────────────────────────
--- Consultas frecuentes: por fecha, por zona geográfica, por nivel de confianza
-
-CREATE INDEX IF NOT EXISTS idx_focos_fecha_adq
-    ON focos_calor (fecha_adq DESC);
-
--- Para filtros espaciales aproximados (bounding box por zona)
-CREATE INDEX IF NOT EXISTS idx_focos_lat_lon
-    ON focos_calor (latitud, longitud);
-
--- Para análisis por confianza
-CREATE INDEX IF NOT EXISTS idx_focos_confianza
-    ON focos_calor (confianza_num)
-    WHERE confianza_num IS NOT NULL;
-
--- Para análisis de intensidad (FRP)
-CREATE INDEX IF NOT EXISTS idx_focos_frp
-    ON focos_calor (potencia_radiativa DESC)
-    WHERE potencia_radiativa IS NOT NULL;
-
--- ── meteo_diario ──────────────────────────────────────────────────────────────
--- Consultas frecuentes: por punto+fecha, por nivel_riesgo, por rango de fechas
-
--- Patrón de consulta principal del dashboard
-CREATE INDEX IF NOT EXISTS idx_meteo_punto_fecha
-    ON meteo_diario (id_punto, fecha DESC);
-
--- Para consultas por fecha sola (aggregaciones temporales)
-CREATE INDEX IF NOT EXISTS idx_meteo_fecha
-    ON meteo_diario (fecha DESC);
-
--- Para filtros por nivel de riesgo (alertas, análisis de días críticos)
-CREATE INDEX IF NOT EXISTS idx_meteo_nivel_riesgo
-    ON meteo_diario (nivel_riesgo, fecha DESC)
-    WHERE nivel_riesgo IS NOT NULL;
-
--- Para el dashboard: solo forecast
-CREATE INDEX IF NOT EXISTS idx_meteo_forecast
-    ON meteo_diario (id_punto, fecha)
-    WHERE tipo_dato = 'forecast';
-
--- ── calidad_aire_diario ───────────────────────────────────────────────────────
-
--- Patrón de consulta principal
-CREATE INDEX IF NOT EXISTS idx_cams_punto_fecha
-    ON calidad_aire_diario (id_punto, fecha DESC);
-
--- Índice parcial: solo días con alerta OMS (útil para el dashboard de alertas)
--- Evita scan completo de la tabla cuando se buscan solo días problemáticos
-CREATE INDEX IF NOT EXISTS idx_cams_alerta_oms
-    ON calidad_aire_diario (fecha DESC, id_punto)
-    WHERE supera_oms_pm10 = TRUE;
-
--- Para análisis de tendencia temporal
-CREATE INDEX IF NOT EXISTS idx_cams_fecha
-    ON calidad_aire_diario (fecha DESC);
-
--- ── etl_ejecuciones ───────────────────────────────────────────────────────────
-
--- Para consultar la última ejecución de cada fuente (CDC)
-CREATE INDEX IF NOT EXISTS idx_etl_fuente_inicio
-    ON etl_ejecuciones (fuente, iniciado_en DESC);
-
-CREATE INDEX IF NOT EXISTS idx_etl_estado
-    ON etl_ejecuciones (estado, iniciado_en DESC)
-    WHERE estado IN ('error', 'parcial');
+-- Proyecto LIDIA - indices B-tree para joins y filtros analiticos.
+CREATE INDEX IF NOT EXISTS idx_fact_fecha ON dw.fact_incendio (fecha_id);
+CREATE INDEX IF NOT EXISTS idx_fact_ubicacion_fecha ON dw.fact_incendio (ubicacion_id, fecha_id);
+CREATE INDEX IF NOT EXISTS idx_fact_frp ON dw.fact_incendio (frp_mw DESC) WHERE frp_mw IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_fecha_anio_mes ON dw.dim_fecha (anio, mes);
+CREATE INDEX IF NOT EXISTS idx_ubicacion_pais ON dw.dim_ubicacion (pais_codigo);
+CREATE INDEX IF NOT EXISTS idx_clima_ubicacion_fecha ON dw.dim_clima (ubicacion_id, fecha_id);
+CREATE INDEX IF NOT EXISTS idx_clima_ubicacion_instante ON dw.dim_clima (ubicacion_id, fecha_hora_utc);
+CREATE INDEX IF NOT EXISTS idx_precipitacion_ubicacion_fecha ON dw.dim_precipitacion (ubicacion_id, fecha_id);
+CREATE INDEX IF NOT EXISTS idx_cobertura_ubicacion_anio ON dw.dim_cobertura_vegetal (ubicacion_id, anio);
+CREATE INDEX IF NOT EXISTS idx_etl_fuente_inicio ON audit.etl_runs (fuente, iniciado_en DESC);
+CREATE INDEX IF NOT EXISTS idx_cdc_run_tipo ON audit.cdc_eventos (run_id, tipo_evento);
