@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from config.settings import ROOT, SOURCE_FILES
+from config.settings import SOURCE_FILES
 
 
 def read_source(source: str, path: str | Path | None = None) -> pd.DataFrame:
@@ -12,8 +12,6 @@ def read_source(source: str, path: str | Path | None = None) -> pd.DataFrame:
     if not configured:
         raise FileNotFoundError(f"{source}: configure {source}_FILE en config/.env")
     candidate = Path(configured).expanduser()
-    if not candidate.is_absolute():
-        candidate = ROOT / candidate
     if not candidate.exists():
         raise FileNotFoundError(f"{source}: archivo no encontrado: {candidate}")
     if candidate.suffix.lower() in {".parquet", ".pq"}:

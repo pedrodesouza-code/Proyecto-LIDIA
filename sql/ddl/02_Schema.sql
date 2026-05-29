@@ -71,8 +71,6 @@ CREATE TABLE IF NOT EXISTS staging.stg_chirps (
     fecha DATE NOT NULL,
     pais_codigo CHAR(3) NOT NULL CHECK (pais_codigo IN ('URY','ARG','BRA')),
     ubicacion VARCHAR(100) NOT NULL,
-    latitud NUMERIC(9,6) CHECK (latitud BETWEEN -90 AND 90),
-    longitud NUMERIC(9,6) CHECK (longitud BETWEEN -180 AND 180),
     precipitacion_mm NUMERIC(10,3) NOT NULL CHECK (precipitacion_mm >= 0),
     raw_payload JSONB,
     cargado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -84,8 +82,6 @@ CREATE TABLE IF NOT EXISTS staging.stg_modis (
     anio SMALLINT NOT NULL CHECK (anio BETWEEN 2018 AND 2025),
     pais_codigo CHAR(3) NOT NULL CHECK (pais_codigo IN ('URY','ARG','BRA')),
     ubicacion VARCHAR(100) NOT NULL,
-    latitud NUMERIC(9,6) CHECK (latitud BETWEEN -90 AND 90),
-    longitud NUMERIC(9,6) CHECK (longitud BETWEEN -180 AND 180),
     codigo_cobertura INTEGER,
     descripcion_cobertura VARCHAR(120),
     raw_payload JSONB,
@@ -230,34 +226,3 @@ CREATE TABLE IF NOT EXISTS audit.cdc_eventos (
     registrado_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     detalle JSONB
 );
-
-CREATE TABLE IF NOT EXISTS audit.asociacion_espacial_runs (
-    asociacion_id UUID NOT NULL,
-    variable VARCHAR(20) NOT NULL CHECK (variable IN ('clima','precipitacion','cobertura')),
-    metodo VARCHAR(40) NOT NULL DEFAULT 'nearest_neighbor_haversine',
-    umbral_km NUMERIC(8,2) NOT NULL CHECK (umbral_km > 0),
-    total_hechos BIGINT NOT NULL CHECK (total_hechos >= 0),
-    asociados BIGINT NOT NULL CHECK (asociados >= 0),
-    sin_asociar BIGINT NOT NULL CHECK (sin_asociar >= 0),
-    distancia_maxima_km NUMERIC(10,3),
-    detalle JSONB,
-    ejecutado_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (asociacion_id, variable)
-);
-
-CREATE OR REPLACE FUNCTION dw.distancia_haversine_km(
-    latitud_origen DOUBLE PRECISION,
-    longitud_origen DOUBLE PRECISION,
-    latitud_destino DOUBLE PRECISION,
-    longitud_destino DOUBLE PRECISION
-) RETURNS DOUBLE PRECISION
-LANGUAGE SQL IMMUTABLE STRICT PARALLEL SAFE AS $$
-    SELECT 6371.0088 * 2 * ASIN(
-        SQRT(LEAST(
-            1.0,
-            POWER(SIN(RADIANS((latitud_destino - latitud_origen) / 2.0)), 2)
-            + COS(RADIANS(latitud_origen)) * COS(RADIANS(latitud_destino))
-              * POWER(SIN(RADIANS((longitud_destino - longitud_origen) / 2.0)), 2)
-        ))
-    );
-$$;
