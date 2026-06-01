@@ -1,0 +1,7 @@
+{
+  "generado_en": "2026-06-01T20:09:09.636643+00:00",
+  "staging_meteo": 2173968,
+  "dw_dim_clima_meteo": 2173968,
+  "upsert_dim_clima_rowcount": 2173968,
+  "duracion_segundos": 581.31
+}

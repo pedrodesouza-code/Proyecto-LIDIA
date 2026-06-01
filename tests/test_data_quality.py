@@ -27,29 +27,16 @@ def test_inumet_restringido_a_uruguay():
 
 
 def test_extract_inumet_une_csv_reales_y_filtra_periodo(tmp_path, monkeypatch):
+    from etl.extract import base
     from etl.extract import extract_inumet
 
-    temperature = tmp_path / "temperatura.csv"
-    humidity = tmp_path / "humedad.csv"
-    temperature.write_text(
-        "fecha;estacion_id;temp_aire\n"
-        "2025-01-01 00:00:00;Prueba G3;19.4\n"
-        "2026-01-01 00:00:00;Prueba G3;20.0\n",
+    source = tmp_path / "inumet.csv"
+    source.write_text(
+        "fecha,estacion,pais,temperatura_c,humedad_pct,latitud,longitud\n"
+        "2025-01-01 00:00:00,Carrasco,URY,19.4,71,-34.79,-56.26\n",
         encoding="utf-8",
     )
-    humidity.write_text(
-        "fecha;estacion_id;hum_relativa\n"
-        "2025-01-01 00:00:00;Prueba G3;71\n"
-        "2026-01-01 00:00:00;Prueba G3;72\n",
-        encoding="utf-8",
-    )
-    monkeypatch.setattr(extract_inumet, "INUMET_TEMPERATURA_FILE", str(temperature))
-    monkeypatch.setattr(extract_inumet, "INUMET_HUMEDAD_FILE", str(humidity))
-    monkeypatch.setattr(
-        extract_inumet,
-        "STATIONS",
-        {"Prueba G3": {"departamento": "Montevideo", "lat": -34.79, "lon": -56.26}},
-    )
+    monkeypatch.setitem(base.SOURCE_FILES, "INUMET", str(source))
 
     frame = extract_inumet.extract()
     accepted, rejected = normalize("INUMET", frame)
@@ -137,22 +124,17 @@ def test_modis_serializa_nulos_como_json_valido():
     assert accepted[0]["raw_payload"]["descripcion_cobertura"] is None
 
 
-def test_extract_meteo_api_conserva_variables_y_pais(monkeypatch):
+def test_extract_meteo_api_conserva_variables_y_pais(tmp_path, monkeypatch):
+    from etl.extract import base
     from etl.extract import extract_meteo
 
-    class Response:
-        def raise_for_status(self):
-            return None
-
-        def json(self):
-            return {"hourly": {
-                "time": ["2024-01-01T00:00"], "temperature_2m": [20.0],
-                "relative_humidity_2m": [50], "wind_speed_10m": [5.0],
-                "wind_direction_10m": [90], "rain": [0.0], "surface_pressure": [1000],
-            }}
-
-    monkeypatch.setattr(extract_meteo, "PUNTOS_MONITOREO", {"Montevideo": {"lat": -34.9, "lon": -56.2, "pais": "URY"}})
-    monkeypatch.setattr(extract_meteo.requests, "get", lambda *args, **kwargs: Response())
+    source = tmp_path / "meteo.csv"
+    source.write_text(
+        "time,pais,ubicacion,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,rain,surface_pressure\n"
+        "2024-01-01T00:00,URY,Montevideo,20.0,50,5.0,90,0.0,1000\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setitem(base.SOURCE_FILES, "METEO", str(source))
     frame = extract_meteo.extract()
     accepted, rejected = normalize("METEO", frame)
     assert rejected == []
@@ -160,13 +142,73 @@ def test_extract_meteo_api_conserva_variables_y_pais(monkeypatch):
     assert accepted[0]["temperatura_c"] == 20.0
 
 
+def test_extract_meteo_api_controlada(monkeypatch):
+    from etl.extract import base
+    from etl.extract import extract_meteo
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "hourly": {
+                    "time": ["2025-01-01T00:00", "2025-01-01T01:00"],
+                    "temperature_2m": [20.0, 21.0],
+                    "relative_humidity_2m": [50, 51],
+                    "wind_speed_10m": [5.0, 6.0],
+                    "wind_direction_10m": [90, 95],
+                    "rain": [0.0, 0.1],
+                    "surface_pressure": [1000, 1001],
+                }
+            }
+
+    monkeypatch.setitem(base.SOURCE_FILES, "METEO", "")
+    monkeypatch.setattr(extract_meteo.requests, "get", lambda *args, **kwargs: Response())
+    monkeypatch.setenv("METEO_API_ENABLED", "true")
+    monkeypatch.setenv("METEO_POINTS", "UY_Montevideo")
+    frame = extract_meteo.extract()
+    assert len(frame) == 2
+    assert frame.loc[0, "pais"] == "URY"
+    assert frame.loc[0, "ubicacion"] == "Montevideo"
+    assert {"temperature_2m", "relative_humidity_2m", "wind_speed_10m", "wind_direction_10m", "rain", "surface_pressure"}.issubset(frame.columns)
+
+
 def test_extract_cams_opcional_sin_config_no_inventa_datos(monkeypatch):
     from etl.extract import extract_cams
 
     monkeypatch.setattr(extract_cams, "read_source", lambda *args, **kwargs: (_ for _ in ()).throw(FileNotFoundError()))
+    monkeypatch.delenv("CAMS_API_ENABLED", raising=False)
     frame = extract_cams.extract()
     assert frame.empty
     assert {"pm2_5", "pm10"}.issubset(frame.columns)
+
+
+def test_extract_cams_api_controlada(monkeypatch):
+    from etl.extract import extract_cams
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "hourly": {
+                    "time": ["2025-01-01T00:00", "2025-01-01T01:00"],
+                    "pm10": [11.0, 12.0],
+                    "pm2_5": [4.0, 5.0],
+                }
+            }
+
+    monkeypatch.setattr(extract_cams, "read_source", lambda *args, **kwargs: (_ for _ in ()).throw(FileNotFoundError()))
+    monkeypatch.setattr(extract_cams.requests, "get", lambda *args, **kwargs: Response())
+    monkeypatch.setenv("CAMS_API_ENABLED", "true")
+    monkeypatch.setenv("LIDIA_MAX_RECORDS_PER_SOURCE", "2")
+    frame = extract_cams.extract()
+    assert len(frame) == 2
+    assert frame.loc[0, "fuente"] == "CAMS"
+    assert frame.loc[0, "pais_codigo"] in {"URY", "ARG", "BRA"}
+    assert {"fecha_hora_utc", "pm2_5", "pm10", "latitud", "longitud"}.issubset(frame.columns)
 
 
 def test_cams_normaliza_pm25_pm10():

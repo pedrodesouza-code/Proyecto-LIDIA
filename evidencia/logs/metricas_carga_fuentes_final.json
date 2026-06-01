@@ -1,0 +1,276 @@
+{
+  "generado_en": "2026-06-01T21:18:40.578849+00:00",
+  "postgres": [
+    {
+      "title": "staging_por_fuente",
+      "columns": [
+        "fuente",
+        "filas",
+        "desde",
+        "hasta"
+      ],
+      "rows": [
+        {
+          "fuente": "CAMS",
+          "filas": 927024,
+          "desde": "2022-08-04",
+          "hasta": "2025-12-31"
+        },
+        {
+          "fuente": "CHIRPS",
+          "filas": 702,
+          "desde": "2018-01-01",
+          "hasta": "2024-06-01"
+        },
+        {
+          "fuente": "FIRMS",
+          "filas": 2585805,
+          "desde": "2018-01-01",
+          "hasta": "2025-01-01"
+        },
+        {
+          "fuente": "INUMET",
+          "filas": 224369,
+          "desde": "2020-01-01",
+          "hasta": "2025-12-31"
+        },
+        {
+          "fuente": "METEO",
+          "filas": 2173968,
+          "desde": "2018-01-01",
+          "hasta": "2025-12-31"
+        },
+        {
+          "fuente": "MODIS",
+          "filas": 133,
+          "desde": "2018-01-01",
+          "hasta": "2024-01-01"
+        }
+      ]
+    },
+    {
+      "title": "dw_objetos",
+      "columns": [
+        "objeto",
+        "filas"
+      ],
+      "rows": [
+        {
+          "objeto": "dw.dim_calidad_aire",
+          "filas": 38626
+        },
+        {
+          "objeto": "dw.dim_clima",
+          "filas": 2398337
+        },
+        {
+          "objeto": "dw.dim_cobertura_vegetal",
+          "filas": 133
+        },
+        {
+          "objeto": "dw.dim_fecha",
+          "filas": 2929
+        },
+        {
+          "objeto": "dw.dim_precipitacion",
+          "filas": 702
+        },
+        {
+          "objeto": "dw.fact_incendio",
+          "filas": 2585805
+        }
+      ]
+    },
+    {
+      "title": "asociaciones_fact_incendio",
+      "columns": [
+        "total",
+        "con_clima",
+        "con_precipitacion",
+        "con_cobertura",
+        "con_calidad_aire"
+      ],
+      "rows": [
+        {
+          "total": 2585805,
+          "con_clima": 83682,
+          "con_precipitacion": 47576,
+          "con_cobertura": 7108,
+          "con_calidad_aire": 20599
+        }
+      ]
+    },
+    {
+      "title": "cams_por_pais",
+      "columns": [
+        "pais_codigo",
+        "filas",
+        "ubicaciones",
+        "desde",
+        "hasta"
+      ],
+      "rows": [
+        {
+          "pais_codigo": "ARG",
+          "filas": 179424,
+          "ubicaciones": 6,
+          "desde": "2022-08-04",
+          "hasta": "2025-12-31"
+        },
+        {
+          "pais_codigo": "BRA",
+          "filas": 179424,
+          "ubicaciones": 6,
+          "desde": "2022-08-04",
+          "hasta": "2025-12-31"
+        },
+        {
+          "pais_codigo": "URY",
+          "filas": 568176,
+          "ubicaciones": 19,
+          "desde": "2022-08-04",
+          "hasta": "2025-12-31"
+        }
+      ]
+    },
+    {
+      "title": "cams_cobertura_punto_anio",
+      "columns": [
+        "punto_anio_con_datos_pm",
+        "punto_anio_sin_pm",
+        "total_punto_anio",
+        "min_horas_con_pm",
+        "max_horas_con_pm"
+      ],
+      "rows": [
+        {
+          "punto_anio_con_datos_pm": 124,
+          "punto_anio_sin_pm": 124,
+          "total_punto_anio": 248,
+          "min_horas_con_pm": 3600,
+          "max_horas_con_pm": 8784
+        }
+      ]
+    },
+    {
+      "title": "vistas_dashboard",
+      "columns": [
+        "vista",
+        "filas"
+      ],
+      "rows": [
+        {
+          "vista": "dw.v_calidad_aire_alta_actividad",
+          "filas": 5187
+        },
+        {
+          "vista": "dw.v_calidad_pipeline",
+          "filas": 143
+        },
+        {
+          "vista": "dw.v_incendios_clima",
+          "filas": 6409
+        },
+        {
+          "vista": "dw.v_incendios_cobertura",
+          "filas": 6
+        },
+        {
+          "vista": "dw.v_incendios_precipitacion",
+          "filas": 254
+        }
+      ]
+    },
+    {
+      "title": "audit_asociacion_ultima",
+      "columns": [
+        "variable",
+        "total_hechos",
+        "asociados",
+        "sin_asociar",
+        "umbral_km",
+        "distancia_maxima_km",
+        "ejecutado_en"
+      ],
+      "rows": [
+        {
+          "variable": "calidad_aire",
+          "total_hechos": 2585805,
+          "asociados": 20599,
+          "sin_asociar": 2565206,
+          "umbral_km": "100.00",
+          "distancia_maxima_km": "99.999",
+          "ejecutado_en": "2026-06-01 21:16:51.424588+00"
+        },
+        {
+          "variable": "clima",
+          "total_hechos": 2585805,
+          "asociados": 83682,
+          "sin_asociar": 2502123,
+          "umbral_km": "150.00",
+          "distancia_maxima_km": "143.897",
+          "ejecutado_en": "2026-06-01 20:39:37.475998+00"
+        },
+        {
+          "variable": "precipitacion",
+          "total_hechos": 2585805,
+          "asociados": 47576,
+          "sin_asociar": 2538229,
+          "umbral_km": "100.00",
+          "distancia_maxima_km": "99.998",
+          "ejecutado_en": "2026-06-01 20:39:37.475998+00"
+        },
+        {
+          "variable": "cobertura",
+          "total_hechos": 2585805,
+          "asociados": 7108,
+          "sin_asociar": 2578697,
+          "umbral_km": "100.00",
+          "distancia_maxima_km": "99.908",
+          "ejecutado_en": "2026-06-01 20:39:37.475998+00"
+        },
+        {
+          "variable": "precipitacion",
+          "total_hechos": 2585805,
+          "asociados": 47576,
+          "sin_asociar": 2538229,
+          "umbral_km": "100.00",
+          "distancia_maxima_km": "99.998",
+          "ejecutado_en": "2026-05-27 19:01:02.48423+00"
+        },
+        {
+          "variable": "cobertura",
+          "total_hechos": 2585805,
+          "asociados": 7108,
+          "sin_asociar": 2578697,
+          "umbral_km": "100.00",
+          "distancia_maxima_km": "99.908",
+          "ejecutado_en": "2026-05-27 19:01:02.48423+00"
+        }
+      ]
+    }
+  ],
+  "mongo": {
+    "estado": "ok",
+    "database": "grp03db",
+    "colecciones": {
+      "alertas": 0,
+      "cdc_control": 1,
+      "cdc_eventos": 4,
+      "data_quality_results": 36,
+      "devops_probe": 0,
+      "ejecuciones_etl": 3,
+      "etl_runs": 6,
+      "eventos": 2,
+      "focos_resumen_mes": 39,
+      "focos_resumen_pais": 3,
+      "focos_snapshots": 352,
+      "ingesta_metadata": 7,
+      "pipeline_logs": 919,
+      "raw_payloads": 6,
+      "raw_snapshots": 4,
+      "rechazos_etl": 3,
+      "snapshots_firms": 3
+    }
+  }
+}

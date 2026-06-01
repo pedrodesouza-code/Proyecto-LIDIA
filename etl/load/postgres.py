@@ -40,7 +40,7 @@ def _event(cur, run_id, source, hash_value, kind, detail=None):
     )
 
 
-def load_staging(source: str, accepted: list[dict], rejected: list[dict]) -> dict[str, int]:
+def load_staging(source: str, accepted: list[dict], rejected: list[dict], promote: bool = True) -> dict[str, int]:
     """Carga incremental: clave natural detecta registro y hash detecta cambio."""
     table, columns = TABLES[source]
     run_id = str(uuid.uuid4())
@@ -79,7 +79,8 @@ def load_staging(source: str, accepted: list[dict], rejected: list[dict]) -> dic
                 cur.execute(update_stmt, (*updated, row["natural_key"]))
                 counts["actualizadas"] += 1
                 _event(cur, run_id, source, row["record_hash"], "modificacion", {"hash_anterior": prior[0]})
-        _promote(cur, source)
+        if promote and accepted:
+            _promote(cur, source)
         latest = _latest_date(accepted)
         cur.execute(
             """UPDATE audit.etl_runs SET estado='ok', ultima_fecha_procesada=%s,
@@ -193,13 +194,14 @@ def _promote(cur, source: str) -> None:
             ON CONFLICT (pais_codigo,latitud,longitud) DO UPDATE
             SET ubicacion=COALESCE(dw.dim_ubicacion.ubicacion, EXCLUDED.ubicacion)""")
         cur.execute("""INSERT INTO dw.dim_calidad_aire (fecha_id,ubicacion_id,pm25,pm10,fuente,observacion)
-            SELECT d.fecha_id,u.ubicacion_id,s.pm25,s.pm10,'CAMS',
+            SELECT d.fecha_id,u.ubicacion_id,ROUND(AVG(s.pm25), 3),ROUND(AVG(s.pm10), 3),'CAMS',
                    'CAMS/Open-Meteo Air Quality normalizado por Proyecto LIDIA'
             FROM staging.stg_calidad_aire s
             JOIN dw.dim_fecha d ON d.fecha=s.fecha
             JOIN dw.dim_ubicacion u ON u.pais_codigo=s.pais_codigo
              AND u.latitud=s.latitud AND u.longitud=s.longitud
             WHERE s.latitud IS NOT NULL AND s.longitud IS NOT NULL
+            GROUP BY d.fecha_id,u.ubicacion_id
             ON CONFLICT (fecha_id,ubicacion_id) DO UPDATE SET
               pm25=EXCLUDED.pm25, pm10=EXCLUDED.pm10, fuente=EXCLUDED.fuente,
               observacion=EXCLUDED.observacion""")

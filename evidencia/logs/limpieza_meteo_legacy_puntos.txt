@@ -1,0 +1,29 @@
+{
+  "generado_en": "2026-06-01T19:58:59.374863+00:00",
+  "legacy_detectado": [
+    {
+      "pais_codigo": "ARG",
+      "ubicacion": "Buenos_Aires",
+      "filas": 70128
+    },
+    {
+      "pais_codigo": "ARG",
+      "ubicacion": "Posadas",
+      "filas": 70128
+    },
+    {
+      "pais_codigo": "BRA",
+      "ubicacion": "Campo_Grande",
+      "filas": 70128
+    },
+    {
+      "pais_codigo": "BRA",
+      "ubicacion": "Porto_Alegre",
+      "filas": 70128
+    }
+  ],
+  "staging_eliminadas": 280512,
+  "dw_dim_clima_eliminadas": 771408,
+  "fact_incendio_desasociadas": 19836,
+  "legacy_restante": []
+}

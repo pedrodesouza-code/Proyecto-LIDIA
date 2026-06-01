@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS staging.ingesta_metadata (
 CREATE TABLE IF NOT EXISTS staging.rechazos_etl (
     rechazo_id BIGSERIAL PRIMARY KEY,
     run_id UUID NOT NULL,
-    fuente VARCHAR(20) NOT NULL,
+    fuente VARCHAR(20) NOT NULL CHECK (fuente IN ('INUMET','FIRMS','CHIRPS','METEO','MODIS','CAMS')),
     motivo TEXT NOT NULL,
     registro JSONB NOT NULL,
     rechazado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -220,9 +220,40 @@ CREATE TABLE IF NOT EXISTS audit.etl_runs (
 CREATE TABLE IF NOT EXISTS audit.cdc_eventos (
     evento_id BIGSERIAL PRIMARY KEY,
     run_id UUID NOT NULL REFERENCES audit.etl_runs(run_id),
-    fuente VARCHAR(20) NOT NULL,
+    fuente VARCHAR(20) NOT NULL CHECK (fuente IN ('INUMET','FIRMS','CHIRPS','METEO','MODIS','CAMS')),
     record_hash CHAR(64) NOT NULL,
     tipo_evento VARCHAR(15) NOT NULL CHECK (tipo_evento IN ('alta','modificacion','sin_cambio','rechazo')),
     registrado_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     detalle JSONB
 );
+
+CREATE TABLE IF NOT EXISTS audit.asociacion_espacial_runs (
+    asociacion_id UUID NOT NULL,
+    variable VARCHAR(20) NOT NULL CHECK (variable IN ('clima','precipitacion','cobertura','calidad_aire')),
+    metodo VARCHAR(40) NOT NULL DEFAULT 'nearest_neighbor_haversine',
+    umbral_km NUMERIC(8,2) NOT NULL CHECK (umbral_km > 0),
+    total_hechos BIGINT NOT NULL CHECK (total_hechos >= 0),
+    asociados BIGINT NOT NULL CHECK (asociados >= 0),
+    sin_asociar BIGINT NOT NULL CHECK (sin_asociar >= 0),
+    distancia_maxima_km NUMERIC(10,3),
+    detalle JSONB,
+    ejecutado_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (asociacion_id, variable)
+);
+
+CREATE OR REPLACE FUNCTION dw.distancia_haversine_km(
+    latitud_origen DOUBLE PRECISION,
+    longitud_origen DOUBLE PRECISION,
+    latitud_destino DOUBLE PRECISION,
+    longitud_destino DOUBLE PRECISION
+) RETURNS DOUBLE PRECISION
+LANGUAGE SQL IMMUTABLE STRICT PARALLEL SAFE AS $$
+    SELECT 6371.0088 * 2 * ASIN(
+        SQRT(LEAST(
+            1.0,
+            POWER(SIN(RADIANS((latitud_destino - latitud_origen) / 2.0)), 2)
+            + COS(RADIANS(latitud_origen)) * COS(RADIANS(latitud_destino))
+              * POWER(SIN(RADIANS((longitud_destino - longitud_origen) / 2.0)), 2)
+        ))
+    );
+$$;

@@ -1,0 +1,50 @@
+{
+  "inicio": "2026-06-01T20:15:31.149497+00:00",
+  "antes": {
+    "total": 2585805,
+    "con_clima": 3917,
+    "con_precipitacion": 47576,
+    "con_cobertura": 7108,
+    "con_calidad": 0
+  },
+  "resultado_asociacion": {
+    "asociacion_id": "7902d03f-6f96-4b7c-ae62-5a70edef5bbc",
+    "duracion_segundos": 1474.531,
+    "metricas": {
+      "clima": {
+        "total_hechos": 2585805,
+        "asociados": 83682,
+        "sin_asociar": 2502123,
+        "umbral_km": 150.0,
+        "distancia_maxima_km": 143.89749372595543,
+        "updates": 83682
+      },
+      "precipitacion": {
+        "total_hechos": 2585805,
+        "asociados": 47576,
+        "sin_asociar": 2538229,
+        "umbral_km": 100.0,
+        "distancia_maxima_km": 99.99793541728955,
+        "updates": 47576
+      },
+      "cobertura": {
+        "total_hechos": 2585805,
+        "asociados": 7108,
+        "sin_asociar": 2578697,
+        "umbral_km": 100.0,
+        "distancia_maxima_km": 99.90842070404601,
+        "updates": 7108
+      }
+    }
+  },
+  "estado": "ok",
+  "fin": "2026-06-01T20:40:11.458650+00:00",
+  "despues": {
+    "total": 2585805,
+    "con_clima": 83682,
+    "con_precipitacion": 47576,
+    "con_cobertura": 7108,
+    "con_calidad": 0
+  },
+  "duracion_total_segundos": 1483.26
+}

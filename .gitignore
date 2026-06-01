@@ -10,3 +10,13 @@ evidencia/logs/*.jsonl
 *.shp
 *.shx
 *.dbf
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local secrets
+.env
+.env.local
+config/.env
