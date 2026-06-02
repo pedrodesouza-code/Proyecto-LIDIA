@@ -20,3 +20,12 @@ __pycache__/
 .env
 .env.local
 config/.env
+
+# Material legacy/no entregable
+_no_entregar/
+config/utec.env
+docker/.env
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+.env.docker
+data/raw/

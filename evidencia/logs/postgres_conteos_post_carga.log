@@ -1,0 +1,9 @@
+        tabla         | filas 
+----------------------+-------
+ staging.stg_firms    |   838
+ staging.rechazos_etl |     0
+ audit.etl_runs       |     3
+ audit.cdc_eventos    |   856
+ dw.fact_incendio     |     0
+(5 rows)
+

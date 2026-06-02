@@ -1,0 +1,95 @@
+{
+  "generado_en": "2026-06-02T19:52:40.672456+00:00",
+  "estado_general": "NO LISTO",
+  "conteo_estados": {
+    "COMPLETO": 8,
+    "FALTA": 2,
+    "PARCIAL": 3
+  },
+  "completos": [
+    "D1 SQL relacional",
+    "D2 NoSQL documental",
+    "D3 ETL Python modular",
+    "D3 integración y trazabilidad",
+    "D5 consultas y dashboard coherente",
+    "D6 Seguridad y gobernanza",
+    "D7 Streamlit",
+    "D8 Docker/despliegue"
+  ],
+  "parciales": [
+    "D3 idempotencia",
+    "D4 Change Data Capture",
+    "D9 rendimiento"
+  ],
+  "faltantes": [
+    "D1 carga real y validación post-carga",
+    "D5 Testing y validación"
+  ],
+  "no_verificados": [],
+  "urgente_alta": [
+    {
+      "Criterio": "D5 Testing y validación",
+      "Estado": "FALTA",
+      "Evidencia encontrada": "compileall_ok=False; pytest_ok=False; passed=18 passed; logs=1",
+      "Riesgo": "Si pytest falla o no hay evidencia cuantitativa, D5 queda parcial.",
+      "Urgencia": "ALTA",
+      "Acción recomendada": "Corregir tests o guardar evidencia D5 final.",
+      "¿Se puede terminar hoy?": "SI"
+    }
+  ],
+  "urgencias": [
+    {
+      "Criterio": "D1 carga real y validación post-carga",
+      "Estado": "FALTA",
+      "Evidencia encontrada": "conteos=[{'objeto': 'fact_incendio', 'filas': 0}, {'objeto': 'dim_clima', 'filas': 0}, {'objeto': 'dim_precipitacion', 'filas': 0}, {'objeto': 'dim_cobertura_vegetal', 'filas': 0}, {'objeto': 'dim_calidad_aire', 'filas': 0}]; invalidos=[{'check_name': 'ubicacion_pais_fuera_alcance', 'n': 0}, {'check_name': 'ubicacion_latitud_invalida', 'n': 0}, {'check_name': 'ubicacion_longitud_invalida', 'n': 0}, {'check_name': 'frp_negativo', 'n': 0}, {'check_name': 'humedad_invalida', 'n': 0}, {'check_name': 'direccion_viento_invalida', 'n': 0}, {'check_name': 'pm_invalido', 'n': 0}]; rechazos=0; ingesta_metadata=0",
+      "Riesgo": "Si faltan metadata o controles cuantitativos, defensa queda débil.",
+      "Urgencia": "MEDIA",
+      "Acción recomendada": "Actualizar evidencia final si cambian cargas.",
+      "¿Se puede terminar hoy?": "SI"
+    },
+    {
+      "Criterio": "D3 idempotencia",
+      "Estado": "PARCIAL",
+      "Evidencia encontrada": "natural/record_hash=13 columnas; duplicados=[{'stg_firms': 0}, {'stg_meteo': 0}, {'stg_chirps': 0}, {'stg_modis': 0}, {'stg_calidad_aire': 0}]; logs_idempotencia=1; dos_corridas=False",
+      "Riesgo": "Sin dos corridas consecutivas, idempotencia queda parcialmente demostrada.",
+      "Urgencia": "MEDIA",
+      "Acción recomendada": "Generar corrida 1 y 2 smoke con conteo antes/después.",
+      "¿Se puede terminar hoy?": "SI"
+    },
+    {
+      "Criterio": "D4 Change Data Capture",
+      "Estado": "PARCIAL",
+      "Evidencia encontrada": "logs_d4=0; log_ok=False; cdc_sql=[{'fuente': 'FIRMS', 'tipo_evento': 'alta', 'n': 838}, {'fuente': 'FIRMS', 'tipo_evento': 'sin_cambio', 'n': 18}]; cdc_mongo=[]",
+      "Riesgo": "D4 solo es completo con evidencia SQL y MongoDB.",
+      "Urgencia": "MEDIA",
+      "Acción recomendada": "Reejecutar script D4 si falta MongoDB CDC o resumen exit_code 0.",
+      "¿Se puede terminar hoy?": "SI"
+    },
+    {
+      "Criterio": "D5 Testing y validación",
+      "Estado": "FALTA",
+      "Evidencia encontrada": "compileall_ok=False; pytest_ok=False; passed=18 passed; logs=1",
+      "Riesgo": "Si pytest falla o no hay evidencia cuantitativa, D5 queda parcial.",
+      "Urgencia": "ALTA",
+      "Acción recomendada": "Corregir tests o guardar evidencia D5 final.",
+      "¿Se puede terminar hoy?": "SI"
+    },
+    {
+      "Criterio": "D9 rendimiento",
+      "Estado": "PARCIAL",
+      "Evidencia encontrada": "logs=1; tiempos_consultas=True; tiempos_pipeline=False; indices=False; completa_vs_smoke=False",
+      "Riesgo": "Sin tiempos cuantitativos, el rendimiento queda como afirmación cualitativa.",
+      "Urgencia": "MEDIA",
+      "Acción recomendada": "Guardar tabla de tiempos de vistas/pipeline y explicar impacto de índices y smoke vs carga completa.",
+      "¿Se puede terminar hoy?": "SI"
+    }
+  ],
+  "se_puede_terminar_hoy": true,
+  "condiciones_para_terminar_hoy": [
+    "Actualizar evidencia final si cambian cargas.",
+    "Generar corrida 1 y 2 smoke con conteo antes/después.",
+    "Reejecutar script D4 si falta MongoDB CDC o resumen exit_code 0.",
+    "Corregir tests o guardar evidencia D5 final.",
+    "Guardar tabla de tiempos de vistas/pipeline y explicar impacto de índices y smoke vs carga completa."
+  ]
+}

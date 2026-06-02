@@ -54,10 +54,8 @@ summary = query(
     params,
 ).iloc[0]
 quality = query(
-    """SELECT COALESCE(SUM(filas_insertadas), 0)::bigint AS altas,
-              COALESCE(SUM(filas_actualizadas), 0)::bigint AS modificaciones,
-              COALESCE(SUM(filas_rechazadas), 0)::bigint AS rechazos
-       FROM dw.v_calidad_pipeline"""
+    """SELECT altas, modificaciones, descartes_auditoria, rechazos_detallados
+       FROM dw.v_resumen_calidad_pipeline"""
 ).iloc[0]
 
 c1, c2, c3, c4 = st.columns(4)
@@ -69,7 +67,7 @@ c5, c6, c7, c8 = st.columns(4)
 c5.metric("Meses cubiertos", int(summary.meses))
 c6.metric("Altas CDC", f"{int(quality.altas):,}")
 c7.metric("Modificaciones CDC", f"{int(quality.modificaciones):,}")
-c8.metric("Rechazos ETL", f"{int(quality.rechazos):,}")
+c8.metric("Rechazos detallados", f"{int(quality.rechazos_detallados):,}")
 
 activity, environment, tracking = st.tabs(["Actividad", "Ambiente", "Calidad y CDC"])
 with activity:
@@ -134,6 +132,10 @@ with tracking:
            FROM dw.v_calidad_pipeline LIMIT 30"""
     )
     st.info("Calidad del aire usa CAMS/Open-Meteo Air Quality cuando hay PM2.5/PM10 validado; queda nula si no existe dato compatible.")
+    st.caption(
+        f"Descartes/filtrados registrados en auditoria: {int(quality.descartes_auditoria):,}. "
+        "No equivalen a errores: incluyen filas fuera del alcance geografico o temporal."
+    )
     st.dataframe(air, width="stretch", hide_index=True)
     st.subheader("Trazabilidad del pipeline")
     st.dataframe(runs, width="stretch", hide_index=True)

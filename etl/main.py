@@ -27,15 +27,17 @@ class RunOptions:
     skip_mongo: bool = False
 
 
-def _split_countries(value: str | None) -> tuple[str, ...]:
+def _split_countries(value: str | list[str] | tuple[str, ...] | None) -> tuple[str, ...]:
     if not value:
         return ()
     aliases = {"UY": "URY", "AR": "ARG", "BR": "BRA", "URUGUAY": "URY", "ARGENTINA": "ARG", "BRASIL": "BRA"}
     countries = []
-    for item in value.split(","):
-        country = aliases.get(item.strip().upper(), item.strip().upper())
-        if country:
-            countries.append(country)
+    raw_items = value if isinstance(value, (list, tuple)) else [value]
+    for raw_item in raw_items:
+        for item in str(raw_item).split(","):
+            country = aliases.get(item.strip().upper(), item.strip().upper())
+            if country:
+                countries.append(country)
     return tuple(countries)
 
 
@@ -138,7 +140,7 @@ def main() -> int:
     parser.add_argument("--smoke", action="store_true", help="Corrida controlada de evidencia; no es carga historica completa.")
     parser.add_argument("--start-date", help="Fecha inicial inclusiva para recorte de evidencia, formato YYYY-MM-DD.")
     parser.add_argument("--end-date", help="Fecha final inclusiva para recorte de evidencia, formato YYYY-MM-DD.")
-    parser.add_argument("--countries", help="Paises separados por coma, por ejemplo URY,ARG,BRA.")
+    parser.add_argument("--countries", nargs="*", help="Paises separados por coma o espacios, por ejemplo URY,ARG,BRA o URY ARG BRA.")
     parser.add_argument("--max-records-per-source", type=int, help="Limite maximo de registros por fuente.")
     parser.add_argument("--skip-mongo", action="store_true", help="Omite persistencia documental MongoDB en esta corrida.")
     args = parser.parse_args()

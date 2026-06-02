@@ -4,7 +4,7 @@
 Pensado para Jupyter/UTEC: no requiere ejecutar archivos .sh.
 
 Uso:
-    DATABASE_URL='postgresql://...' python scripts/d3_generar_evidencia_etl.py
+    DATABASE_URL definida en el entorno python scripts/d3_generar_evidencia_etl.py
 
 Opcional:
     D3_ETL_COMMAND='python -m etl.main --smoke --source FIRMS --skip-mongo' python scripts/d3_generar_evidencia_etl.py
@@ -89,6 +89,15 @@ def run_command(command: list[str], cwd: Path, timeout: int | None = None) -> di
         "stdout": result.stdout,
         "stderr": result.stderr,
     }
+
+
+def clean_env_uri(value: str) -> str:
+    """Normaliza URI si el .env dejo dos asignaciones en una misma linea."""
+    cleaned = value.strip().strip('"').strip("'")
+    for marker in (" MONGO_URI=", " DATABASE_URL="):
+        if marker in cleaned:
+            cleaned = cleaned.split(marker, 1)[0]
+    return cleaned.strip().strip('"').strip("'")
 
 
 def write_command_result(result: dict[str, Any]) -> None:
@@ -288,10 +297,10 @@ def validate_postgres(database_url: str, output_path: Path) -> None:
 
 
 def main() -> int:
-    database_url = os.getenv("DATABASE_URL")
+    database_url = clean_env_uri(os.getenv("DATABASE_URL", ""))
     if not database_url:
         print("ERROR: DATABASE_URL no esta definida.", file=sys.stderr)
-        print("Ejemplo: export DATABASE_URL='postgresql://usuario:password@host:5432/proyecto_lidia'", file=sys.stderr)
+        print("Definir DATABASE_URL como variable de entorno antes de ejecutar.", file=sys.stderr)
         return 1
 
     mongo_enabled = os.getenv("MONGO_ENABLED", "false").lower() in {"1", "true", "yes"}
@@ -356,6 +365,9 @@ def main() -> int:
                 print("El proceso fue matado por recursos. Recomendacion: usar --smoke, acotar fechas/paises y bajar --max-records-per-source.")
             else:
                 print("El pipeline finalizo con error; revisar stdout/stderr anteriores.")
+        else:
+            print("estado_pipeline=ok")
+            print("exit_code=0")
 
     validate_postgres(database_url, sql_log)
 
@@ -369,6 +381,8 @@ def main() -> int:
             f"Validacion SQL/Python log: {sql_log}",
             f"Comando pipeline: {' '.join(pipeline_command)}",
             f"Exit code pipeline: {pipeline_returncode}",
+            f"exit_code={pipeline_returncode}",
+            f"estado_pipeline={'ok' if pipeline_returncode == 0 else 'error'}",
             "Limitacion: si el exit code es -9 o 137, el proceso fue matado por recursos; usar corrida smoke acotada.",
             "PostgreSQL es el Data Warehouse principal; MongoDB queda como complemento documental.",
             "",
@@ -378,7 +392,7 @@ def main() -> int:
     print("D3 ETL evidencia generada:")
     for path in (structure_log, tests_log, pipeline_log, sql_log, summary_log):
         print(f"- {path}")
-    return 0 if pipeline_returncode == 0 else pipeline_returncode
+    return pipeline_returncode
 
 
 if __name__ == "__main__":

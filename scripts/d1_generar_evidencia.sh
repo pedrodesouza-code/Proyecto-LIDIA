@@ -3,7 +3,7 @@ set -euo pipefail
 
 if [[ -z "${DATABASE_URL:-}" ]]; then
   echo "ERROR: DATABASE_URL no esta definida." >&2
-  echo "Ejemplo: export DATABASE_URL='postgresql://usuario:password@host:5432/proyecto_lidia'" >&2
+  echo "Definir DATABASE_URL como variable de entorno antes de ejecutar." >&2
   exit 1
 fi
 

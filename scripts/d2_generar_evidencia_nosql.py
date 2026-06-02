@@ -2,7 +2,7 @@
 """Genera evidencia D2 NoSQL para Proyecto LIDIA usando MongoDB.
 
 Uso:
-    MONGO_URI='mongodb://...' python scripts/d2_generar_evidencia_nosql.py
+    MONGO_URI definida en el entorno python scripts/d2_generar_evidencia_nosql.py
 
 El script es de solo lectura: no inserta, actualiza ni elimina documentos.
 """
@@ -278,7 +278,7 @@ def main() -> int:
     if not mongo_uri:
         print("ERROR: MONGO_URI no esta definida.", file=sys.stderr)
         print(
-            "Ejemplo: export MONGO_URI='mongodb://usuario:password@host:27017/proyecto_lidia?authSource=admin'",
+            "Definir MONGO_URI como variable de entorno antes de ejecutar.",
             file=sys.stderr,
         )
         return 1

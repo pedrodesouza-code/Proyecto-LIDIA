@@ -4,7 +4,7 @@
 Pensado para Jupyter/UTEC: no requiere bash ni mongosh.
 
 Uso:
-    DATABASE_URL='postgresql://...' MONGO_URI='mongodb://...' python scripts/d4_generar_evidencia_cdc.py
+    DATABASE_URL y MONGO_URI definidas en el entorno python scripts/d4_generar_evidencia_cdc.py
 
 La prueba usa un conjunto pequeno de registros FIRMS reales ya existentes en
 staging.stg_firms. No modifica los hechos ni las tablas staging: registra una
@@ -409,7 +409,6 @@ def main() -> int:
                 "MONGO_URI": "definida",
                 "fuentes_validas": sorted(VALID_SOURCES),
                 "fuente_evidencia": SOURCE,
-                "forecast": "no usado",
             })
             exit_code = run_evidence(database_url, mongo_uri)
             if exit_code == 0:

@@ -3,7 +3,7 @@ set -euo pipefail
 
 if [[ -z "${MONGO_URI:-}" ]]; then
   echo "ERROR: MONGO_URI no esta definida." >&2
-  echo "Ejemplo: export MONGO_URI='mongodb://usuario:password@host:27017/proyecto_lidia?authSource=admin'" >&2
+  echo "Definir MONGO_URI como variable de entorno antes de ejecutar." >&2
   exit 1
 fi
 

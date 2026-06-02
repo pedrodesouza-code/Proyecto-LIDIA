@@ -61,6 +61,15 @@ SELECT fuente, estado, iniciado_en, finalizado_en, duracion_segundos,
 FROM audit.etl_runs
 ORDER BY iniciado_en DESC;
 
+CREATE OR REPLACE VIEW dw.v_resumen_calidad_pipeline AS
+SELECT
+    COALESCE(SUM(filas_insertadas), 0)::bigint AS altas,
+    COALESCE(SUM(filas_actualizadas), 0)::bigint AS modificaciones,
+    COALESCE(SUM(filas_rechazadas), 0)::bigint AS descartes_auditoria,
+    (SELECT COUNT(*)::bigint FROM staging.rechazos_etl) AS rechazos_detallados
+FROM audit.etl_runs;
+
 GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
     dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
-    dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline TO lidia_dashboard;
+    dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline,
+    dw.v_resumen_calidad_pipeline TO lidia_dashboard;

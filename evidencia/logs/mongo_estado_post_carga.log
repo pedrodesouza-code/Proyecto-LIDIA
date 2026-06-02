@@ -1,0 +1,17 @@
+{
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 4,
+    pipeline_logs: 4,
+    raw_payloads: 20,
+    rechazos_etl: 0,
+    snapshots_firms: 3
+  }
+}

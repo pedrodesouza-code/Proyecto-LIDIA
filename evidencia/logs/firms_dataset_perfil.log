@@ -1,0 +1,50 @@
+{
+  "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet",
+  "filas": 5283,
+  "columnas": [
+    "latitud",
+    "longitud",
+    "brillo_ti4",
+    "scan",
+    "track",
+    "fecha_adq",
+    "hora_adq_hhmm",
+    "satelite",
+    "instrumento",
+    "confianza_raw",
+    "version",
+    "brillo_ti5",
+    "potencia_radiativa",
+    "dia_noche",
+    "pais",
+    "confianza_num",
+    "hora_adq",
+    "es_diurno"
+  ],
+  "fecha_columna": "fecha_adq",
+  "fecha_min": "2026-05-11",
+  "fecha_max": "2026-05-15",
+  "conteo_por_pais": {
+    "ARG": 1334,
+    "BRA": 2930,
+    "CHL": 945,
+    "URY": 74
+  },
+  "conteo_por_anio": {
+    "2026": 5283
+  },
+  "nulos_columnas_clave": {
+    "latitud": 0,
+    "longitud": 0,
+    "fecha_adq": 0,
+    "hora_adq_hhmm": 0,
+    "pais": 0,
+    "potencia_radiativa": 0,
+    "brillo_ti4": 0
+  },
+  "rango_smoke_seleccionado": {
+    "start_date": "2026-05-01",
+    "end_date": "2026-05-31",
+    "filas_preferidas": 4338
+  }
+}

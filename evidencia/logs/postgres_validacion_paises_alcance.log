@@ -1,0 +1,12 @@
+ pais_codigo | filas |      origen       
+-------------+-------+-------------------
+ ARG         |   256 | staging.stg_firms
+ BRA         |   564 | staging.stg_firms
+ URY         |    18 | staging.stg_firms
+(3 rows)
+
+ paises_fuera_alcance 
+----------------------
+                    0
+(1 row)
+

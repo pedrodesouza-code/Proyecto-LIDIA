@@ -1,0 +1,111 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-proyecto_lidia}
+      POSTGRES_USER: ${POSTGRES_USER:-lidia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_lidia}
+      POSTGRES_ETL_PASSWORD: ${POSTGRES_PASSWORD:-local_lidia}
+      POSTGRES_DASHBOARD_PASSWORD: ${POSTGRES_PASSWORD:-local_lidia}
+    ports:
+      - "${POSTGRES_PORT:-15432}:5432"
+    volumes:
+      - lidia_postgres_data:/var/lib/postgresql/data
+      - ./docker/init_roles.sh:/docker-entrypoint-initdb.d/00_users.sh:ro
+      - ./sql/ddl/00_schemas.sql:/docker-entrypoint-initdb.d/01_schemas.sql:ro
+      - ./sql/ddl/01_roles.sql:/docker-entrypoint-initdb.d/02_roles.sql:ro
+      - ./sql/ddl/02_Schema.sql:/docker-entrypoint-initdb.d/03_schema.sql:ro
+      - ./sql/ddl/03_indices.sql:/docker-entrypoint-initdb.d/04_indices.sql:ro
+      - ./sql/ddl/04_vistas.sql:/docker-entrypoint-initdb.d/05_vistas.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lidia} -d ${POSTGRES_DB:-proyecto_lidia}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  mongo:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-lidia}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-local_lidia}
+      MONGO_INITDB_DATABASE: proyecto_lidia
+    ports:
+      - "${MONGO_PORT:-27027}:27017"
+    volumes:
+      - lidia_mongo_data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet --username ${MONGO_INITDB_ROOT_USERNAME:-lidia} --password ${MONGO_INITDB_ROOT_PASSWORD:-local_lidia} --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  etl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://lidia:local_lidia@postgres:5432/proyecto_lidia}
+      MONGO_URI: ${MONGO_URI:-mongodb://lidia:local_lidia@mongo:27017/proyecto_lidia?authSource=admin}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-proyecto_lidia}
+      LIDIA_POSTGRES_DB: ${POSTGRES_DB:-proyecto_lidia}
+      POSTGRES_USER: ${POSTGRES_USER:-lidia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_lidia}
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DB: proyecto_lidia
+      MONGO_USER: ${MONGO_INITDB_ROOT_USERNAME:-lidia}
+      MONGO_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-local_lidia}
+      MONGO_AUTH_SOURCE: admin
+      MONGO_ENABLED: "true"
+      PYTHONPATH: /app
+    command: ["python", "scripts/ec3_verificar_logrado.py"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://lidia:local_lidia@postgres:5432/proyecto_lidia}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-proyecto_lidia}
+      LIDIA_POSTGRES_DB: ${POSTGRES_DB:-proyecto_lidia}
+      POSTGRES_USER: ${POSTGRES_USER:-lidia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_lidia}
+      PYTHONPATH: /app
+    command:
+      [
+        "streamlit",
+        "run",
+        "dashboard/streamlit_app.py",
+        "--server.address=0.0.0.0",
+        "--server.port=8501"
+      ]
+    ports:
+      - "8501:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  lidia_postgres_data:
+  lidia_mongo_data:

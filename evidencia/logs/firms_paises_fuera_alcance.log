@@ -1,0 +1,11 @@
+{
+  "permitidos": [
+    "ARG",
+    "BRA",
+    "URY"
+  ],
+  "fuera_alcance": {
+    "CHL": 945
+  },
+  "nota": "CHL corresponde a Chile y se descarta porque no pertenece al alcance Proyecto LIDIA."
+}

@@ -17,6 +17,30 @@ def test_firms_completitud_duplicados_y_rangos():
     assert len({row["natural_key"] for row in accepted}) == 2
 
 
+def test_firms_descarta_chile_fuera_del_alcance():
+    raw = pd.DataFrame([
+        {"fecha_adq": "2026-05-11", "latitud": -32.0, "longitud": -56.0, "pais": "URY", "potencia_radiativa": 11.2},
+        {"fecha_adq": "2026-05-11", "latitud": -33.4, "longitud": -70.6, "pais": "CHL", "potencia_radiativa": 8.1},
+    ])
+    accepted, rejected = normalize("FIRMS", raw)
+    assert len(accepted) == 1
+    assert accepted[0]["pais_codigo"] == "URY"
+    assert len(rejected) == 1
+    assert rejected[0]["motivo"] == "pais fuera del alcance URY/ARG/BRA"
+
+
+def test_firms_solo_acepta_paises_del_alcance_lidia():
+    raw = pd.DataFrame([
+        {"fecha_adq": "2026-05-11", "latitud": -30.0, "longitud": -51.0, "pais": "BRA", "potencia_radiativa": 5.0},
+        {"fecha_adq": "2026-05-11", "latitud": -31.0, "longitud": -58.0, "pais": "ARG", "potencia_radiativa": 6.0},
+        {"fecha_adq": "2026-05-11", "latitud": -34.0, "longitud": -56.0, "pais": "URY", "potencia_radiativa": 7.0},
+        {"fecha_adq": "2026-05-11", "latitud": -25.0, "longitud": -57.0, "pais": "PRY", "potencia_radiativa": 8.0},
+    ])
+    accepted, rejected = normalize("FIRMS", raw)
+    assert {row["pais_codigo"] for row in accepted} == {"BRA", "ARG", "URY"}
+    assert len(rejected) == 1
+
+
 def test_inumet_restringido_a_uruguay():
     raw = pd.DataFrame([
         {"fecha": "2023-01-01", "estacion": "Carrasco", "pais": "URY", "temperatura_c": 20},

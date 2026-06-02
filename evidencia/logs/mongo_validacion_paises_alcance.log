@@ -1,0 +1,7 @@
+{
+  ingesta_metadata: 0,
+  raw_payloads: 0,
+  snapshots_firms: 0,
+  pipeline_logs: 0,
+  rechazos_etl: 0
+}

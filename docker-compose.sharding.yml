@@ -1,0 +1,52 @@
+services:
+  configsvr:
+    image: mongo:7
+    command: ["mongod", "--configsvr", "--replSet", "rs-config", "--bind_ip_all", "--port", "27017"]
+    volumes:
+      - lidia_configsvr_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  shard01:
+    image: mongo:7
+    command: ["mongod", "--shardsvr", "--replSet", "rs-shard-01", "--bind_ip_all", "--port", "27017"]
+    volumes:
+      - lidia_shard01_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  shard02:
+    image: mongo:7
+    command: ["mongod", "--shardsvr", "--replSet", "rs-shard-02", "--bind_ip_all", "--port", "27017"]
+    volumes:
+      - lidia_shard02_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  mongo:
+    image: mongo:7
+    command: ["mongos", "--configdb", "rs-config/configsvr:27017", "--bind_ip_all", "--port", "27017"]
+    depends_on:
+      configsvr:
+        condition: service_healthy
+      shard01:
+        condition: service_healthy
+      shard02:
+        condition: service_healthy
+
+volumes:
+  lidia_configsvr_data:
+  lidia_shard01_data:
+  lidia_shard02_data:
