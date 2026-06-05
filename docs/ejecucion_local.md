@@ -37,6 +37,16 @@ Cargar sin reset, usando upsert/idempotencia:
 bash scripts/local_load_all.sh
 ```
 
+Preparar INUMET local desde los CSV reales de temperatura y humedad:
+
+```bash
+python3 scripts/preparar_inumet_file_local.py
+```
+
+Ese comando genera `data/processed/inumet_procesado.parquet` y configura
+`INUMET_FILE`, `INUMET_TEMPERATURA_FILE` e `INUMET_HUMEDAD_FILE` en
+`config/.env` local.
+
 Validar estado:
 
 ```bash

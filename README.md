@@ -7,9 +7,10 @@ proyecto: **NASA FIRMS, Open-Meteo historico, CAMS/Open-Meteo Air Quality,
 CHIRPS, MODIS e INUMET**.
 
 No se versionan datasets crudos, shapefiles, parquets, claves ni contrasenas.
-La dimension de calidad del aire se mantiene nullable y preparada para
-CAMS/Open-Meteo Air Quality; no se inventan PM2.5 ni PM10 cuando no hay carga
-real validada. La base
+La dimension de calidad del aire integra CAMS/Open-Meteo Air Quality cuando
+existe archivo o API validada con PM2.5/PM10; sigue siendo nullable para los
+incendios sin dato ambiental cercano y no se inventan valores cuando no hay
+carga real disponible. La base
 PostgreSQL recomendada para una instalacion limpia es `proyecto_lidia`.
 En servidores que inyectan una base compartida, `LIDIA_POSTGRES_DB` selecciona
 explicitamente el Data Warehouse de este proyecto.
@@ -38,6 +39,9 @@ Las variables `*_FILE` apuntan a archivos locales CSV/Parquet de las fuentes
 reales. `METEO` es la etiqueta tecnica interna de Open-Meteo historico e
 `INUMET` se valida solo para Uruguay. En FIRMS, `brillo_termico`
 representa brillo termico satelital, nunca temperatura del aire.
+Para calidad del aire, `CAMS_FILE` o `AIR_QUALITY_FILE` apuntan a datos
+CAMS/Open-Meteo Air Quality procesados; el ETL normaliza `pm2_5`/`pm2_5_media`
+y `pm10`/`pm10_media`.
 
 ## Base De Datos
 
@@ -79,6 +83,22 @@ procesada quedan en `audit.etl_runs`.
 MongoDB complementa al DW con raw payloads por fuente, metadata de ejecucion,
 logs, rechazos y snapshots FIRMS. El contrato esta en `nosql/mongo_schema.json`; no
 reemplaza hechos ni dimensiones PostgreSQL.
+
+## Estado De Datos
+
+La carga reproducible local usa los archivos reales disponibles en
+`data/processed/`. En el estado local preparado se cargan FIRMS,
+METEO/Open-Meteo historico, CAMS/Open-Meteo Air Quality, CHIRPS, MODIS e
+INUMET. Para INUMET, los CSV reales de temperatura y humedad se unifican en
+`data/processed/inumet_procesado.parquet` mediante
+`scripts/preparar_inumet_file_local.py`, dejando `INUMET_FILE` configurado en
+`config/.env` local.
+
+En evidencia previa de Jupyter/UTEC se registraron las seis fuentes del
+proyecto: FIRMS, METEO/Open-Meteo historico, CAMS/Open-Meteo Air Quality,
+CHIRPS, MODIS e INUMET. Los conteos verificables estan en
+`evidencia/logs/metricas_carga_fuentes_final.md` y en los logs de carga local
+`evidencia/logs/carga_completa_postgres_conteos.log`.
 
 ## Tests Y Dashboard
 
@@ -143,6 +163,7 @@ criticas. PostGIS agrega geometria de FIRMS de forma opcional y separada.
 
 - Ejecutar DDL y ETL contra la instancia UTEC con variables locales validas.
 - Registrar conteos reales de una segunda corrida y capturas del dashboard.
-- Cargar calidad del aire CAMS/Open-Meteo Air Quality con archivo/API validado.
+- Mantener actualizados los CSV locales de INUMET si se agregan nuevas
+  observaciones fuera del entorno Jupyter/UTEC.
 - Validar con el equipo los umbrales documentados del enlace nearest neighbor:
   100 km para Open-Meteo historico, CHIRPS, MODIS y calidad del aire, y 150 km para INUMET.

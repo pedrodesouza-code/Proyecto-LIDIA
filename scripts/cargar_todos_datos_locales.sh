@@ -78,6 +78,7 @@ CAMS_FILE_PATH="$PROJECT_ROOT/data/processed/cams_procesado_todos.parquet"
 [[ -f "$CAMS_FILE_PATH" ]] || CAMS_FILE_PATH="$PROJECT_ROOT/data/processed/cams_nrt_procesado.parquet"
 CHIRPS_FILE_PATH="$PROJECT_ROOT/data/processed/chirps_sa.parquet"
 MODIS_FILE_PATH="$PROJECT_ROOT/data/processed/modis_lc.parquet"
+INUMET_FILE_PATH="$PROJECT_ROOT/data/processed/inumet_procesado.parquet"
 
 SOURCES_TO_LOAD=()
 if require_file "$FIRMS_FILE_PATH" "FIRMS"; then
@@ -101,7 +102,14 @@ if require_file "$MODIS_FILE_PATH" "MODIS"; then
   SOURCES_TO_LOAD+=("MODIS")
 fi
 
-if grep -q '^INUMET_FILE=' "$ENV_FILE" && [[ -n "$(grep '^INUMET_FILE=' "$ENV_FILE" | tail -1 | cut -d= -f2- | tr -d '"')" ]]; then
+if [[ ! -f "$INUMET_FILE_PATH" ]]; then
+  echo "[carga-completa] Intentando preparar INUMET desde CSV reales locales..."
+  python3 scripts/preparar_inumet_file_local.py --quiet || true
+fi
+if [[ -f "$INUMET_FILE_PATH" ]]; then
+  upsert_env INUMET_FILE "$INUMET_FILE_PATH"
+  SOURCES_TO_LOAD+=("INUMET")
+elif grep -q '^INUMET_FILE=' "$ENV_FILE" && [[ -n "$(grep '^INUMET_FILE=' "$ENV_FILE" | tail -1 | cut -d= -f2- | tr -d '"')" ]]; then
   SOURCES_TO_LOAD+=("INUMET")
 else
   echo "[carga-completa] INUMET omitido: no hay INUMET_FILE real configurado."
@@ -319,4 +327,4 @@ echo "- Log general: $LOG_FILE"
 echo "- Conteos PostgreSQL: evidencia/logs/carga_completa_postgres_conteos.log"
 echo "- Conteos MongoDB: evidencia/logs/carga_completa_mongo_conteos.log"
 echo "- Fuentes cargadas: ${SOURCES_TO_LOAD[*]}"
-echo "- INUMET queda omitido si no se configuro INUMET_FILE real."
+echo "- INUMET se carga si existe data/processed/inumet_procesado.parquet o si puede prepararse desde CSV reales locales."
