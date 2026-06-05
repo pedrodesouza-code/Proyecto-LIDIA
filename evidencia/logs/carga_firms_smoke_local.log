@@ -1,0 +1,10 @@
+{"countries": ["URY", "ARG", "BRA"], "end_date": "2026-05-31", "estado": "inicio", "etapa": "pipeline", "fuente": "FIRMS", "max_records_per_source": 1000, "nota": "carga solicitada", "skip_mongo": false, "smoke": false, "start_date": "2026-05-01", "timestamp": "2026-06-02T21:19:03.896825+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:03.896920+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:03.897302+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 838, "filas_leidas": 1000, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:03.916883+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 838, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:03.916966+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 838, "filas_rechazadas": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:04.025895+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 838, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:04.025979+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 838, "filas_rechazadas": 0, "filas_sin_cambio": 838, "fuente": "FIRMS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-02T21:19:04.270481+00:00"}
+{"duracion_segundos": 0.426, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 838, "filas_rechazadas": 0, "filas_sin_cambio": 838, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:04.322677+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:04.323203+00:00"}

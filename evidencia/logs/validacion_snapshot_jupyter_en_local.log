@@ -1,0 +1,278 @@
+=== FECHA ===
+vie 05 jun 2026 11:53:56 -03
+=== DOCKER PS ===
+NAME                                   IMAGE                                COMMAND                  SERVICE     CREATED        STATUS                    PORTS
+proyecto-lidia-ec3-pedro-etl-1         proyecto-lidia-ec3-pedro-etl         "python scripts/ec3_…"   etl         20 hours ago   Up 15 seconds             
+proyecto-lidia-ec3-pedro-mongo-1       mongo:7                              "docker-entrypoint.s…"   mongo       20 hours ago   Up 32 minutes (healthy)   0.0.0.0:27027->27017/tcp, [::]:27027->27017/tcp
+proyecto-lidia-ec3-pedro-postgres-1    postgres:16                          "docker-entrypoint.s…"   postgres    3 days ago     Up 32 minutes (healthy)   0.0.0.0:15432->5432/tcp, [::]:15432->5432/tcp
+proyecto-lidia-ec3-pedro-streamlit-1   proyecto-lidia-ec3-pedro-streamlit   "streamlit run dashb…"   streamlit   20 hours ago   Up 15 seconds             0.0.0.0:8501->8501/tcp, [::]:8501->8501/tcp
+=== POSTGRES FACT_INCENDIO ===
+ fact_incendio 
+---------------
+       2585805
+(1 row)
+
+=== VALIDACION LOCAL ===
+[local-validate] 2026-06-05T11:53:56-03:00
+[local-validate] Compose: docker compose --env-file .env.docker.example -f docker-compose.yml
+[local-validate] Estado Docker
+NAME                                   IMAGE                                COMMAND                  SERVICE     CREATED        STATUS                    PORTS
+proyecto-lidia-ec3-pedro-etl-1         proyecto-lidia-ec3-pedro-etl         "python scripts/ec3_…"   etl         20 hours ago   Up 15 seconds             
+proyecto-lidia-ec3-pedro-mongo-1       mongo:7                              "docker-entrypoint.s…"   mongo       20 hours ago   Up 32 minutes (healthy)   0.0.0.0:27027->27017/tcp, [::]:27027->27017/tcp
+proyecto-lidia-ec3-pedro-postgres-1    postgres:16                          "docker-entrypoint.s…"   postgres    3 days ago     Up 32 minutes (healthy)   0.0.0.0:15432->5432/tcp, [::]:15432->5432/tcp
+proyecto-lidia-ec3-pedro-streamlit-1   proyecto-lidia-ec3-pedro-streamlit   "streamlit run dashb…"   streamlit   20 hours ago   Up 15 seconds             0.0.0.0:8501->8501/tcp, [::]:8501->8501/tcp
+[local-validate] PostgreSQL: tablas, claves, conteos y reglas del dominio
+  metrica  | valor 
+-----------+-------
+ dw_tables |     8
+(1 row)
+
+ table_schema |          table_name           | total_tablas 
+--------------+-------------------------------+--------------
+ audit        | asociacion_espacial_runs      |           26
+ audit        | cdc_eventos                   |           26
+ audit        | etl_runs                      |           26
+ dw           | dim_calidad_aire              |           26
+ dw           | dim_clima                     |           26
+ dw           | dim_cobertura_vegetal         |           26
+ dw           | dim_estacion_meteorologica    |           26
+ dw           | dim_fecha                     |           26
+ dw           | dim_precipitacion             |           26
+ dw           | dim_ubicacion                 |           26
+ dw           | fact_incendio                 |           26
+ dw           | v_calidad_aire_alta_actividad |           26
+ dw           | v_calidad_pipeline            |           26
+ dw           | v_incendios_clima             |           26
+ dw           | v_incendios_cobertura         |           26
+ dw           | v_incendios_pais_periodo      |           26
+ dw           | v_incendios_precipitacion     |           26
+ dw           | v_incendios_region            |           26
+ dw           | v_resumen_calidad_pipeline    |           26
+ staging      | ingesta_metadata              |           26
+ staging      | rechazos_etl                  |           26
+ staging      | stg_calidad_aire              |           26
+ staging      | stg_chirps                    |           26
+ staging      | stg_firms                     |           26
+ staging      | stg_meteo                     |           26
+ staging      | stg_modis                     |           26
+(26 rows)
+
+ table_schema |         table_name         | constraint_type | cantidad 
+--------------+----------------------------+-----------------+----------
+ audit        | asociacion_espacial_runs   | CHECK           |       13
+ audit        | asociacion_espacial_runs   | PRIMARY KEY     |        1
+ audit        | cdc_eventos                | CHECK           |        8
+ audit        | cdc_eventos                | FOREIGN KEY     |        1
+ audit        | cdc_eventos                | PRIMARY KEY     |        1
+ audit        | etl_runs                   | CHECK           |       17
+ audit        | etl_runs                   | PRIMARY KEY     |        1
+ dw           | dim_calidad_aire           | CHECK           |        3
+ dw           | dim_calidad_aire           | FOREIGN KEY     |        2
+ dw           | dim_calidad_aire           | PRIMARY KEY     |        1
+ dw           | dim_calidad_aire           | UNIQUE          |        1
+ dw           | dim_clima                  | CHECK           |       10
+ dw           | dim_clima                  | FOREIGN KEY     |        3
+ dw           | dim_clima                  | PRIMARY KEY     |        1
+ dw           | dim_clima                  | UNIQUE          |        1
+ dw           | dim_cobertura_vegetal      | CHECK           |        6
+ dw           | dim_cobertura_vegetal      | FOREIGN KEY     |        1
+ dw           | dim_cobertura_vegetal      | PRIMARY KEY     |        1
+ dw           | dim_cobertura_vegetal      | UNIQUE          |        1
+ dw           | dim_estacion_meteorologica | CHECK           |       11
+ dw           | dim_estacion_meteorologica | PRIMARY KEY     |        1
+ dw           | dim_estacion_meteorologica | UNIQUE          |        1
+ dw           | dim_fecha                  | CHECK           |        7
+ dw           | dim_fecha                  | PRIMARY KEY     |        1
+ dw           | dim_fecha                  | UNIQUE          |        1
+ dw           | dim_precipitacion          | CHECK           |        6
+ dw           | dim_precipitacion          | FOREIGN KEY     |        2
+ dw           | dim_precipitacion          | PRIMARY KEY     |        1
+ dw           | dim_precipitacion          | UNIQUE          |        1
+ dw           | dim_ubicacion              | CHECK           |        8
+ dw           | dim_ubicacion              | PRIMARY KEY     |        1
+ dw           | dim_ubicacion              | UNIQUE          |        1
+ dw           | fact_incendio              | CHECK           |       10
+ dw           | fact_incendio              | FOREIGN KEY     |        6
+ dw           | fact_incendio              | PRIMARY KEY     |        1
+ dw           | fact_incendio              | UNIQUE          |        1
+ staging      | ingesta_metadata           | CHECK           |       15
+ staging      | ingesta_metadata           | PRIMARY KEY     |        1
+ staging      | ingesta_metadata           | UNIQUE          |        1
+ staging      | rechazos_etl               | CHECK           |        7
+ staging      | rechazos_etl               | PRIMARY KEY     |        1
+ staging      | stg_calidad_aire           | CHECK           |       13
+ staging      | stg_calidad_aire           | PRIMARY KEY     |        1
+ staging      | stg_calidad_aire           | UNIQUE          |        1
+ staging      | stg_chirps                 | CHECK           |       11
+ staging      | stg_chirps                 | PRIMARY KEY     |        1
+ staging      | stg_chirps                 | UNIQUE          |        1
+ staging      | stg_firms                  | CHECK           |       14
+ staging      | stg_firms                  | PRIMARY KEY     |        1
+ staging      | stg_firms                  | UNIQUE          |        1
+ staging      | stg_meteo                  | CHECK           |       15
+ staging      | stg_meteo                  | PRIMARY KEY     |        1
+ staging      | stg_meteo                  | UNIQUE          |        1
+ staging      | stg_modis                  | CHECK           |       10
+ staging      | stg_modis                  | PRIMARY KEY     |        1
+ staging      | stg_modis                  | UNIQUE          |        1
+(56 rows)
+
+          tabla           |  filas  
+--------------------------+---------
+ audit.cdc_eventos        |  378879
+ audit.etl_runs           |     167
+ dw.dim_calidad_aire      |   38626
+ dw.dim_clima             | 2398337
+ dw.dim_cobertura_vegetal |     181
+ dw.dim_precipitacion     |     702
+ dw.fact_incendio         | 2585805
+ staging.rechazos_etl     |   10104
+ staging.stg_calidad_aire |  927024
+ staging.stg_chirps       |     702
+ staging.stg_firms        | 2585805
+ staging.stg_meteo        | 2398337
+ staging.stg_modis        |     202
+(13 rows)
+
+ pais_codigo |  focos  
+-------------+---------
+ ARG         |  462017
+ BRA         | 2116305
+ URY         |    7483
+(3 rows)
+
+ hechos_fuera_alcance 
+----------------------
+                    0
+(1 row)
+
+ inumet_fuera_uruguay 
+----------------------
+                    0
+(1 row)
+
+ calidad_aire_sin_pm_valido 
+----------------------------
+                          0
+(1 row)
+
+ columnas_brightness_temperatura 
+---------------------------------
+                               0
+(1 row)
+
+ comentario_fact_incendio |                      comentario_brillo_termico                       
+--------------------------+----------------------------------------------------------------------
+                          | Brightness FIRMS: brillo termico satelital, no temperatura del aire.
+(1 row)
+
+[local-validate] MongoDB: colecciones y documentos
+{
+  database: 'proyecto_lidia',
+  collections_count: 5,
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 11,
+    pipeline_logs: 11,
+    raw_payloads: 1700,
+    rechazos_etl: 0,
+    snapshots_firms: 5
+  }
+}
+{
+  ingesta_metadata_sample: [
+    {
+      run_id: 'local-completa-CAMS',
+      fuente: 'CAMS',
+      estado: 'ok',
+      metricas: {
+        filas_leidas: 124395,
+        filas_insertadas: 30793,
+        filas_actualizadas: 0,
+        filas_rechazadas: 32016
+      },
+      modo: 'carga_completa_local',
+      registrado_en: ISODate('2026-06-05T00:41:25.660Z')
+    },
+    {
+      run_id: 'dc30099c-acf5-4c32-95ff-4ae0e527cc22',
+      fuente: 'FIRMS',
+      estado: 'ok',
+      metricas: {
+        leidas: 838,
+        insertadas: 0,
+        actualizadas: 0,
+        sin_cambio: 838,
+        rechazadas: 0,
+        run_id: 'dc30099c-acf5-4c32-95ff-4ae0e527cc22'
+      },
+      registrado_en: ISODate('2026-06-02T21:19:04.293Z')
+    },
+    {
+      run_id: '5ae04a8d-6fef-4df4-a202-017764081146',
+      fuente: 'FIRMS',
+      estado: 'ok',
+      metricas: {
+        leidas: 838,
+        insertadas: 0,
+        actualizadas: 838,
+        sin_cambio: 0,
+        rechazadas: 0,
+        run_id: '5ae04a8d-6fef-4df4-a202-017764081146'
+      },
+      registrado_en: ISODate('2026-06-02T21:18:48.547Z')
+    }
+  ],
+  snapshots_firms_sample: [
+    {
+      fecha: ISODate('2026-06-05T00:41:26.814Z'),
+      pais_codigo: 'ARG',
+      total_focos: 96232,
+      resumen: {
+        modo: 'carga_completa_local',
+        fuente: 'FIRMS',
+        frp_total_mw: 1126778.94,
+        frp_promedio_mw: 11.709,
+        brightness_descripcion: 'brillo_termico_pixel_satelital'
+      }
+    },
+    {
+      fecha: ISODate('2026-05-01T00:00:00.000Z'),
+      pais_codigo: 'ARG',
+      total_focos: 256,
+      resumen: {
+        fuente: 'FIRMS',
+        tipo: 'snapshot_derivado_postgresql_local',
+        rango_inicio: '2026-05-01',
+        rango_fin: '2026-05-31',
+        brightness_descripcion: 'brillo_termico_pixel_satelital'
+      }
+    },
+    {
+      fecha: ISODate('2025-01-01T00:00:00.000Z'),
+      pais_codigo: 'ARG',
+      total_focos: 0,
+      resumen: {
+        tipo: 'estructura_local_sin_carga_historica',
+        fuente: 'FIRMS',
+        nota: 'Conteo cero porque no se ejecuta carga historica local.'
+      }
+    }
+  ]
+}
+[local-validate] python3 -m compileall -q .
+[local-validate] python3 -m pytest -q tests
+......................                                                   [100%]
+22 passed in 1.17s
+[local-validate] Finalizado: 2026-06-05T11:54:04-03:00
+=== COMPILEALL ===
+compileall OK
+=== PYTEST ===
+......................                                                   [100%]
+22 passed in 0.61s

@@ -1,0 +1,18 @@
+{
+  "inicio": "2026-06-01T21:11:17.290369+00:00",
+  "umbral_km": 100.0,
+  "nota": "Reejecucion incremental sin reset tras habilitar calidad_aire en audit.asociacion_espacial_runs",
+  "antes": {
+    "total": 2585805,
+    "con_calidad": 20599
+  },
+  "despues": {
+    "total": 2585805,
+    "con_calidad": 20599
+  },
+  "asociacion_id": "bff8faec-b71a-491e-98e2-c39e5811af34",
+  "updates": 20599,
+  "distancia_maxima_km": 99.99902970487058,
+  "fin": "2026-06-01T21:17:02.475171+00:00",
+  "duracion_segundos": 345.18
+}

@@ -71,6 +71,8 @@ CREATE TABLE IF NOT EXISTS staging.stg_chirps (
     fecha DATE NOT NULL,
     pais_codigo CHAR(3) NOT NULL CHECK (pais_codigo IN ('URY','ARG','BRA')),
     ubicacion VARCHAR(100) NOT NULL,
+    latitud NUMERIC(9,6) CHECK (latitud BETWEEN -90 AND 90),
+    longitud NUMERIC(9,6) CHECK (longitud BETWEEN -180 AND 180),
     precipitacion_mm NUMERIC(10,3) NOT NULL CHECK (precipitacion_mm >= 0),
     raw_payload JSONB,
     cargado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -82,6 +84,8 @@ CREATE TABLE IF NOT EXISTS staging.stg_modis (
     anio SMALLINT NOT NULL CHECK (anio BETWEEN 2018 AND 2025),
     pais_codigo CHAR(3) NOT NULL CHECK (pais_codigo IN ('URY','ARG','BRA')),
     ubicacion VARCHAR(100) NOT NULL,
+    latitud NUMERIC(9,6) CHECK (latitud BETWEEN -90 AND 90),
+    longitud NUMERIC(9,6) CHECK (longitud BETWEEN -180 AND 180),
     codigo_cobertura INTEGER,
     descripcion_cobertura VARCHAR(120),
     raw_payload JSONB,

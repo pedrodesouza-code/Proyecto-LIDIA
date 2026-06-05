@@ -1,0 +1,79 @@
+ Image proyecto-lidia-ec3-pedro-etl Building 
+ Image proyecto-lidia-ec3-pedro-streamlit Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.09kB done
+#1 DONE 0.0s
+
+#2 [etl internal] load build definition from Dockerfile
+#2 transferring dockerfile: 329B done
+#2 DONE 0.0s
+
+#3 [streamlit internal] load metadata for docker.io/library/python:3.11-slim
+#3 DONE 21.9s
+
+#4 [streamlit internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [streamlit 1/4] FROM docker.io/library/python:3.11-slim@sha256:a3ab0b966bc4e91546a033e22093cb840908979487a9fc0e6e38295747e49ac0
+#5 resolve docker.io/library/python:3.11-slim@sha256:a3ab0b966bc4e91546a033e22093cb840908979487a9fc0e6e38295747e49ac0 0.0s done
+#5 DONE 0.0s
+
+#6 [etl internal] load build context
+#6 transferring context: 38B done
+#6 DONE 0.0s
+
+#7 [etl 2/4] WORKDIR /app
+#7 CACHED
+
+#8 [streamlit 3/4] COPY requirements.txt /tmp/requirements.txt
+#8 CACHED
+
+#9 [etl 4/4] RUN pip install --upgrade pip     && pip install -r /tmp/requirements.txt
+#9 1.510 Requirement already satisfied: pip in /usr/local/lib/python3.11/site-packages (24.0)
+#9 41.55 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e2ebd0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 82.08 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e2f750>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 123.1 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e78090>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 165.1 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e78910>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 209.2 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e79290>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 249.3 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#9 330.9 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ac51c10>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 371.5 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ac50250>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 412.5 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789aec3d90>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 454.5 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789adfe3d0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 498.6 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ae02490>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 538.6 ERROR: Could not find a version that satisfies the requirement pandas>=2.0.0 (from versions: none)
+#9 538.6 ERROR: No matching distribution found for pandas>=2.0.0
+#9 ERROR: process "/bin/sh -c pip install --upgrade pip     && pip install -r /tmp/requirements.txt" did not complete successfully: exit code: 1
+------
+ > [etl 4/4] RUN pip install --upgrade pip     && pip install -r /tmp/requirements.txt:
+165.1 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e78910>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+209.2 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e79290>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+249.3 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+330.9 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ac51c10>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+371.5 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ac50250>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+412.5 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789aec3d90>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+454.5 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789adfe3d0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+498.6 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ae02490>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+538.6 ERROR: Could not find a version that satisfies the requirement pandas>=2.0.0 (from versions: none)
+538.6 ERROR: No matching distribution found for pandas>=2.0.0
+------
+Dockerfile:10
+
+--------------------
+
+   9 |     COPY requirements.txt /tmp/requirements.txt
+
+  10 | >>> RUN pip install --upgrade pip \
+
+  11 | >>>     && pip install -r /tmp/requirements.txt
+
+  12 |     
+
+--------------------
+
+target etl: failed to solve: process "/bin/sh -c pip install --upgrade pip     && pip install -r /tmp/requirements.txt" did not complete successfully: exit code: 1
+
+[D8] Limitacion: el build de etl/streamlit fallo.
+[D8] Si aparecen errores Temporary failure in name resolution, es un problema de DNS/red de Docker hacia PyPI.
+[D8] PostgreSQL y MongoDB locales se validan igual con sus contenedores base.

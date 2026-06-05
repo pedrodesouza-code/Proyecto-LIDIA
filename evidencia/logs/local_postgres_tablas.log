@@ -1,0 +1,30 @@
+ table_schema |          table_name           
+--------------+-------------------------------
+ audit        | asociacion_espacial_runs
+ audit        | cdc_eventos
+ audit        | etl_runs
+ dw           | dim_calidad_aire
+ dw           | dim_clima
+ dw           | dim_cobertura_vegetal
+ dw           | dim_estacion_meteorologica
+ dw           | dim_fecha
+ dw           | dim_precipitacion
+ dw           | dim_ubicacion
+ dw           | fact_incendio
+ dw           | v_calidad_aire_alta_actividad
+ dw           | v_calidad_pipeline
+ dw           | v_incendios_clima
+ dw           | v_incendios_cobertura
+ dw           | v_incendios_pais_periodo
+ dw           | v_incendios_precipitacion
+ dw           | v_incendios_region
+ dw           | v_resumen_calidad_pipeline
+ staging      | ingesta_metadata
+ staging      | rechazos_etl
+ staging      | stg_calidad_aire
+ staging      | stg_chirps
+ staging      | stg_firms
+ staging      | stg_meteo
+ staging      | stg_modis
+(26 rows)
+

@@ -1,0 +1,11 @@
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "METEO", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:49:13.913898+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:13.913987+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:14.041095+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 88087, "filas_leidas": 88087, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:14.113582+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 88087, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:14.113717+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 67309, "filas_rechazadas": 20778, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:52.987004+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 88087, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:52.987160+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 88087, "filas_rechazadas": 20778, "filas_sin_cambio": 67309, "fuente": "METEO", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:50:27.115467+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "METEO", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:50:27.115646+00:00"}
+{"duracion_segundos": 73.202, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 88087, "filas_rechazadas": 20778, "filas_sin_cambio": 67309, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:50:27.115699+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:50:27.186855+00:00"}

@@ -1,0 +1,6 @@
+{"ts": "2026-06-02T13:43:53.621013+00:00", "message": "postgres_connected", "mode": "psycopg2"}
+{"ts": "2026-06-02T13:43:54.041653+00:00", "message": "mongo_pymongo_unavailable_or_failed", "error": "NotImplementedError: Database objects do not implement truth value testing or bool(). Please compare with None instead: database is not None"}
+{"ts": "2026-06-02T13:43:54.042387+00:00", "message": "run_cmd", "args": ["mongosh", "mongodb://grp03:***@10.200.245.40:27023/grp03db?authSource=grp03db", "--quiet", "--eval", "db.runCommand({ping:1}).ok"]}
+{"ts": "2026-06-02T13:44:13.335067+00:00", "message": "run_cmd", "args": ["python", "-m", "compileall", "-q", "."]}
+{"ts": "2026-06-02T13:44:13.387580+00:00", "message": "run_cmd", "args": ["python", "-m", "pytest", "-q", "tests"]}
+{"ts": "2026-06-02T13:44:58.598584+00:00", "message": "report_generated", "run_log": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T134353Z.log", "markdown": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md", "urgencies": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json"}

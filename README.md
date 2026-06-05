@@ -98,6 +98,23 @@ El servidor institucional debe usar servicios autorizados; este aporte no
 asume Docker ni sharding disponibles. El procedimiento de backup/recuperacion
 esta documentado en `docker/README.md`.
 
+## Ejecucion Local Equivalente A Jupyter
+
+El flujo operativo local esta documentado en `docs/ejecucion_local.md`.
+Comandos principales:
+
+```bash
+docker compose --env-file .env.docker.example up -d
+CONFIRM_RESET=1 bash scripts/local_reset_and_load.sh
+bash scripts/local_load_all.sh
+bash scripts/local_validate_state.sh
+bash scripts/export_state_from_jupyter.sh
+CONFIRM_RESTORE=1 bash scripts/import_state_to_local.sh
+```
+
+Para MongoDB shardeado local, usar el compose complementario y validar siempre
+contra el servicio `mongo` como router `mongos`, no contra los shards.
+
 ## 3.4 Procedimientos De Analisis De Datos
 
 La integracion parte de FIRMS como hecho central y enlaza dimensiones mediante

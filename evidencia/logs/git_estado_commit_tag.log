@@ -1,0 +1,99 @@
+=== BRANCH ===
+ec3-lidia-correccion-datos-pedro
+=== ESTADO ===
+ D data/processed/forecast_riesgo.parquet
+ M etl/extract/extract_cams.py
+ M etl/main.py
+ M etl/transform/normalize.py
+ M evidencia/logs/ec3_reporte_estado_actual.md
+ M evidencia/logs/ec3_resumen_urgencias.json
+ M evidencia/logs/local_db_resumen.md
+ M evidencia/logs/mongo_estado_post_carga.log
+ M evidencia/logs/postgres_conteos_post_carga.log
+ M evidencia/logs/postgres_validacion_paises_alcance.log
+ M evidencia/logs/validacion_final_entorno_local.log
+ M scripts/cargar_bases_local_docker.sh
+ M scripts/cargar_firms_smoke_local.sh
+ M sql/ddl/02_Schema.sql
+?? evidencia/logs/carga_cams_restante_31_puntos.txt
+?? evidencia/logs/carga_cams_retry_durazno.txt
+?? evidencia/logs/carga_completa_asociacion_ambiental.log
+?? evidencia/logs/carga_completa_cams.log
+?? evidencia/logs/carga_completa_chirps.log
+?? evidencia/logs/carga_completa_ddl.log
+?? evidencia/logs/carga_completa_firms.log
+?? evidencia/logs/carga_completa_local.log
+?? evidencia/logs/carga_completa_meteo.log
+?? evidencia/logs/carga_completa_modis.log
+?? evidencia/logs/carga_completa_mongo_conteos.log
+?? evidencia/logs/carga_completa_postgres_conteos.log
+?? evidencia/logs/carga_completa_pytest.log
+?? evidencia/logs/carga_firms_smoke_local.log
+?? evidencia/logs/carga_firms_validaciones.log
+?? evidencia/logs/carga_modis_arg_bra_zenodo.txt
+?? evidencia/logs/cdc_validacion_local.log
+?? evidencia/logs/compileall_ok.log
+?? evidencia/logs/d8_docker_build.log
+?? evidencia/logs/d8_docker_compose_config.log
+?? evidencia/logs/d8_docker_compose_ps.log
+?? evidencia/logs/d8_docker_compose_up.log
+?? evidencia/logs/d8_docker_ddl_check.log
+?? evidencia/logs/d8_docker_mongo_check.log
+?? evidencia/logs/d8_docker_postgres_check.log
+?? evidencia/logs/d8_generar_evidencia_docker_terminal.log
+?? evidencia/logs/docker_estado_final.log
+?? evidencia/logs/ec3_preparar_datos_locales.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T134320Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T134353Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T134525Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T134733Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T191928Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T192634Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T195240Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T204507Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T211851Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T211907Z.log
+?? evidencia/logs/ec3_verificacion_logrado_20260602T211909Z.log
+?? evidencia/logs/ec3_verificar_logrado_terminal.log
+?? evidencia/logs/estructura_repositorio.log
+?? evidencia/logs/git_estado_commit_tag.log
+?? evidencia/logs/idempotencia_firms_smoke.log
+?? evidencia/logs/local_db_compose_up.log
+?? evidencia/logs/local_mongo_carga.log
+?? evidencia/logs/local_postgres_ddl.log
+?? evidencia/logs/local_postgres_tablas.log
+?? evidencia/logs/metricas_modis_dashboard_final.json
+?? evidencia/logs/metricas_modis_dashboard_final.md
+?? evidencia/logs/pytest_tests.log
+?? evidencia/logs/recalculo_asociacion_calidad_aire_post_cams.txt
+?? evidencia/logs/recalculo_asociacion_cobertura_post_modis_arg_bra.txt
+?? scripts/cargar_todos_datos_locales.sh
+?? scripts/ec3_preparar_datos_locales.sh
+?? scripts/ec3_validar_cdc_local.sh
+=== ÚLTIMOS COMMITS ===
+* fdec33d (HEAD -> ec3-lidia-correccion-datos-pedro) Avanza EC3 con Docker local, ETL FIRMS y validaciones
+* bac1801 EC3: actualizar ETL, CDC, evidencias y carga METEO final
+*   9c8349e Resuelve conflictos del PR fuentes oficiales LIDIA
+|\  
+| * 211624c (origin/main) Update utec.env.example
+| *   9c282af Merge pull request #4 from RafaelQuintanilla/ec3-lidia-correccion-datos-pedro
+| |\  
+| | *   f3cbf2f Merge branch 'main' into ec3-lidia-correccion-datos-pedro
+| | |\  
+| | |/  
+| |/|   
+| * |   892651e Merge pull request #3 from RafaelQuintanilla/ec3-lidia-correccion-modelo
+| |\ \  
+| | * | 408c33a Agrega evidencia de commit EC3
+| | * | 38951d0 Corrige implementación EC3 Proyecto LIDIA
+| |/ /  
+* | | 2f50d80 (backup/antes-resolver-conflictos-pr) Corrige fuentes oficiales y restaura calidad del aire LIDIA
+* | | 2fbf9a1 Refuerza evidencia NoSQL EC3
+| |/  
+|/|   
+* | 129305d Agrega evidencia formal de cumplimiento EC3
+* | 070122a Agrega carga real integrada y asociacion espacial LIDIA
+* | 686869b Corrige implementación Agregacion de datos
+|/  
+* d7eb588 (main, backup/antes-limpieza-total-ec3) EC3 Pedro: actualizar aporte completo
+=== TAGS ===

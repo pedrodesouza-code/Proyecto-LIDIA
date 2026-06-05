@@ -106,7 +106,7 @@ def run_source(source: str, options: RunOptions | None = None) -> dict:
         result = load_staging(source, accepted, rejected, promote=not options.smoke)
         evento(logger, fuente=source, etapa="load", estado="ok", filas_leidas=len(frame),
                filas_insertadas=result["insertadas"], filas_actualizadas=result["actualizadas"],
-               filas_rechazadas=result["rechazadas"], smoke=options.smoke,
+               filas_sin_cambio=result.get("sin_cambio", 0), filas_rechazadas=result["rechazadas"], smoke=options.smoke,
                promocion_dw=not options.smoke)
         if MONGO_ENABLED and not options.skip_mongo:
             configure_collections()
@@ -116,7 +116,7 @@ def run_source(source: str, options: RunOptions | None = None) -> dict:
         evento(logger, fuente=source, etapa="pipeline", estado="ok", filas_leidas=len(frame),
                filas_cargadas=result["insertadas"] + result["actualizadas"],
                filas_insertadas=result["insertadas"], filas_actualizadas=result["actualizadas"],
-               filas_rechazadas=result["rechazadas"], duracion_segundos=round(time.perf_counter() - started, 3),
+               filas_sin_cambio=result.get("sin_cambio", 0), filas_rechazadas=result["rechazadas"], duracion_segundos=round(time.perf_counter() - started, 3),
                smoke=options.smoke)
         return result
     except FileNotFoundError as exc:

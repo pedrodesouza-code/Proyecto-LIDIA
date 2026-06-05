@@ -133,7 +133,11 @@ def extract(path=None) -> pd.DataFrame:
     para dejar la dimension preparada sin inventar datos.
     """
     try:
-        return read_source("CAMS", path)
+        frame = read_source("CAMS", path)
+        pm_columns = [column for column in ("pm25", "pm2_5", "pm2_5_media", "pm10", "pm10_media") if column in frame.columns]
+        if pm_columns:
+            return frame.loc[frame[pm_columns].notna().any(axis=1)].reset_index(drop=True)
+        return frame
     except FileNotFoundError:
         if _api_enabled():
             return _extract_api()

@@ -1,9 +1,12 @@
  pais_codigo | filas |      origen       
 -------------+-------+-------------------
+ ARG         |   256 | dw.fact_incendio
+ BRA         |   564 | dw.fact_incendio
+ URY         |    18 | dw.fact_incendio
  ARG         |   256 | staging.stg_firms
  BRA         |   564 | staging.stg_firms
  URY         |    18 | staging.stg_firms
-(3 rows)
+(6 rows)
 
  paises_fuera_alcance 
 ----------------------

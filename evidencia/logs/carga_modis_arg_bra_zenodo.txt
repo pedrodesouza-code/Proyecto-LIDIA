@@ -1,0 +1,7 @@
+{"ts": "2026-06-01T21:40:53.528094+00:00", "msg": "uruguay_lc_type1_preparado", "filas": 133, "anios": [2018, 2019, 2020, 2021, 2022, 2023, 2024]}
+{"ts": "2026-06-01T21:41:03.169885+00:00", "msg": "zenodo_anio_muestreado", "anio": 2018, "filas": 12, "url": "https://zenodo.org/api/records/8338928/files/lc_mcd12q1v061.t1_c_500m_s_20180101_20181231_go_epsg.4326_v20230818.tif/content"}
+{"ts": "2026-06-01T21:41:11.142629+00:00", "msg": "zenodo_anio_muestreado", "anio": 2019, "filas": 12, "url": "https://zenodo.org/api/records/8338928/files/lc_mcd12q1v061.t1_c_500m_s_20190101_20191231_go_epsg.4326_v20230818.tif/content"}
+{"ts": "2026-06-01T21:41:17.176795+00:00", "msg": "zenodo_anio_muestreado", "anio": 2020, "filas": 12, "url": "https://zenodo.org/api/records/8338928/files/lc_mcd12q1v061.t1_c_500m_s_20200101_20201231_go_epsg.4326_v20230818.tif/content"}
+{"ts": "2026-06-01T21:41:22.466411+00:00", "msg": "zenodo_anio_muestreado", "anio": 2021, "filas": 12, "url": "https://zenodo.org/api/records/8338928/files/lc_mcd12q1v061.t1_c_500m_s_20210101_20211231_go_epsg.4326_v20230818.tif/content"}
+{"ts": "2026-06-01T21:41:22.498054+00:00", "msg": "csv_generado", "path": "/home/pepo/Datos completos/MODIS/modis_lc_type1_lidia_ury_arg_bra.csv", "filas": 181, "arg_bra": "/home/pepo/Datos completos/MODIS/modis_arg_bra_2018_2021_zenodo.csv", "filas_arg_bra": 48}
+{"ts": "2026-06-01T21:41:39.590299+00:00", "msg": "postgres_modis_recargado", "filas": 181, "promoted": 181, "run_id": "30bf2123-7f12-44fc-8b29-53c72afabb74"}

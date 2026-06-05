@@ -1,0 +1,169 @@
+name: proyecto-lidia-ec3-pedro
+services:
+  etl:
+    build:
+      context: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+      dockerfile: Dockerfile
+    command:
+      - python
+      - scripts/ec3_verificar_logrado.py
+    depends_on:
+      mongo:
+        condition: service_healthy
+        required: true
+      postgres:
+        condition: service_healthy
+        required: true
+    environment:
+      DATABASE_URL: postgresql://lidia:***@postgres:5432/proyecto_lidia
+      LIDIA_POSTGRES_DB: proyecto_lidia
+      MONGO_AUTH_SOURCE: admin
+      MONGO_DB: proyecto_lidia
+      MONGO_ENABLED: "true"
+      MONGO_HOST: mongo
+      MONGO_PASSWORD: ***
+      MONGO_PORT: "27017"
+      MONGO_URI: mongodb://lidia:***@mongo:27017/proyecto_lidia?authSource=admin
+      MONGO_USER: lidia
+      POSTGRES_DB: proyecto_lidia
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: ***
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: lidia
+      PYTHONPATH: /app
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+        target: /app
+        bind: {}
+    working_dir: /app
+  mongo:
+    environment:
+      MONGO_INITDB_DATABASE: proyecto_lidia
+      MONGO_INITDB_ROOT_PASSWORD: ***
+      MONGO_INITDB_ROOT_USERNAME: lidia
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'mongosh --quiet --username lidia --password *** --authenticationDatabase admin --eval ''db.adminCommand({ ping: 1 }).ok'' | grep 1'
+      timeout: 5s
+      interval: 10s
+      retries: 10
+      start_period: 20s
+    image: mongo:7
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 27017
+        published: "27027"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: lidia_mongo_data
+        target: /data/db
+        volume: {}
+  postgres:
+    environment:
+      POSTGRES_DASHBOARD_PASSWORD: ***
+      POSTGRES_DB: proyecto_lidia
+      POSTGRES_ETL_PASSWORD: ***
+      POSTGRES_PASSWORD: ***
+      POSTGRES_USER: lidia
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U lidia -d proyecto_lidia
+      timeout: 5s
+      interval: 10s
+      retries: 10
+      start_period: 20s
+    image: postgres:16
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "15432"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: lidia_postgres_data
+        target: /var/lib/postgresql/data
+        volume: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/docker/init_roles.sh
+        target: /docker-entrypoint-initdb.d/00_users.sh
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/00_schemas.sql
+        target: /docker-entrypoint-initdb.d/01_schemas.sql
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/01_roles.sql
+        target: /docker-entrypoint-initdb.d/02_roles.sql
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/02_Schema.sql
+        target: /docker-entrypoint-initdb.d/03_schema.sql
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/03_indices.sql
+        target: /docker-entrypoint-initdb.d/04_indices.sql
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/04_vistas.sql
+        target: /docker-entrypoint-initdb.d/05_vistas.sql
+        read_only: true
+        bind: {}
+  streamlit:
+    build:
+      context: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+      dockerfile: Dockerfile
+    command:
+      - streamlit
+      - run
+      - dashboard/streamlit_app.py
+      - --server.address=0.0.0.0
+      - --server.port=8501
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: true
+    environment:
+      DATABASE_URL: postgresql://lidia:***@postgres:5432/proyecto_lidia
+      LIDIA_POSTGRES_DB: proyecto_lidia
+      POSTGRES_DB: proyecto_lidia
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: ***
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: lidia
+      PYTHONPATH: /app
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8501
+        published: "8501"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+        target: /app
+        bind: {}
+    working_dir: /app
+networks:
+  default:
+    name: proyecto-lidia-ec3-pedro_default
+volumes:
+  lidia_mongo_data:
+    name: proyecto-lidia-ec3-pedro_lidia_mongo_data
+  lidia_postgres_data:
+    name: proyecto-lidia-ec3-pedro_lidia_postgres_data

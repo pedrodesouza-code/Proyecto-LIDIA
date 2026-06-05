@@ -1,0 +1,305 @@
+Generando evidencia D8 Docker con .env.docker.example (valores sensibles ocultos).
+[D8] 1/7 Validando docker-compose.yml...
+name: proyecto-lidia-ec3-pedro
+services:
+  etl:
+    build:
+      context: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+      dockerfile: Dockerfile
+    command:
+      - python
+      - scripts/ec3_verificar_logrado.py
+    depends_on:
+      mongo:
+        condition: service_healthy
+        required: true
+      postgres:
+        condition: service_healthy
+        required: true
+    environment:
+      DATABASE_URL: postgresql://lidia:***@postgres:5432/proyecto_lidia
+      LIDIA_POSTGRES_DB: proyecto_lidia
+      MONGO_AUTH_SOURCE: admin
+      MONGO_DB: proyecto_lidia
+      MONGO_ENABLED: "true"
+      MONGO_HOST: mongo
+      MONGO_PASSWORD: ***
+      MONGO_PORT: "27017"
+      MONGO_URI: mongodb://lidia:***@mongo:27017/proyecto_lidia?authSource=admin
+      MONGO_USER: lidia
+      POSTGRES_DB: proyecto_lidia
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: ***
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: lidia
+      PYTHONPATH: /app
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+        target: /app
+        bind: {}
+    working_dir: /app
+  mongo:
+    environment:
+      MONGO_INITDB_DATABASE: proyecto_lidia
+      MONGO_INITDB_ROOT_PASSWORD: ***
+      MONGO_INITDB_ROOT_USERNAME: lidia
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'mongosh --quiet --username lidia --password *** --authenticationDatabase admin --eval ''db.adminCommand({ ping: 1 }).ok'' | grep 1'
+      timeout: 5s
+      interval: 10s
+      retries: 10
+      start_period: 20s
+    image: mongo:7
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 27017
+        published: "27027"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: lidia_mongo_data
+        target: /data/db
+        volume: {}
+  postgres:
+    environment:
+      POSTGRES_DASHBOARD_PASSWORD: ***
+      POSTGRES_DB: proyecto_lidia
+      POSTGRES_ETL_PASSWORD: ***
+      POSTGRES_PASSWORD: ***
+      POSTGRES_USER: lidia
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U lidia -d proyecto_lidia
+      timeout: 5s
+      interval: 10s
+      retries: 10
+      start_period: 20s
+    image: postgres:16
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "15432"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: lidia_postgres_data
+        target: /var/lib/postgresql/data
+        volume: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/docker/init_roles.sh
+        target: /docker-entrypoint-initdb.d/00_users.sh
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/00_schemas.sql
+        target: /docker-entrypoint-initdb.d/01_schemas.sql
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/01_roles.sql
+        target: /docker-entrypoint-initdb.d/02_roles.sql
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/02_Schema.sql
+        target: /docker-entrypoint-initdb.d/03_schema.sql
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/03_indices.sql
+        target: /docker-entrypoint-initdb.d/04_indices.sql
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/sql/ddl/04_vistas.sql
+        target: /docker-entrypoint-initdb.d/05_vistas.sql
+        read_only: true
+        bind: {}
+  streamlit:
+    build:
+      context: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+      dockerfile: Dockerfile
+    command:
+      - streamlit
+      - run
+      - dashboard/streamlit_app.py
+      - --server.address=0.0.0.0
+      - --server.port=8501
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: true
+    environment:
+      DATABASE_URL: postgresql://lidia:***@postgres:5432/proyecto_lidia
+      LIDIA_POSTGRES_DB: proyecto_lidia
+      POSTGRES_DB: proyecto_lidia
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: ***
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: lidia
+      PYTHONPATH: /app
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8501
+        published: "8501"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+        target: /app
+        bind: {}
+    working_dir: /app
+networks:
+  default:
+    name: proyecto-lidia-ec3-pedro_default
+volumes:
+  lidia_mongo_data:
+    name: proyecto-lidia-ec3-pedro_lidia_mongo_data
+  lidia_postgres_data:
+    name: proyecto-lidia-ec3-pedro_lidia_postgres_data
+[D8] 2/7 Levantando PostgreSQL y MongoDB locales. La primera vez puede tardar por descarga de imagenes...
+ Container proyecto-lidia-ec3-pedro-mongo-1 Running 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Running 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Healthy 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Healthy 
+[D8] 3/7 Construyendo imagen Python para ETL/Streamlit. La primera vez puede tardar instalando requirements...
+ Image proyecto-lidia-ec3-pedro-etl Building 
+ Image proyecto-lidia-ec3-pedro-streamlit Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.09kB done
+#1 DONE 0.0s
+
+#2 [etl internal] load build definition from Dockerfile
+#2 transferring dockerfile: 329B done
+#2 DONE 0.0s
+
+#3 [streamlit internal] load metadata for docker.io/library/python:3.11-slim
+#3 DONE 21.9s
+
+#4 [streamlit internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [streamlit 1/4] FROM docker.io/library/python:3.11-slim@sha256:a3ab0b966bc4e91546a033e22093cb840908979487a9fc0e6e38295747e49ac0
+#5 resolve docker.io/library/python:3.11-slim@sha256:a3ab0b966bc4e91546a033e22093cb840908979487a9fc0e6e38295747e49ac0 0.0s done
+#5 DONE 0.0s
+
+#6 [etl internal] load build context
+#6 transferring context: 38B done
+#6 DONE 0.0s
+
+#7 [etl 2/4] WORKDIR /app
+#7 CACHED
+
+#8 [streamlit 3/4] COPY requirements.txt /tmp/requirements.txt
+#8 CACHED
+
+#9 [etl 4/4] RUN pip install --upgrade pip     && pip install -r /tmp/requirements.txt
+#9 1.510 Requirement already satisfied: pip in /usr/local/lib/python3.11/site-packages (24.0)
+#9 41.55 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e2ebd0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 82.08 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e2f750>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 123.1 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e78090>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 165.1 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e78910>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 209.2 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e79290>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+#9 249.3 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#9 330.9 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ac51c10>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 371.5 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ac50250>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 412.5 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789aec3d90>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 454.5 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789adfe3d0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 498.6 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ae02490>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+#9 538.6 ERROR: Could not find a version that satisfies the requirement pandas>=2.0.0 (from versions: none)
+#9 538.6 ERROR: No matching distribution found for pandas>=2.0.0
+#9 ERROR: process "/bin/sh -c pip install --upgrade pip     && pip install -r /tmp/requirements.txt" did not complete successfully: exit code: 1
+------
+ > [etl 4/4] RUN pip install --upgrade pip     && pip install -r /tmp/requirements.txt:
+165.1 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e78910>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+209.2 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fb757e79290>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pip/
+249.3 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+330.9 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ac51c10>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+371.5 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ac50250>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+412.5 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789aec3d90>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+454.5 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789adfe3d0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+498.6 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f789ae02490>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/pandas/
+538.6 ERROR: Could not find a version that satisfies the requirement pandas>=2.0.0 (from versions: none)
+538.6 ERROR: No matching distribution found for pandas>=2.0.0
+------
+Dockerfile:10
+
+--------------------
+
+   9 |     COPY requirements.txt /tmp/requirements.txt
+
+  10 | >>> RUN pip install --upgrade pip \
+
+  11 | >>>     && pip install -r /tmp/requirements.txt
+
+  12 |     
+
+--------------------
+
+target etl: failed to solve: process "/bin/sh -c pip install --upgrade pip     && pip install -r /tmp/requirements.txt" did not complete successfully: exit code: 1
+
+[D8] Limitacion: el build de etl/streamlit fallo.
+[D8] Si aparecen errores Temporary failure in name resolution, es un problema de DNS/red de Docker hacia PyPI.
+[D8] PostgreSQL y MongoDB locales se validan igual con sus contenedores base.
+[D8] 4/7 Registrando estado de servicios...
+NAME                                  IMAGE         COMMAND                  SERVICE    CREATED       STATUS                 PORTS
+proyecto-lidia-ec3-pedro-mongo-1      mongo:7       "docker-entrypoint.s…"   mongo      2 hours ago   Up 2 hours (healthy)   0.0.0.0:27027->27017/tcp, [::]:27027->27017/tcp
+proyecto-lidia-ec3-pedro-postgres-1   postgres:16   "docker-entrypoint.s…"   postgres   6 hours ago   Up 5 hours (healthy)   0.0.0.0:15432->5432/tcp, [::]:15432->5432/tcp
+[D8] 5/7 Ejecutando DDL base en PostgreSQL local desde contenedor ETL...
+DDL no ejecutado desde ETL porque la imagen Python no pudo construirse.
+Se valida PostgreSQL local con pg_isready/psql desde el contenedor postgres.
+[D8] 6/7 Probando conexion PostgreSQL desde contenedor ETL...
+    database    | usuario 
+----------------+---------
+ proyecto_lidia | lidia
+(1 row)
+
+[D8] 7/7 Probando conexion MongoDB desde contenedor ETL...
+{
+  mongo_ping: 1,
+  database: 'test',
+  desde: 'mongo'
+}
+# D8 Docker/despliegue - Resumen
+
+Generado con: `.env.docker.example`.
+
+## Servicios esperados
+
+- postgres: presente
+- mongo: presente
+- etl: presente
+- streamlit: presente
+
+## Evidencias
+
+- `evidencia/logs/d8_docker_compose_config.log`: configuración Docker Compose con credenciales ocultas.
+- `evidencia/logs/d8_docker_compose_up.log`: arranque local de PostgreSQL y MongoDB.
+- `evidencia/logs/d8_docker_build.log`: construcción de imagen Python para ETL/Streamlit.
+- `evidencia/logs/d8_docker_compose_ps.log`: estado de servicios.
+- `evidencia/logs/d8_docker_ddl_check.log`: ejecución de DDL base en PostgreSQL local.
+- `evidencia/logs/d8_docker_postgres_check.log`: conexión PostgreSQL desde contenedor ETL.
+- `evidencia/logs/d8_docker_mongo_check.log`: conexión MongoDB desde contenedor ETL.
+
+## Alcance
+
+Entorno local reproducible. No usa credenciales reales de UTEC ni se conecta a bases institucionales.
+No ejecuta carga histórica completa.
+
+Estado build ETL/Streamlit: PARCIAL por problema de DNS/red de Docker hacia PyPI. PostgreSQL y MongoDB locales fueron validados con contenedores base.
+[D8] Evidencia Docker finalizada.

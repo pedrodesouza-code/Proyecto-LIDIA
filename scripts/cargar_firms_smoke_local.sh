@@ -215,16 +215,14 @@ fi
 echo "[LOCAL-DB] Preparando DDL PostgreSQL y colecciones Mongo locales..."
 bash scripts/cargar_bases_local_docker.sh
 
-echo "[ETL] Ejecutando carga smoke FIRMS para URY/ARG/BRA entre ${START_DATE} y ${END_DATE}..."
+echo "[ETL] Ejecutando carga controlada FIRMS para URY/ARG/BRA entre ${START_DATE} y ${END_DATE}..."
 {
   python3 -u etl/main.py \
     --source FIRMS \
-    --smoke \
     --start-date "$START_DATE" \
     --end-date "$END_DATE" \
     --countries URY ARG BRA \
-    --max-records-per-source 1000 \
-    --skip-mongo
+    --max-records-per-source 1000
 } 2>&1 | tee "$LOAD_LOG"
 
 python3 - <<'PY' "$LOAD_LOG"
@@ -235,6 +233,7 @@ from pathlib import Path
 
 text = Path(sys.argv[1]).read_text(encoding="utf-8", errors="ignore")
 loaded = 0
+unchanged = 0
 for line in text.splitlines():
     try:
         event = json.loads(line)
@@ -242,9 +241,10 @@ for line in text.splitlines():
         continue
     if event.get("fuente") == "FIRMS" and event.get("etapa") == "load" and event.get("estado") == "ok":
         loaded = int(event.get("filas_insertadas") or 0) + int(event.get("filas_actualizadas") or 0)
-if loaded <= 0:
-    raise SystemExit("La carga FIRMS no puede declararse exitosa: filas insertadas/actualizadas = 0")
-print({"filas_cargadas_o_actualizadas": loaded})
+        unchanged = int(event.get("filas_sin_cambio") or event.get("sin_cambio") or 0)
+if loaded <= 0 and unchanged <= 0:
+    raise SystemExit("La carga FIRMS no puede declararse exitosa: filas insertadas/actualizadas/sin_cambio = 0")
+print({"filas_cargadas_o_actualizadas": loaded, "filas_sin_cambio": unchanged})
 PY
 
 echo "[POSTGRES] Guardando conteos post carga..."
@@ -279,6 +279,38 @@ fi
 
 echo "[MONGO] Guardando estado post carga..."
 if [[ "$MONGO_STATUS" == "ok" ]]; then
+  echo "[MONGO] Creando snapshots FIRMS derivados de PostgreSQL local..."
+  while IFS='|' read -r pais total; do
+    [[ -z "${pais}" || -z "${total}" ]] && continue
+    docker compose --env-file "$DOCKER_ENV" exec -T mongo mongosh -u "$MONGO_USER" -p "$MONGO_PASSWORD" \
+      --authenticationDatabase admin proyecto_lidia --eval "
+        db.snapshots_firms.replaceOne(
+          {fecha: new Date('${START_DATE}T00:00:00Z'), pais_codigo: '${pais}'},
+          {
+            fecha: new Date('${START_DATE}T00:00:00Z'),
+            pais_codigo: '${pais}',
+            total_focos: NumberInt(${total}),
+            resumen: {
+              fuente: 'FIRMS',
+              tipo: 'snapshot_derivado_postgresql_local',
+              rango_inicio: '${START_DATE}',
+              rango_fin: '${END_DATE}',
+              brightness_descripcion: 'brillo_termico_pixel_satelital'
+            }
+          },
+          {upsert: true}
+        )
+      " >/dev/null
+  done < <(
+    docker compose --env-file "$DOCKER_ENV" exec -T postgres psql -U lidia -d proyecto_lidia -At -F '|' -c "
+      SELECT pais_codigo, COUNT(*)::int
+      FROM staging.stg_firms
+      WHERE pais_codigo IN ('URY','ARG','BRA')
+      GROUP BY pais_codigo
+      ORDER BY pais_codigo;
+    "
+  )
+
   docker compose --env-file "$DOCKER_ENV" exec -T mongo mongosh -u "$MONGO_USER" -p "$MONGO_PASSWORD" \
     --authenticationDatabase admin proyecto_lidia --eval '
       printjson({

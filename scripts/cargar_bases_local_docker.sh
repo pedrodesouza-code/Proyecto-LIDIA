@@ -29,6 +29,8 @@ MONGO_USER="${MONGO_INITDB_ROOT_USERNAME:-lidia}"
 MONGO_PASSWORD="${MONGO_INITDB_ROOT_PASSWORD:-local_lidia}"
 
 COMPOSE=(docker compose --env-file "${ENV_FILE}" -f docker-compose.yml)
+export PAGER=cat
+export PSQL_PAGER=cat
 
 mask() {
   sed -E \
@@ -42,6 +44,7 @@ mask() {
 echo "[local-db] Levantando PostgreSQL y MongoDB locales..."
 "${COMPOSE[@]}" up -d --wait postgres mongo --remove-orphans 2>&1 | mask | tee "${LOG_DIR}/local_db_compose_up.log"
 
+if [[ "${LIDIA_LOCAL_DB_SKIP_DDL:-0}" != "1" ]]; then
 echo "[local-db] Ejecutando DDL PostgreSQL local..."
 {
   for sql_file in \
@@ -54,6 +57,7 @@ echo "[local-db] Ejecutando DDL PostgreSQL local..."
     echo "== ${sql_file} =="
     "${COMPOSE[@]}" exec -T postgres psql \
       -v ON_ERROR_STOP=1 \
+      -P pager=off \
       -U "${POSTGRES_USER}" \
       -d "${POSTGRES_DB}" \
       < "${sql_file}" 2>&1
@@ -62,6 +66,7 @@ echo "[local-db] Ejecutando DDL PostgreSQL local..."
 
 echo "[local-db] Validando tablas PostgreSQL locales..."
 "${COMPOSE[@]}" exec -T postgres psql \
+  -P pager=off \
   -U "${POSTGRES_USER}" \
   -d "${POSTGRES_DB}" \
   -c "
@@ -70,16 +75,17 @@ FROM information_schema.tables
 WHERE table_schema IN ('staging','dw','audit')
 ORDER BY table_schema, table_name;
 " 2>&1 | mask | tee "${LOG_DIR}/local_postgres_tablas.log"
+else
+  echo "[local-db] DDL PostgreSQL omitido por LIDIA_LOCAL_DB_SKIP_DDL=1."
+fi
 
-echo "[local-db] Creando colecciones MongoDB locales con validadores y documentos minimos de evidencia..."
+echo "[local-db] Creando colecciones MongoDB locales con validadores..."
+echo "[local-db] Si este paso demora, se esta aplicando collMod/createCollection en MongoDB local."
 "${COMPOSE[@]}" exec -T mongo mongosh --quiet \
   --username "${MONGO_USER}" \
   --password "${MONGO_PASSWORD}" \
   --authenticationDatabase admin \
   proyecto_lidia <<'JS' 2>&1 | mask | tee "evidencia/logs/local_mongo_carga.log"
-const now = new Date();
-const runId = "local-d8-" + now.toISOString();
-
 function ensureCollection(name, validator) {
   const exists = db.getCollectionNames().includes(name);
   if (!exists) {
@@ -159,66 +165,6 @@ ensureCollection("snapshots_firms", {
   }
 });
 
-db.ingesta_metadata.replaceOne(
-  { run_id: runId, fuente: "FIRMS" },
-  {
-    run_id: runId,
-    fuente: "FIRMS",
-    estado: "ok",
-    metricas: {
-      tipo: "evidencia_local_docker",
-      filas_reales_cargadas: 0,
-      nota: "Documento operativo local; no representa carga historica real."
-    },
-    registrado_en: now
-  },
-  { upsert: true }
-);
-
-db.pipeline_logs.replaceOne(
-  { run_id: runId, fuente: "FIRMS", mensaje: "Carga local Docker PostgreSQL/Mongo validada" },
-  {
-    run_id: runId,
-    fuente: "FIRMS",
-    estado: "ok",
-    mensaje: "Carga local Docker PostgreSQL/Mongo validada",
-    registrado_en: now
-  },
-  { upsert: true }
-);
-
-db.raw_payloads.replaceOne(
-  { run_id: runId, fuente: "FIRMS" },
-  {
-    run_id: runId,
-    fuente: "FIRMS",
-    payload: {
-      tipo: "snapshot_controlado_local",
-      brightness_descripcion: "brillo_termico_pixel_satelital",
-      paises_alcance: ["URY", "ARG", "BRA"]
-    },
-    registrado_en: now
-  },
-  { upsert: true }
-);
-
-for (const pais of ["URY", "ARG", "BRA"]) {
-  db.snapshots_firms.replaceOne(
-    { fecha: new Date("2025-01-01T00:00:00Z"), pais_codigo: pais },
-    {
-      fecha: new Date("2025-01-01T00:00:00Z"),
-      pais_codigo: pais,
-      total_focos: NumberInt(0),
-      resumen: {
-        tipo: "estructura_local_sin_carga_historica",
-        fuente: "FIRMS",
-        nota: "Conteo cero porque no se ejecuta carga historica local."
-      }
-    },
-    { upsert: true }
-  );
-}
-
 printjson({
   database: db.getName(),
   collections: db.getCollectionNames().sort(),
@@ -237,7 +183,7 @@ echo "[local-db] Resumen final local..."
   echo "# Carga Local PostgreSQL/Mongo - Proyecto LIDIA"
   echo
   echo "- PostgreSQL local: DDL ejecutado para esquemas staging, dw y audit."
-  echo "- MongoDB local: colecciones documentales creadas con validadores."
+  echo "- MongoDB local: colecciones documentales creadas con validadores, sin documentos sinteticos."
   echo "- No se ejecutó carga histórica completa."
   echo "- No se usaron credenciales reales de UTEC."
   echo "- MongoDB sigue siendo complemento documental; PostgreSQL es el DW principal."

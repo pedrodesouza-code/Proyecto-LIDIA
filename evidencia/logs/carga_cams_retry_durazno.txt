@@ -1,0 +1,9 @@
+{"ts": "2026-06-01T21:01:16.075476+00:00", "msg": "anio_ok", "anio": 2018, "leidas": 8760, "acumuladas": 0, "sin_pm": 8760}
+{"ts": "2026-06-01T21:01:17.532593+00:00", "msg": "anio_ok", "anio": 2019, "leidas": 8760, "acumuladas": 0, "sin_pm": 17520}
+{"ts": "2026-06-01T21:01:19.072304+00:00", "msg": "anio_ok", "anio": 2020, "leidas": 8784, "acumuladas": 0, "sin_pm": 26304}
+{"ts": "2026-06-01T21:01:20.711847+00:00", "msg": "anio_ok", "anio": 2021, "leidas": 8760, "acumuladas": 0, "sin_pm": 35064}
+{"ts": "2026-06-01T21:01:22.169788+00:00", "msg": "anio_ok", "anio": 2022, "leidas": 8760, "acumuladas": 3600, "sin_pm": 40224}
+{"ts": "2026-06-01T21:01:23.846614+00:00", "msg": "anio_ok", "anio": 2023, "leidas": 8760, "acumuladas": 12360, "sin_pm": 40224}
+{"ts": "2026-06-01T21:01:25.571307+00:00", "msg": "anio_ok", "anio": 2024, "leidas": 8784, "acumuladas": 21144, "sin_pm": 40224}
+{"ts": "2026-06-01T21:01:27.334573+00:00", "msg": "anio_ok", "anio": 2025, "leidas": 8760, "acumuladas": 29904, "sin_pm": 40224}
+{"ts": "2026-06-01T21:03:41.815966+00:00", "msg": "durazno_retry_ok", "leidas": 70128, "insertadas": 29904, "sin_pm": 40224, "rechazadas": 0, "promoted_rowcount": 38626, "run_id": "9eb37c16-8bbd-4eab-abda-f9c7be70de8e"}

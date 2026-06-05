@@ -1,7 +1,7 @@
 # Carga Local PostgreSQL/Mongo - Proyecto LIDIA
 
 - PostgreSQL local: DDL ejecutado para esquemas staging, dw y audit.
-- MongoDB local: colecciones documentales creadas con validadores.
+- MongoDB local: colecciones documentales creadas con validadores, sin documentos sinteticos.
 - No se ejecutó carga histórica completa.
 - No se usaron credenciales reales de UTEC.
 - MongoDB sigue siendo complemento documental; PostgreSQL es el DW principal.

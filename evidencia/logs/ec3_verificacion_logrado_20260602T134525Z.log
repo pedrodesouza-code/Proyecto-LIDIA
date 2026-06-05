@@ -1,0 +1,5 @@
+{"ts": "2026-06-02T13:45:25.528525+00:00", "message": "postgres_connected", "mode": "psycopg2"}
+{"ts": "2026-06-02T13:45:25.797823+00:00", "message": "mongo_connected", "mode": "pymongo", "database": "grp03db"}
+{"ts": "2026-06-02T13:45:44.187809+00:00", "message": "run_cmd", "args": ["python", "-m", "compileall", "-q", "."]}
+{"ts": "2026-06-02T13:45:44.283758+00:00", "message": "run_cmd", "args": ["python", "-m", "pytest", "-q", "tests"]}
+{"ts": "2026-06-02T13:46:29.884433+00:00", "message": "report_generated", "run_log": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T134525Z.log", "markdown": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md", "urgencies": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json"}

@@ -1,0 +1,2 @@
+DDL no ejecutado desde ETL porque la imagen Python no pudo construirse.
+Se valida PostgreSQL local con pg_isready/psql desde el contenedor postgres.

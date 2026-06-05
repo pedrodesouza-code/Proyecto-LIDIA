@@ -29,3 +29,11 @@ docker/.env
 **/.ipynb_checkpoints/
 .env.docker
 data/raw/
+backups/
+
+# Backups y snapshots de bases
+backups/
+*.dump
+*.sql.gz
+*.archive
+*.tar.gz

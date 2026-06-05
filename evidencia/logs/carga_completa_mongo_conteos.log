@@ -1,0 +1,46 @@
+{
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 11,
+    pipeline_logs: 11,
+    raw_payloads: 1700,
+    rechazos_etl: 0,
+    snapshots_firms: 5
+  }
+}
+[
+  {
+    run_id: 'local-completa-CAMS',
+    fuente: 'CAMS',
+    estado: 'ok',
+    metricas: {
+      filas_leidas: 124395,
+      filas_insertadas: 30793,
+      filas_actualizadas: 0,
+      filas_rechazadas: 32016
+    },
+    modo: 'carga_completa_local',
+    registrado_en: ISODate('2026-06-05T00:41:25.660Z')
+  }
+]
+[
+  {
+    fecha: ISODate('2026-06-05T00:41:26.814Z'),
+    pais_codigo: 'ARG',
+    total_focos: 96232,
+    resumen: {
+      modo: 'carga_completa_local',
+      fuente: 'FIRMS',
+      frp_total_mw: 1126778.94,
+      frp_promedio_mw: 11.709,
+      brightness_descripcion: 'brillo_termico_pixel_satelital'
+    }
+  }
+]

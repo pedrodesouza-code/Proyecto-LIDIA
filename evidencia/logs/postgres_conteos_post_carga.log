@@ -2,8 +2,8 @@
 ----------------------+-------
  staging.stg_firms    |   838
  staging.rechazos_etl |     0
- audit.etl_runs       |     3
- audit.cdc_eventos    |   856
- dw.fact_incendio     |     0
+ audit.etl_runs       |     9
+ audit.cdc_eventos    |  5884
+ dw.fact_incendio     |   838
 (5 rows)
 

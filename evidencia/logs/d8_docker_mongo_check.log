@@ -1,0 +1,5 @@
+{
+  mongo_ping: 1,
+  database: 'test',
+  desde: 'mongo'
+}

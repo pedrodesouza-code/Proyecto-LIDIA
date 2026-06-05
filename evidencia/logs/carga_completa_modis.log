@@ -1,0 +1,11 @@
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "MODIS", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:51:04.895911+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.896010+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.896522+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 63, "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.916028+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.916230+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 63, "filas_rechazadas": 0, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.928076+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.928154+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 63, "filas_rechazadas": 0, "filas_sin_cambio": 63, "fuente": "MODIS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:51:04.962266+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "MODIS", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:51:04.962360+00:00"}
+{"duracion_segundos": 0.066, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 63, "filas_rechazadas": 0, "filas_sin_cambio": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.962433+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.962522+00:00"}

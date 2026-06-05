@@ -1,0 +1,11 @@
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "CHIRPS", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:51:03.553620+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.553714+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.554279+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 2262, "filas_leidas": 2886, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.572161+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 2262, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.572373+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 2262, "filas_rechazadas": 0, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.817695+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 2262, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.817775+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 2262, "filas_rechazadas": 0, "filas_sin_cambio": 2262, "fuente": "CHIRPS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:51:04.391237+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "CHIRPS", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:51:04.391368+00:00"}
+{"duracion_segundos": 0.838, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 2262, "filas_rechazadas": 0, "filas_sin_cambio": 2262, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:04.391430+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:04.392195+00:00"}

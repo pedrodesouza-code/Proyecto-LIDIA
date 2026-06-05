@@ -8,10 +8,10 @@
     'snapshots_firms'
   ],
   counts: {
-    ingesta_metadata: 4,
-    pipeline_logs: 4,
-    raw_payloads: 20,
+    ingesta_metadata: 10,
+    pipeline_logs: 10,
+    raw_payloads: 1700,
     rechazos_etl: 0,
-    snapshots_firms: 3
+    snapshots_firms: 4
   }
 }

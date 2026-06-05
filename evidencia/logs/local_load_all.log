@@ -1,0 +1,296 @@
+[local-load] 2026-06-04T20:35:10-03:00
+[local-load] Comando: bash scripts/local_load_all.sh
+[carga-completa] INUMET omitido: no hay INUMET_FILE real configurado.
+[carga-completa] Fuentes a cargar: FIRMS METEO CAMS CHIRPS MODIS
+[carga-completa] Nota: CHL/Chile queda fuera del alcance y sera rechazado/descartado por restricciones URY/ARG/BRA.
+[carga-completa] Levantando PostgreSQL y MongoDB locales...
+ Container proyecto-lidia-ec3-pedro-postgres-1 Starting 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Starting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Started 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Started 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Healthy 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Healthy 
+[carga-completa] Sin reset: se preservan datos existentes y se aplican cargas idempotentes.
+[carga-completa] Para borrar y reconstruir desde cero use CONFIRM_RESET=1.
+[carga-completa] Recreando estructuras SQL/NoSQL locales...
+== sql/ddl/00_schemas.sql ==
+NOTICE:  schema "staging" already exists, skipping
+NOTICE:  schema "dw" already exists, skipping
+CREATE SCHEMA
+CREATE SCHEMA
+NOTICE:  schema "audit" already exists, skipping
+CREATE SCHEMA
+== sql/ddl/01_roles.sql ==
+DO
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+== sql/ddl/02_Schema.sql ==
+NOTICE:  relation "ingesta_metadata" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "rechazos_etl" already exists, skipping
+NOTICE:  relation "stg_firms" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_meteo" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_chirps" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_modis" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_calidad_aire" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_fecha" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "dim_ubicacion" already exists, skipping
+NOTICE:  relation "dim_estacion_meteorologica" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_clima" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_precipitacion" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_cobertura_vegetal" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_calidad_aire" already exists, skipping
+CREATE TABLE
+COMMENT
+NOTICE:  relation "fact_incendio" already exists, skipping
+CREATE TABLE
+COMMENT
+NOTICE:  relation "etl_runs" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "cdc_eventos" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "asociacion_espacial_runs" already exists, skipping
+CREATE FUNCTION
+== sql/ddl/03_indices.sql ==
+CREATE INDEX
+NOTICE:  relation "idx_fact_fecha" already exists, skipping
+NOTICE:  relation "idx_fact_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_fact_enriquecimiento" already exists, skipping
+NOTICE:  relation "idx_fact_frp" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fecha_anio_mes" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais_coordenadas" already exists, skipping
+NOTICE:  relation "idx_clima_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_fecha_fuente_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_ubicacion_instante" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_fecha_ubicacion" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_cobertura_ubicacion_anio" already exists, skipping
+NOTICE:  relation "idx_cobertura_anio_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_calidad_aire_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_etl_fuente_inicio" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_cdc_run_tipo" already exists, skipping
+CREATE INDEX
+== sql/ddl/04_vistas.sql ==
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+GRANT
+[carga-completa] Creando colecciones MongoDB locales...
+[local-db] Levantando PostgreSQL y MongoDB locales...
+[local-db] DDL PostgreSQL omitido por LIDIA_LOCAL_DB_SKIP_DDL=1.
+[local-db] Creando colecciones MongoDB locales con validadores...
+[local-db] Si este paso demora, se esta aplicando collMod/createCollection en MongoDB local.
+  database: 'proyecto_lidia',
+  collections: [
+  counts: {
+proyecto_lidia> [local-db] Resumen final local...
+[local-db] Listo.
+
+[carga-completa] Cargando fuente real FIRMS...
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "FIRMS", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:35:19.643556+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-04T23:35:19.643643+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-04T23:35:19.644261+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 1836537, "filas_leidas": 1946361, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-04T23:35:20.863546+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 1836537, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-04T23:35:20.863721+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 1836537, "filas_rechazadas": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-04T23:39:11.120275+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 1836537, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-04T23:39:11.136580+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 1836537, "filas_rechazadas": 0, "filas_sin_cambio": 1836537, "fuente": "FIRMS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:49:05.589719+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "FIRMS", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:49:05.608489+00:00"}
+{"duracion_segundos": 825.965, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 1836537, "filas_rechazadas": 0, "filas_sin_cambio": 1836537, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-04T23:49:05.608876+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-04T23:49:12.171398+00:00"}
+
+[carga-completa] Cargando fuente real METEO...
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "METEO", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:49:13.913898+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:13.913987+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:14.041095+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 88087, "filas_leidas": 88087, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:14.113582+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 88087, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:14.113717+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 67309, "filas_rechazadas": 20778, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:52.987004+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 88087, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:49:52.987160+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 88087, "filas_rechazadas": 20778, "filas_sin_cambio": 67309, "fuente": "METEO", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:50:27.115467+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "METEO", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:50:27.115646+00:00"}
+{"duracion_segundos": 73.202, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 88087, "filas_rechazadas": 20778, "filas_sin_cambio": 67309, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:50:27.115699+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "METEO", "smoke": false, "timestamp": "2026-06-04T23:50:27.186855+00:00"}
+
+[carga-completa] Cargando fuente real CAMS...
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "CAMS", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:50:27.963333+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:27.963438+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:28.027587+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 41465, "filas_leidas": 41465, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:28.062745+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 41465, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:28.062845+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 30793, "filas_rechazadas": 10672, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:47.499422+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 41465, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:47.499521+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 41465, "filas_rechazadas": 10672, "filas_sin_cambio": 30793, "fuente": "CAMS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:51:03.016449+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "CAMS", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:51:03.016597+00:00"}
+{"duracion_segundos": 35.053, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 41465, "filas_rechazadas": 10672, "filas_sin_cambio": 30793, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:51:03.016689+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:51:03.036099+00:00"}
+
+[carga-completa] Cargando fuente real CHIRPS...
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "CHIRPS", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:51:03.553620+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.553714+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.554279+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 2262, "filas_leidas": 2886, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.572161+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 2262, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.572373+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 2262, "filas_rechazadas": 0, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.817695+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 2262, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:03.817775+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 2262, "filas_rechazadas": 0, "filas_sin_cambio": 2262, "fuente": "CHIRPS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:51:04.391237+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "CHIRPS", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:51:04.391368+00:00"}
+{"duracion_segundos": 0.838, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 2262, "filas_rechazadas": 0, "filas_sin_cambio": 2262, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:04.391430+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-04T23:51:04.392195+00:00"}
+
+[carga-completa] Cargando fuente real MODIS...
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "MODIS", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:51:04.895911+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.896010+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.896522+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 63, "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.916028+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.916230+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 63, "filas_rechazadas": 0, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.928076+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.928154+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 63, "filas_rechazadas": 0, "filas_sin_cambio": 63, "fuente": "MODIS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:51:04.962266+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "MODIS", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:51:04.962360+00:00"}
+{"duracion_segundos": 0.066, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 63, "filas_rechazadas": 0, "filas_sin_cambio": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.962433+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-04T23:51:04.962522+00:00"}
+[carga-completa] Asociando dimensiones ambientales por proximidad espacial/temporal si hay datos...
+{'asociacion_id': 'b8634018-0e1b-4890-b7ad-669ab02ce37a', 'duracion_segundos': 3019.43, 'metricas': {'clima': {'total_hechos': 1836537, 'asociados': 39128, 'sin_asociar': 1797409, 'umbral_km': 150.0, 'distancia_maxima_km': 99.9995427508918, 'updates': 39128}, 'precipitacion': {'total_hechos': 1836537, 'asociados': 5017, 'sin_asociar': 1831520, 'umbral_km': 100.0, 'distancia_maxima_km': 99.96969451678898, 'updates': 5017}, 'cobertura': {'total_hechos': 1836537, 'asociados': 36585, 'sin_asociar': 1799952, 'umbral_km': 100.0, 'distancia_maxima_km': 99.9995427508918, 'updates': 36585}}}
+[carga-completa] Insertando metadata y snapshots reales en MongoDB local...
+{ acknowledged: true, deletedCount: 1 }
+[carga-completa] Validando conteos finales PostgreSQL...
+          tabla           |  filas  
+--------------------------+---------
+ dw.dim_cobertura_vegetal |      63
+ staging.stg_modis        |      63
+ dw.dim_precipitacion     |    2262
+ staging.stg_chirps       |    2262
+ dw.dim_calidad_aire      |   30793
+ staging.stg_calidad_aire |   30793
+ dw.dim_clima             |   67309
+ staging.stg_meteo        |   67309
+ dw.fact_incendio         | 1836537
+ staging.stg_firms        | 1836537
+(10 rows)
+
+ pais_codigo |  focos  
+-------------+---------
+ ARG         |   96232
+ BRA         | 1737010
+ URY         |    3295
+(3 rows)
+
+ paises_fuera_alcance_staging_firms 
+------------------------------------
+                                  0
+(1 row)
+
+ fuente | rechazos 
+--------+----------
+ CAMS   |    32016
+ METEO  |    62334
+(2 rows)
+
+[carga-completa] Validando MongoDB local...
+{
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 11,
+    pipeline_logs: 11,
+    raw_payloads: 1700,
+    rechazos_etl: 0,
+    snapshots_firms: 5
+  }
+}
+[
+  {
+    run_id: 'local-completa-CAMS',
+    fuente: 'CAMS',
+    estado: 'ok',
+    metricas: {
+      filas_leidas: 124395,
+      filas_insertadas: 30793,
+      filas_actualizadas: 0,
+      filas_rechazadas: 32016
+    },
+    modo: 'carga_completa_local',
+    registrado_en: ISODate('2026-06-05T00:41:25.660Z')
+  }
+]
+[
+  {
+    fecha: ISODate('2026-06-05T00:41:26.814Z'),
+    pais_codigo: 'ARG',
+    total_focos: 96232,
+    resumen: {
+      modo: 'carga_completa_local',
+      fuente: 'FIRMS',
+      frp_total_mw: 1126778.94,
+      frp_promedio_mw: 11.709,
+      brightness_descripcion: 'brillo_termico_pixel_satelital'
+    }
+  }
+]
+[carga-completa] Ejecutando compileall y pytest...
+......................                                                   [100%]
+22 passed in 0.68s
+
+# Carga completa local finalizada
+- Log general: evidencia/logs/carga_completa_local.log
+- Conteos PostgreSQL: evidencia/logs/carga_completa_postgres_conteos.log
+- Conteos MongoDB: evidencia/logs/carga_completa_mongo_conteos.log
+- Fuentes cargadas: FIRMS METEO CAMS CHIRPS MODIS
+- INUMET queda omitido si no se configuro INUMET_FILE real.
+[local-load] Finalizado: 2026-06-04T21:41:31-03:00

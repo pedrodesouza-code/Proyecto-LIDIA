@@ -1,0 +1,993 @@
+[EC3-local] Proyecto: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro
+[EC3-local] Levantando PostgreSQL y MongoDB locales...
+ Container proyecto-lidia-ec3-pedro-postgres-1 Running 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Running 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Healthy 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Healthy 
+[EC3-local] Estado Docker:
+NAME                                  IMAGE         COMMAND                  SERVICE    CREATED       STATUS                 PORTS
+proyecto-lidia-ec3-pedro-mongo-1      mongo:7       "docker-entrypoint.s…"   mongo      2 hours ago   Up 2 hours (healthy)   0.0.0.0:27027->27017/tcp, [::]:27027->27017/tcp
+proyecto-lidia-ec3-pedro-postgres-1   postgres:16   "docker-entrypoint.s…"   postgres   6 hours ago   Up 5 hours (healthy)   0.0.0.0:15432->5432/tcp, [::]:15432->5432/tcp
+[EC3-local] Preparando estructuras PostgreSQL/MongoDB...
+[local-db] Levantando PostgreSQL y MongoDB locales...
+ Container proyecto-lidia-ec3-pedro-postgres-1 Running 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Running 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Healthy 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Healthy 
+[local-db] Ejecutando DDL PostgreSQL local...
+== sql/ddl/00_schemas.sql ==
+CREATE SCHEMA
+NOTICE:  schema "staging" already exists, skipping
+NOTICE:  schema "dw" already exists, skipping
+CREATE SCHEMA
+CREATE SCHEMA
+NOTICE:  schema "audit" already exists, skipping
+== sql/ddl/01_roles.sql ==
+DO
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+== sql/ddl/02_Schema.sql ==
+NOTICE:  relation "ingesta_metadata" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "rechazos_etl" already exists, skipping
+NOTICE:  relation "stg_firms" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_meteo" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "stg_chirps" already exists, skipping
+NOTICE:  relation "stg_modis" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_calidad_aire" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_fecha" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_ubicacion" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_estacion_meteorologica" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_clima" already exists, skipping
+NOTICE:  relation "dim_precipitacion" already exists, skipping
+NOTICE:  relation "dim_cobertura_vegetal" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "dim_calidad_aire" already exists, skipping
+COMMENT
+CREATE TABLE
+NOTICE:  relation "fact_incendio" already exists, skipping
+COMMENT
+NOTICE:  relation "etl_runs" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "cdc_eventos" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "asociacion_espacial_runs" already exists, skipping
+CREATE TABLE
+CREATE FUNCTION
+== sql/ddl/03_indices.sql ==
+NOTICE:  relation "idx_fact_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fact_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fact_enriquecimiento" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fact_frp" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fecha_anio_mes" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais_coordenadas" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_fecha_fuente_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_ubicacion_instante" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_ubicacion_fecha" already exists, skipping
+NOTICE:  relation "idx_precipitacion_fecha_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_cobertura_ubicacion_anio" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_cobertura_anio_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_calidad_aire_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_etl_fuente_inicio" already exists, skipping
+NOTICE:  relation "idx_cdc_run_tipo" already exists, skipping
+CREATE INDEX
+== sql/ddl/04_vistas.sql ==
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+GRANT
+[local-db] Validando tablas PostgreSQL locales...
+ table_schema |          table_name           
+--------------+-------------------------------
+ audit        | asociacion_espacial_runs
+ audit        | cdc_eventos
+ audit        | etl_runs
+ dw           | dim_calidad_aire
+ dw           | dim_clima
+ dw           | dim_cobertura_vegetal
+ dw           | dim_estacion_meteorologica
+ dw           | dim_fecha
+ dw           | dim_precipitacion
+ dw           | dim_ubicacion
+ dw           | fact_incendio
+ dw           | v_calidad_aire_alta_actividad
+ dw           | v_calidad_pipeline
+ dw           | v_incendios_clima
+ dw           | v_incendios_cobertura
+ dw           | v_incendios_pais_periodo
+ dw           | v_incendios_precipitacion
+ dw           | v_incendios_region
+ dw           | v_resumen_calidad_pipeline
+ staging      | ingesta_metadata
+ staging      | rechazos_etl
+ staging      | stg_calidad_aire
+ staging      | stg_chirps
+ staging      | stg_firms
+ staging      | stg_meteo
+ staging      | stg_modis
+(26 rows)
+
+[local-db] Creando colecciones MongoDB locales con validadores...
+proyecto_lidia> | | | | | | | [Function: ensureCollection]
+proyecto_lidia> 
+proyecto_lidia> 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | {
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 8,
+    rechazos_etl: 0,
+    raw_payloads: 24,
+    pipeline_logs: 8,
+    snapshots_firms: 3
+  }
+}
+
+proyecto_lidia> [local-db] Resumen final local...
+# Carga Local PostgreSQL/Mongo - Proyecto LIDIA
+
+- PostgreSQL local: DDL ejecutado para esquemas staging, dw y audit.
+- MongoDB local: colecciones documentales creadas con validadores, sin documentos sinteticos.
+- No se ejecutó carga histórica completa.
+- No se usaron credenciales reales de UTEC.
+- MongoDB sigue siendo complemento documental; PostgreSQL es el DW principal.
+
+Logs:
+- evidencia/logs/local_db_compose_up.log
+- evidencia/logs/local_postgres_ddl.log
+- evidencia/logs/local_postgres_tablas.log
+- evidencia/logs/local_mongo_carga.log
+[local-db] Listo.
+[EC3-local] Carga FIRMS real controlada - corrida 1...
+[FIRMS] Buscando archivo FIRMS Parquet/CSV dentro del proyecto...
+[FIRMS] Archivo seleccionado: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet
+[FIRMS] FIRMS_FILE actualizado en config/.env
+{'FIRMS_FILE': '/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet', 'exists': True}
+[FIRMS] Perfilando dataset origen...
+{"start_date": "2026-05-01", "end_date": "2026-05-31", "out_of_scope": {"CHL": 945}}
+[DOCKER] Levantando PostgreSQL y MongoDB locales...
+ Container proyecto-lidia-ec3-pedro-mongo-1 Running 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Running 
+[POSTGRES] Validando conexión local localhost:15432...
+ current_database | current_user 
+------------------+--------------
+ proyecto_lidia   | lidia
+(1 row)
+
+[MONGO] Esperando y validando conexión local localhost:27027...
+{ ok: 1 }
+[LOCAL-DB] Preparando DDL PostgreSQL y colecciones Mongo locales...
+[local-db] Levantando PostgreSQL y MongoDB locales...
+ Container proyecto-lidia-ec3-pedro-mongo-1 Running 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Running 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Healthy 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Healthy 
+[local-db] Ejecutando DDL PostgreSQL local...
+== sql/ddl/00_schemas.sql ==
+CREATE SCHEMA
+NOTICE:  schema "staging" already exists, skipping
+CREATE SCHEMA
+NOTICE:  schema "dw" already exists, skipping
+NOTICE:  schema "audit" already exists, skipping
+CREATE SCHEMA
+== sql/ddl/01_roles.sql ==
+DO
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+== sql/ddl/02_Schema.sql ==
+CREATE TABLE
+NOTICE:  relation "ingesta_metadata" already exists, skipping
+NOTICE:  relation "rechazos_etl" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_firms" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "stg_meteo" already exists, skipping
+NOTICE:  relation "stg_chirps" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_modis" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_calidad_aire" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "dim_fecha" already exists, skipping
+NOTICE:  relation "dim_ubicacion" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "dim_estacion_meteorologica" already exists, skipping
+NOTICE:  relation "dim_clima" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_precipitacion" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_cobertura_vegetal" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_calidad_aire" already exists, skipping
+CREATE TABLE
+COMMENT
+NOTICE:  relation "fact_incendio" already exists, skipping
+CREATE TABLE
+COMMENT
+NOTICE:  relation "etl_runs" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "cdc_eventos" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "asociacion_espacial_runs" already exists, skipping
+CREATE TABLE
+CREATE FUNCTION
+== sql/ddl/03_indices.sql ==
+CREATE INDEX
+NOTICE:  relation "idx_fact_fecha" already exists, skipping
+NOTICE:  relation "idx_fact_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fact_enriquecimiento" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_fact_frp" already exists, skipping
+NOTICE:  relation "idx_fecha_anio_mes" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais_coordenadas" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_fecha_fuente_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_ubicacion_instante" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_fecha_ubicacion" already exists, skipping
+NOTICE:  relation "idx_cobertura_ubicacion_anio" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_cobertura_anio_ubicacion" already exists, skipping
+NOTICE:  relation "idx_calidad_aire_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_etl_fuente_inicio" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_cdc_run_tipo" already exists, skipping
+CREATE INDEX
+== sql/ddl/04_vistas.sql ==
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+GRANT
+[local-db] Validando tablas PostgreSQL locales...
+ table_schema |          table_name           
+--------------+-------------------------------
+ audit        | asociacion_espacial_runs
+ audit        | cdc_eventos
+ audit        | etl_runs
+ dw           | dim_calidad_aire
+ dw           | dim_clima
+ dw           | dim_cobertura_vegetal
+ dw           | dim_estacion_meteorologica
+ dw           | dim_fecha
+ dw           | dim_precipitacion
+ dw           | dim_ubicacion
+ dw           | fact_incendio
+ dw           | v_calidad_aire_alta_actividad
+ dw           | v_calidad_pipeline
+ dw           | v_incendios_clima
+ dw           | v_incendios_cobertura
+ dw           | v_incendios_pais_periodo
+ dw           | v_incendios_precipitacion
+ dw           | v_incendios_region
+ dw           | v_resumen_calidad_pipeline
+ staging      | ingesta_metadata
+ staging      | rechazos_etl
+ staging      | stg_calidad_aire
+ staging      | stg_chirps
+ staging      | stg_firms
+ staging      | stg_meteo
+ staging      | stg_modis
+(26 rows)
+
+[local-db] Creando colecciones MongoDB locales con validadores...
+proyecto_lidia> | | | | | | | [Function: ensureCollection]
+proyecto_lidia> 
+proyecto_lidia> 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | {
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 8,
+    rechazos_etl: 0,
+    raw_payloads: 24,
+    pipeline_logs: 8,
+    snapshots_firms: 3
+  }
+}
+
+proyecto_lidia> [local-db] Resumen final local...
+# Carga Local PostgreSQL/Mongo - Proyecto LIDIA
+
+- PostgreSQL local: DDL ejecutado para esquemas staging, dw y audit.
+- MongoDB local: colecciones documentales creadas con validadores, sin documentos sinteticos.
+- No se ejecutó carga histórica completa.
+- No se usaron credenciales reales de UTEC.
+- MongoDB sigue siendo complemento documental; PostgreSQL es el DW principal.
+
+Logs:
+- evidencia/logs/local_db_compose_up.log
+- evidencia/logs/local_postgres_ddl.log
+- evidencia/logs/local_postgres_tablas.log
+- evidencia/logs/local_mongo_carga.log
+[local-db] Listo.
+[ETL] Ejecutando carga controlada FIRMS para URY/ARG/BRA entre 2026-05-01 y 2026-05-31...
+{"countries": ["URY", "ARG", "BRA"], "end_date": "2026-05-31", "estado": "inicio", "etapa": "pipeline", "fuente": "FIRMS", "max_records_per_source": 1000, "nota": "carga solicitada", "skip_mongo": false, "smoke": false, "start_date": "2026-05-01", "timestamp": "2026-06-02T21:18:47.916728+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:18:47.916938+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:18:47.918153+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 838, "filas_leidas": 1000, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:18:47.944809+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 838, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:18:47.944905+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 838, "filas_rechazadas": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:18:48.046949+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 838, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:18:48.047033+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 838, "filas_insertadas": 0, "filas_leidas": 838, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "FIRMS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-02T21:18:48.519097+00:00"}
+{"duracion_segundos": 0.668, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 838, "filas_cargadas": 838, "filas_insertadas": 0, "filas_leidas": 838, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:18:48.585080+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:18:48.585680+00:00"}
+{'filas_cargadas_o_actualizadas': 838, 'filas_sin_cambio': 0}
+[POSTGRES] Guardando conteos post carga...
+        tabla         | filas 
+----------------------+-------
+ staging.stg_firms    |   838
+ staging.rechazos_etl |     0
+ audit.etl_runs       |     8
+ audit.cdc_eventos    |  5046
+ dw.fact_incendio     |   838
+(5 rows)
+
+ pais_codigo | filas |      origen       
+-------------+-------+-------------------
+ ARG         |   256 | dw.fact_incendio
+ BRA         |   564 | dw.fact_incendio
+ URY         |    18 | dw.fact_incendio
+ ARG         |   256 | staging.stg_firms
+ BRA         |   564 | staging.stg_firms
+ URY         |    18 | staging.stg_firms
+(6 rows)
+
+ paises_fuera_alcance 
+----------------------
+                    0
+(1 row)
+
+[MONGO] Guardando estado post carga...
+[MONGO] Creando snapshots FIRMS derivados de PostgreSQL local...
+{
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 9,
+    pipeline_logs: 9,
+    raw_payloads: 862,
+    rechazos_etl: 0,
+    snapshots_firms: 4
+  }
+}
+{
+  ingesta_metadata: 0,
+  raw_payloads: 0,
+  snapshots_firms: 0,
+  pipeline_logs: 0,
+  rechazos_etl: 0
+}
+[VALIDACION] Ejecutando validaciones finales...
+[VALIDACION] python3 -m compileall -q .
+[VALIDACION] python3 -m pytest -q tests
+......................                                                   [100%]
+22 passed in 0.47s
+[VALIDACION] python3 scripts/ec3_verificar_logrado.py
+{"ts": "2026-06-02T21:18:51.746010+00:00", "message": "postgres_connected", "mode": "psycopg2"}
+{"ts": "2026-06-02T21:18:51.831144+00:00", "message": "mongo_connected", "mode": "pymongo", "database": "proyecto_lidia"}
+{"ts": "2026-06-02T21:18:51.949975+00:00", "message": "run_cmd", "args": ["python", "-m", "compileall", "-q", "."]}
+{"ts": "2026-06-02T21:18:51.950721+00:00", "message": "run_cmd", "args": ["python", "-m", "pytest", "-q", "tests"]}
+{"ts": "2026-06-02T21:18:51.970473+00:00", "message": "report_generated", "run_log": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T211851Z.log", "markdown": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md", "urgencies": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json"}
+
+Reporte: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md
+Urgencias: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json
+Log: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T211851Z.log
+
+# Resumen carga FIRMS smoke local
+- Archivo FIRMS usado: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet
+- Rango smoke usado: 2026-05-01 a 2026-05-31
+- Archivo de configuración: config/.env
+- PostgreSQL: validado en localhost:15432
+- MongoDB: ok en localhost:27027
+- Perfil FIRMS: evidencia/logs/firms_dataset_perfil.log
+- Paises fuera de alcance: evidencia/logs/firms_paises_fuera_alcance.log
+- Log de carga: evidencia/logs/carga_firms_smoke_local.log
+- Conteos PostgreSQL: evidencia/logs/postgres_conteos_post_carga.log
+- Validación países PostgreSQL: evidencia/logs/postgres_validacion_paises_alcance.log
+- Estado MongoDB: evidencia/logs/mongo_estado_post_carga.log
+- Validación países MongoDB: evidencia/logs/mongo_validacion_paises_alcance.log
+- Log de validaciones: evidencia/logs/carga_firms_validaciones.log
+
+[FIRMS] Proceso finalizado.
+[EC3-local] Conteo despues de corrida 1...
+[EC3-local] dw.fact_incendio despues corrida 1: 838
+[EC3-local] Carga FIRMS real controlada - corrida 2 para idempotencia...
+[FIRMS] Buscando archivo FIRMS Parquet/CSV dentro del proyecto...
+[FIRMS] Archivo seleccionado: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet
+[FIRMS] FIRMS_FILE actualizado en config/.env
+{'FIRMS_FILE': '/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet', 'exists': True}
+[FIRMS] Perfilando dataset origen...
+{"start_date": "2026-05-01", "end_date": "2026-05-31", "out_of_scope": {"CHL": 945}}
+[DOCKER] Levantando PostgreSQL y MongoDB locales...
+ Container proyecto-lidia-ec3-pedro-mongo-1 Running 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Running 
+[POSTGRES] Validando conexión local localhost:15432...
+ current_database | current_user 
+------------------+--------------
+ proyecto_lidia   | lidia
+(1 row)
+
+[MONGO] Esperando y validando conexión local localhost:27027...
+{ ok: 1 }
+[LOCAL-DB] Preparando DDL PostgreSQL y colecciones Mongo locales...
+[local-db] Levantando PostgreSQL y MongoDB locales...
+ Container proyecto-lidia-ec3-pedro-mongo-1 Running 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Running 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Waiting 
+ Container proyecto-lidia-ec3-pedro-mongo-1 Healthy 
+ Container proyecto-lidia-ec3-pedro-postgres-1 Healthy 
+[local-db] Ejecutando DDL PostgreSQL local...
+== sql/ddl/00_schemas.sql ==
+CREATE SCHEMA
+CREATE SCHEMA
+CREATE SCHEMA
+NOTICE:  schema "staging" already exists, skipping
+NOTICE:  schema "dw" already exists, skipping
+NOTICE:  schema "audit" already exists, skipping
+== sql/ddl/01_roles.sql ==
+DO
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+== sql/ddl/02_Schema.sql ==
+CREATE TABLE
+NOTICE:  relation "ingesta_metadata" already exists, skipping
+NOTICE:  relation "rechazos_etl" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_firms" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_meteo" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_chirps" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_modis" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_calidad_aire" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_fecha" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_ubicacion" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_estacion_meteorologica" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_clima" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_precipitacion" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_cobertura_vegetal" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "dim_calidad_aire" already exists, skipping
+COMMENT
+CREATE TABLE
+NOTICE:  relation "fact_incendio" already exists, skipping
+COMMENT
+CREATE TABLE
+NOTICE:  relation "etl_runs" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "cdc_eventos" already exists, skipping
+NOTICE:  relation "asociacion_espacial_runs" already exists, skipping
+CREATE TABLE
+CREATE FUNCTION
+== sql/ddl/03_indices.sql ==
+NOTICE:  relation "idx_fact_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fact_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fact_enriquecimiento" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_fact_frp" already exists, skipping
+NOTICE:  relation "idx_fecha_anio_mes" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais_coordenadas" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_fecha_fuente_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_ubicacion_instante" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_fecha_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_cobertura_ubicacion_anio" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_cobertura_anio_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_calidad_aire_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_etl_fuente_inicio" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_cdc_run_tipo" already exists, skipping
+CREATE INDEX
+== sql/ddl/04_vistas.sql ==
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+GRANT
+[local-db] Validando tablas PostgreSQL locales...
+ table_schema |          table_name           
+--------------+-------------------------------
+ audit        | asociacion_espacial_runs
+ audit        | cdc_eventos
+ audit        | etl_runs
+ dw           | dim_calidad_aire
+ dw           | dim_clima
+ dw           | dim_cobertura_vegetal
+ dw           | dim_estacion_meteorologica
+ dw           | dim_fecha
+ dw           | dim_precipitacion
+ dw           | dim_ubicacion
+ dw           | fact_incendio
+ dw           | v_calidad_aire_alta_actividad
+ dw           | v_calidad_pipeline
+ dw           | v_incendios_clima
+ dw           | v_incendios_cobertura
+ dw           | v_incendios_pais_periodo
+ dw           | v_incendios_precipitacion
+ dw           | v_incendios_region
+ dw           | v_resumen_calidad_pipeline
+ staging      | ingesta_metadata
+ staging      | rechazos_etl
+ staging      | stg_calidad_aire
+ staging      | stg_chirps
+ staging      | stg_firms
+ staging      | stg_meteo
+ staging      | stg_modis
+(26 rows)
+
+[local-db] Creando colecciones MongoDB locales con validadores...
+proyecto_lidia> | | | | | | | [Function: ensureCollection]
+proyecto_lidia> 
+proyecto_lidia> 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | | 
+proyecto_lidia> 
+proyecto_lidia> | | | | | | | | | | {
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 9,
+    rechazos_etl: 0,
+    raw_payloads: 862,
+    pipeline_logs: 9,
+    snapshots_firms: 4
+  }
+}
+
+proyecto_lidia> [local-db] Resumen final local...
+# Carga Local PostgreSQL/Mongo - Proyecto LIDIA
+
+- PostgreSQL local: DDL ejecutado para esquemas staging, dw y audit.
+- MongoDB local: colecciones documentales creadas con validadores, sin documentos sinteticos.
+- No se ejecutó carga histórica completa.
+- No se usaron credenciales reales de UTEC.
+- MongoDB sigue siendo complemento documental; PostgreSQL es el DW principal.
+
+Logs:
+- evidencia/logs/local_db_compose_up.log
+- evidencia/logs/local_postgres_ddl.log
+- evidencia/logs/local_postgres_tablas.log
+- evidencia/logs/local_mongo_carga.log
+[local-db] Listo.
+[ETL] Ejecutando carga controlada FIRMS para URY/ARG/BRA entre 2026-05-01 y 2026-05-31...
+{"countries": ["URY", "ARG", "BRA"], "end_date": "2026-05-31", "estado": "inicio", "etapa": "pipeline", "fuente": "FIRMS", "max_records_per_source": 1000, "nota": "carga solicitada", "skip_mongo": false, "smoke": false, "start_date": "2026-05-01", "timestamp": "2026-06-02T21:19:03.896825+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:03.896920+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:03.897302+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 838, "filas_leidas": 1000, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:03.916883+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 838, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:03.916966+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 838, "filas_rechazadas": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:04.025895+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 838, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:04.025979+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 838, "filas_rechazadas": 0, "filas_sin_cambio": 838, "fuente": "FIRMS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-02T21:19:04.270481+00:00"}
+{"duracion_segundos": 0.426, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 838, "filas_rechazadas": 0, "filas_sin_cambio": 838, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:04.322677+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-02T21:19:04.323203+00:00"}
+{'filas_cargadas_o_actualizadas': 0, 'filas_sin_cambio': 838}
+[POSTGRES] Guardando conteos post carga...
+        tabla         | filas 
+----------------------+-------
+ staging.stg_firms    |   838
+ staging.rechazos_etl |     0
+ audit.etl_runs       |     9
+ audit.cdc_eventos    |  5884
+ dw.fact_incendio     |   838
+(5 rows)
+
+ pais_codigo | filas |      origen       
+-------------+-------+-------------------
+ ARG         |   256 | dw.fact_incendio
+ BRA         |   564 | dw.fact_incendio
+ URY         |    18 | dw.fact_incendio
+ ARG         |   256 | staging.stg_firms
+ BRA         |   564 | staging.stg_firms
+ URY         |    18 | staging.stg_firms
+(6 rows)
+
+ paises_fuera_alcance 
+----------------------
+                    0
+(1 row)
+
+[MONGO] Guardando estado post carga...
+[MONGO] Creando snapshots FIRMS derivados de PostgreSQL local...
+{
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 10,
+    pipeline_logs: 10,
+    raw_payloads: 1700,
+    rechazos_etl: 0,
+    snapshots_firms: 4
+  }
+}
+{
+  ingesta_metadata: 0,
+  raw_payloads: 0,
+  snapshots_firms: 0,
+  pipeline_logs: 0,
+  rechazos_etl: 0
+}
+[VALIDACION] Ejecutando validaciones finales...
+[VALIDACION] python3 -m compileall -q .
+[VALIDACION] python3 -m pytest -q tests
+......................                                                   [100%]
+22 passed in 0.46s
+[VALIDACION] python3 scripts/ec3_verificar_logrado.py
+{"ts": "2026-06-02T21:19:07.435234+00:00", "message": "postgres_connected", "mode": "psycopg2"}
+{"ts": "2026-06-02T21:19:07.522113+00:00", "message": "mongo_connected", "mode": "pymongo", "database": "proyecto_lidia"}
+{"ts": "2026-06-02T21:19:07.632675+00:00", "message": "run_cmd", "args": ["python", "-m", "compileall", "-q", "."]}
+{"ts": "2026-06-02T21:19:07.633260+00:00", "message": "run_cmd", "args": ["python", "-m", "pytest", "-q", "tests"]}
+{"ts": "2026-06-02T21:19:07.652100+00:00", "message": "report_generated", "run_log": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T211907Z.log", "markdown": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md", "urgencies": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json"}
+
+Reporte: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md
+Urgencias: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json
+Log: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T211907Z.log
+
+# Resumen carga FIRMS smoke local
+- Archivo FIRMS usado: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet
+- Rango smoke usado: 2026-05-01 a 2026-05-31
+- Archivo de configuración: config/.env
+- PostgreSQL: validado en localhost:15432
+- MongoDB: ok en localhost:27027
+- Perfil FIRMS: evidencia/logs/firms_dataset_perfil.log
+- Paises fuera de alcance: evidencia/logs/firms_paises_fuera_alcance.log
+- Log de carga: evidencia/logs/carga_firms_smoke_local.log
+- Conteos PostgreSQL: evidencia/logs/postgres_conteos_post_carga.log
+- Validación países PostgreSQL: evidencia/logs/postgres_validacion_paises_alcance.log
+- Estado MongoDB: evidencia/logs/mongo_estado_post_carga.log
+- Validación países MongoDB: evidencia/logs/mongo_validacion_paises_alcance.log
+- Log de validaciones: evidencia/logs/carga_firms_validaciones.log
+
+[FIRMS] Proceso finalizado.
+
+== Conteos CDC FIRMS ==
+ fuente | tipo_evento  | eventos 
+--------+--------------+---------
+ FIRMS  | alta         |     838
+ FIRMS  | modificacion |     838
+ FIRMS  | sin_cambio   |    4208
+(3 rows)
+
+
+== Duplicados por natural_key en dw.fact_incendio ==
+ natural_keys_duplicadas 
+-------------------------
+                       0
+(1 row)
+
+[EC3-local] dw.fact_incendio despues corrida 2: 838
+[EC3-local] Ejecutando validacion CDC local...
+[CDC-local] Validando eventos CDC FIRMS en PostgreSQL local...
+ fuente | tipo_evento  | eventos 
+--------+--------------+---------
+ FIRMS  | alta         |     838
+ FIRMS  | modificacion |     838
+ FIRMS  | sin_cambio   |    4208
+(3 rows)
+
+                run_id                | fuente | estado | filas_leidas | filas_insertadas | filas_actualizadas | filas_rechazadas |         finalizado_en         
+--------------------------------------+--------+--------+--------------+------------------+--------------------+------------------+-------------------------------
+ dc30099c-acf5-4c32-95ff-4ae0e527cc22 | FIRMS  | ok     |          838 |                0 |                  0 |                0 | 2026-06-02 21:19:04.034977+00
+ 5ae04a8d-6fef-4df4-a202-017764081146 | FIRMS  | ok     |          838 |                0 |                838 |                0 | 2026-06-02 21:18:48.062939+00
+ 7f2eda67-d9f2-41cc-82bc-4b4cd6ed8759 | FIRMS  | ok     |          838 |                0 |                  0 |                0 | 2026-06-02 20:46:47.464216+00
+ fa6c26bc-abaf-401c-8249-71f0863bd026 | FIRMS  | ok     |          838 |                0 |                  0 |                0 | 2026-06-02 20:46:35.260221+00
+ bad1d918-5953-4cc5-be8b-bb21a58beab4 | FIRMS  | ok     |          838 |                0 |                  0 |                0 | 2026-06-02 20:45:57.533498+00
+(5 rows)
+
+ natural_keys_duplicadas 
+-------------------------
+                       0
+(1 row)
+
+[CDC-local] Validando trazas MongoDB relacionadas...
+{
+  ingesta_metadata_firms: 10,
+  pipeline_logs_firms: 10,
+  raw_payloads_firms: 1700,
+  snapshots_firms: 4
+}
+[
+  {
+    run_id: 'dc30099c-acf5-4c32-95ff-4ae0e527cc22',
+    fuente: 'FIRMS',
+    estado: 'ok',
+    metricas: {
+      leidas: 838,
+      insertadas: 0,
+      actualizadas: 0,
+      sin_cambio: 838,
+      rechazadas: 0,
+      run_id: 'dc30099c-acf5-4c32-95ff-4ae0e527cc22'
+    },
+    registrado_en: ISODate('2026-06-02T21:19:04.293Z')
+  },
+  {
+    run_id: '5ae04a8d-6fef-4df4-a202-017764081146',
+    fuente: 'FIRMS',
+    estado: 'ok',
+    metricas: {
+      leidas: 838,
+      insertadas: 0,
+      actualizadas: 838,
+      sin_cambio: 0,
+      rechazadas: 0,
+      run_id: '5ae04a8d-6fef-4df4-a202-017764081146'
+    },
+    registrado_en: ISODate('2026-06-02T21:18:48.547Z')
+  },
+  {
+    run_id: 'local-d8-2026-06-02T20:46:38.558Z',
+    fuente: 'FIRMS',
+    estado: 'ok',
+    metricas: {
+      tipo: 'evidencia_local_docker',
+      filas_reales_cargadas: 0,
+      nota: 'Documento operativo local; no representa carga historica real.'
+    },
+    registrado_en: ISODate('2026-06-02T20:46:38.558Z')
+  }
+]
+
+[CDC-local] Interpretacion:
+- 'alta' demuestra carga inicial de registros reales FIRMS.
+- 'sin_cambio' aparece cuando se ejecuta la misma carga controlada otra vez.
+- 'modificacion' solo aparece si el origen real cambia o si se ejecuta una simulacion CDC marcada explicitamente como tal.
+- Este script no simula modificaciones para no presentar datos fabricados como evidencia real.
+[EC3-local] Ejecutando compileall...
+[EC3-local] Ejecutando pytest...
+......................                                                   [100%]
+22 passed in 0.44s
+[EC3-local] Ejecutando auditor EC3...
+{"ts": "2026-06-02T21:19:25.786249+00:00", "message": "postgres_psycopg2_unavailable_or_failed", "error": "OperationalError: could not translate host name \"postgres\" to address: Name or service not known\n"}
+{"ts": "2026-06-02T21:19:25.787122+00:00", "message": "run_cmd", "args": ["psql", "postgresql://lidia:***@postgres:5432/proyecto_lidia", "-At", "-c", "SELECT 1"]}
+{"ts": "2026-06-02T21:19:46.997784+00:00", "message": "mongo_pymongo_unavailable_or_failed", "error": "ServerSelectionTimeoutError: No servers found yet, Timeout: 5.0s, Topology Description: <TopologyDescription id: 6a1f48ed02151646daf2eaa9, topology_type: Unknown, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None>]>"}
+{"ts": "2026-06-02T21:19:46.998132+00:00", "message": "run_cmd", "args": ["mongosh", "mongodb://lidia:***@mongo:27017/proyecto_lidia?authSource=admin", "--quiet", "--eval", "db.runCommand({ping:1}).ok"]}
+{"ts": "2026-06-02T21:20:03.682055+00:00", "message": "run_cmd", "args": ["python", "-m", "compileall", "-q", "."]}
+{"ts": "2026-06-02T21:20:03.682677+00:00", "message": "run_cmd", "args": ["python", "-m", "pytest", "-q", "tests"]}
+{"ts": "2026-06-02T21:20:03.693643+00:00", "message": "report_generated", "run_log": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T211909Z.log", "markdown": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md", "urgencies": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json"}
+
+Reporte: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md
+Urgencias: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json
+Log: /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T211909Z.log
+[EC3-local] Resumen PostgreSQL:
+       tabla       | filas 
+-------------------+-------
+ staging.stg_firms |   838
+ dw.fact_incendio  |   838
+(2 rows)
+
+ pais_codigo | filas 
+-------------+-------
+ ARG         |   256
+ BRA         |   564
+ URY         |    18
+(3 rows)
+
+ fuera_alcance 
+---------------
+             0
+(1 row)
+
+[EC3-local] Resumen MongoDB:
+{
+  database: 'proyecto_lidia',
+  collections: [
+    'ingesta_metadata',
+    'pipeline_logs',
+    'raw_payloads',
+    'rechazos_etl',
+    'snapshots_firms'
+  ],
+  counts: {
+    ingesta_metadata: 10,
+    pipeline_logs: 10,
+    raw_payloads: 1700,
+    rechazos_etl: 0,
+    snapshots_firms: 4
+  }
+}
+
+# Resumen EC3 local
+- Docker: postgres/mongo levantados con docker-compose.yml
+- PostgreSQL staging.stg_firms y dw.fact_incendio cargados desde FIRMS real local.
+- MongoDB: metadata/logs/raw_payloads/snapshots complementarios.
+- Idempotencia: conteo dw.fact_incendio corrida 1=838, corrida 2=838.
+- Logs principales:
+  - evidencia/logs/ec3_preparar_datos_locales.log
+  - evidencia/logs/firms_dataset_perfil.log
+  - evidencia/logs/firms_paises_fuera_alcance.log
+  - evidencia/logs/carga_firms_smoke_local.log
+  - evidencia/logs/postgres_conteos_post_carga.log
+  - evidencia/logs/mongo_estado_post_carga.log
+  - evidencia/logs/idempotencia_firms_smoke.log
+  - evidencia/logs/cdc_validacion_local.log

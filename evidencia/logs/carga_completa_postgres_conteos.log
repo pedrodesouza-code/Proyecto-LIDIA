@@ -1,0 +1,32 @@
+          tabla           |  filas  
+--------------------------+---------
+ dw.dim_cobertura_vegetal |      63
+ staging.stg_modis        |      63
+ dw.dim_precipitacion     |    2262
+ staging.stg_chirps       |    2262
+ dw.dim_calidad_aire      |   30793
+ staging.stg_calidad_aire |   30793
+ dw.dim_clima             |   67309
+ staging.stg_meteo        |   67309
+ dw.fact_incendio         | 1836537
+ staging.stg_firms        | 1836537
+(10 rows)
+
+ pais_codigo |  focos  
+-------------+---------
+ ARG         |   96232
+ BRA         | 1737010
+ URY         |    3295
+(3 rows)
+
+ paises_fuera_alcance_staging_firms 
+------------------------------------
+                                  0
+(1 row)
+
+ fuente | rechazos 
+--------+----------
+ CAMS   |    32016
+ METEO  |    62334
+(2 rows)
+

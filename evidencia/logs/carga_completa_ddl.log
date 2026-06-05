@@ -1,0 +1,109 @@
+== sql/ddl/00_schemas.sql ==
+NOTICE:  schema "staging" already exists, skipping
+NOTICE:  schema "dw" already exists, skipping
+CREATE SCHEMA
+CREATE SCHEMA
+NOTICE:  schema "audit" already exists, skipping
+CREATE SCHEMA
+== sql/ddl/01_roles.sql ==
+DO
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+GRANT
+GRANT
+GRANT
+== sql/ddl/02_Schema.sql ==
+NOTICE:  relation "ingesta_metadata" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "rechazos_etl" already exists, skipping
+NOTICE:  relation "stg_firms" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_meteo" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_chirps" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_modis" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "stg_calidad_aire" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_fecha" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "dim_ubicacion" already exists, skipping
+NOTICE:  relation "dim_estacion_meteorologica" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_clima" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_precipitacion" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_cobertura_vegetal" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "dim_calidad_aire" already exists, skipping
+CREATE TABLE
+COMMENT
+NOTICE:  relation "fact_incendio" already exists, skipping
+CREATE TABLE
+COMMENT
+NOTICE:  relation "etl_runs" already exists, skipping
+CREATE TABLE
+NOTICE:  relation "cdc_eventos" already exists, skipping
+CREATE TABLE
+CREATE TABLE
+NOTICE:  relation "asociacion_espacial_runs" already exists, skipping
+CREATE FUNCTION
+== sql/ddl/03_indices.sql ==
+CREATE INDEX
+NOTICE:  relation "idx_fact_fecha" already exists, skipping
+NOTICE:  relation "idx_fact_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_fact_enriquecimiento" already exists, skipping
+NOTICE:  relation "idx_fact_frp" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_fecha_anio_mes" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_ubicacion_pais_coordenadas" already exists, skipping
+NOTICE:  relation "idx_clima_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_fecha_fuente_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_clima_ubicacion_instante" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_precipitacion_fecha_ubicacion" already exists, skipping
+CREATE INDEX
+CREATE INDEX
+NOTICE:  relation "idx_cobertura_ubicacion_anio" already exists, skipping
+NOTICE:  relation "idx_cobertura_anio_ubicacion" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_calidad_aire_ubicacion_fecha" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_etl_fuente_inicio" already exists, skipping
+CREATE INDEX
+NOTICE:  relation "idx_cdc_run_tipo" already exists, skipping
+CREATE INDEX
+== sql/ddl/04_vistas.sql ==
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+GRANT

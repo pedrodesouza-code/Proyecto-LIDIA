@@ -1,0 +1,5 @@
+{"ts": "2026-06-02T19:19:28.140207+00:00", "message": "postgres_no_database_url"}
+{"ts": "2026-06-02T19:19:28.140249+00:00", "message": "mongo_no_mongo_uri"}
+{"ts": "2026-06-02T19:19:28.227596+00:00", "message": "run_cmd", "args": ["python", "-m", "compileall", "-q", "."]}
+{"ts": "2026-06-02T19:19:28.228225+00:00", "message": "run_cmd", "args": ["python", "-m", "pytest", "-q", "tests"]}
+{"ts": "2026-06-02T19:19:28.242471+00:00", "message": "report_generated", "run_log": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_verificacion_logrado_20260602T191928Z.log", "markdown": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_reporte_estado_actual.md", "urgencies": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/evidencia/logs/ec3_resumen_urgencias.json"}

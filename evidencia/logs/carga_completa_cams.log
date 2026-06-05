@@ -1,0 +1,11 @@
+{"countries": ["URY", "ARG", "BRA"], "end_date": null, "estado": "inicio", "etapa": "pipeline", "fuente": "CAMS", "max_records_per_source": null, "nota": "carga solicitada", "skip_mongo": true, "smoke": false, "start_date": null, "timestamp": "2026-06-04T23:50:27.963333+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:27.963438+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:28.027587+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 41465, "filas_leidas": 41465, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:28.062745+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 41465, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:28.062845+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 30793, "filas_rechazadas": 10672, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:47.499422+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 41465, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:50:47.499521+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 41465, "filas_rechazadas": 10672, "filas_sin_cambio": 30793, "fuente": "CAMS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-04T23:51:03.016449+00:00"}
+{"estado": "omitido", "etapa": "mongo", "fuente": "CAMS", "motivo": "skip_mongo", "smoke": false, "timestamp": "2026-06-04T23:51:03.016597+00:00"}
+{"duracion_segundos": 35.053, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 41465, "filas_rechazadas": 10672, "filas_sin_cambio": 30793, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:51:03.016689+00:00"}
+{"estado": "fin", "etapa": "pipeline", "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-04T23:51:03.036099+00:00"}

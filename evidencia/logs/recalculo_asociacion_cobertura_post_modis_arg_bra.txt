@@ -1,0 +1,19 @@
+{
+  "inicio": "2026-06-01T21:42:15.152054+00:00",
+  "umbral_km": 100.0,
+  "fuente": "MODIS LC_Type1",
+  "antes": {
+    "total": 2585805,
+    "con_cobertura": 0
+  },
+  "despues": {
+    "total": 2585805,
+    "con_cobertura": 56652
+  },
+  "reset_previos": 0,
+  "updates": 56652,
+  "asociacion_id": "d01a7043-8807-45a3-a6a2-4b014e889ea4",
+  "distancia_maxima_km": 99.99735649161096,
+  "fin": "2026-06-01T21:49:48.553863+00:00",
+  "duracion_segundos": 453.4
+}

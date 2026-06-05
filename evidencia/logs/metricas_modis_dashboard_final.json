@@ -1,0 +1,171 @@
+{
+  "generado_en": "2026-06-01T21:51:05.866365+00:00",
+  "postgres": [
+    {
+      "title": "modis_staging_pais",
+      "columns": [
+        "pais_codigo",
+        "filas",
+        "ubicaciones",
+        "desde",
+        "hasta"
+      ],
+      "rows": [
+        {
+          "pais_codigo": "ARG",
+          "filas": 24,
+          "ubicaciones": 6,
+          "desde": 2018,
+          "hasta": 2021
+        },
+        {
+          "pais_codigo": "BRA",
+          "filas": 24,
+          "ubicaciones": 6,
+          "desde": 2018,
+          "hasta": 2021
+        },
+        {
+          "pais_codigo": "URY",
+          "filas": 133,
+          "ubicaciones": 19,
+          "desde": 2018,
+          "hasta": 2024
+        }
+      ]
+    },
+    {
+      "title": "modis_dw_pais",
+      "columns": [
+        "pais_codigo",
+        "filas",
+        "ubicaciones",
+        "desde",
+        "hasta"
+      ],
+      "rows": [
+        {
+          "pais_codigo": "ARG",
+          "filas": 24,
+          "ubicaciones": 6,
+          "desde": 2018,
+          "hasta": 2021
+        },
+        {
+          "pais_codigo": "BRA",
+          "filas": 24,
+          "ubicaciones": 6,
+          "desde": 2018,
+          "hasta": 2021
+        },
+        {
+          "pais_codigo": "URY",
+          "filas": 133,
+          "ubicaciones": 19,
+          "desde": 2018,
+          "hasta": 2024
+        }
+      ]
+    },
+    {
+      "title": "asociaciones_fact_incendio",
+      "columns": [
+        "total",
+        "con_clima",
+        "con_precipitacion",
+        "con_cobertura",
+        "con_calidad_aire"
+      ],
+      "rows": [
+        {
+          "total": 2585805,
+          "con_clima": 83682,
+          "con_precipitacion": 47576,
+          "con_cobertura": 56652,
+          "con_calidad_aire": 20599
+        }
+      ]
+    },
+    {
+      "title": "cobertura_por_pais",
+      "columns": [
+        "pais_codigo",
+        "focos_con_cobertura"
+      ],
+      "rows": [
+        {
+          "pais_codigo": "ARG",
+          "focos_con_cobertura": 39439
+        },
+        {
+          "pais_codigo": "BRA",
+          "focos_con_cobertura": 10105
+        },
+        {
+          "pais_codigo": "URY",
+          "focos_con_cobertura": 7108
+        }
+      ]
+    },
+    {
+      "title": "resumen_pipeline",
+      "columns": [
+        "altas",
+        "modificaciones",
+        "descartes_auditoria",
+        "rechazos_detallados"
+      ],
+      "rows": [
+        {
+          "altas": 6304398,
+          "modificaciones": 667,
+          "descartes_auditoria": 1089952,
+          "rechazos_detallados": 3704
+        }
+      ]
+    },
+    {
+      "title": "rechazos_detallados",
+      "columns": [
+        "fuente",
+        "rechazos"
+      ],
+      "rows": [
+        {
+          "fuente": "CHIRPS",
+          "rechazos": 702
+        },
+        {
+          "fuente": "FIRMS",
+          "rechazos": 3002
+        }
+      ]
+    },
+    {
+      "title": "vistas_dashboard",
+      "columns": [
+        "vista",
+        "filas"
+      ],
+      "rows": [
+        {
+          "vista": "dw.v_calidad_pipeline",
+          "filas": 144
+        },
+        {
+          "vista": "dw.v_incendios_cobertura",
+          "filas": 7
+        },
+        {
+          "vista": "dw.v_resumen_calidad_pipeline",
+          "filas": 1
+        }
+      ]
+    }
+  ],
+  "fuentes_externas": {
+    "MODIS_ARG_BRA": "Zenodo record 8338928, MCD12Q1 v061 t1 COG, 2018-2021",
+    "MODIS_URY": "archivo local AppEEARS LC_Type1, 2018-2024",
+    "limitacion": "Argentina/Brasil 2022-2024 no disponibles en el record abierto usado; no se inventaron valores."
+  }
+}

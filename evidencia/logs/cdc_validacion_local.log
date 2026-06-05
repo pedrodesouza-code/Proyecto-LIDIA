@@ -1,0 +1,76 @@
+[CDC-local] Validando eventos CDC FIRMS en PostgreSQL local...
+ fuente | tipo_evento  | eventos 
+--------+--------------+---------
+ FIRMS  | alta         |     838
+ FIRMS  | modificacion |     838
+ FIRMS  | sin_cambio   |    4208
+(3 rows)
+
+                run_id                | fuente | estado | filas_leidas | filas_insertadas | filas_actualizadas | filas_rechazadas |         finalizado_en         
+--------------------------------------+--------+--------+--------------+------------------+--------------------+------------------+-------------------------------
+ dc30099c-acf5-4c32-95ff-4ae0e527cc22 | FIRMS  | ok     |          838 |                0 |                  0 |                0 | 2026-06-02 21:19:04.034977+00
+ 5ae04a8d-6fef-4df4-a202-017764081146 | FIRMS  | ok     |          838 |                0 |                838 |                0 | 2026-06-02 21:18:48.062939+00
+ 7f2eda67-d9f2-41cc-82bc-4b4cd6ed8759 | FIRMS  | ok     |          838 |                0 |                  0 |                0 | 2026-06-02 20:46:47.464216+00
+ fa6c26bc-abaf-401c-8249-71f0863bd026 | FIRMS  | ok     |          838 |                0 |                  0 |                0 | 2026-06-02 20:46:35.260221+00
+ bad1d918-5953-4cc5-be8b-bb21a58beab4 | FIRMS  | ok     |          838 |                0 |                  0 |                0 | 2026-06-02 20:45:57.533498+00
+(5 rows)
+
+ natural_keys_duplicadas 
+-------------------------
+                       0
+(1 row)
+
+[CDC-local] Validando trazas MongoDB relacionadas...
+{
+  ingesta_metadata_firms: 10,
+  pipeline_logs_firms: 10,
+  raw_payloads_firms: 1700,
+  snapshots_firms: 4
+}
+[
+  {
+    run_id: 'dc30099c-acf5-4c32-95ff-4ae0e527cc22',
+    fuente: 'FIRMS',
+    estado: 'ok',
+    metricas: {
+      leidas: 838,
+      insertadas: 0,
+      actualizadas: 0,
+      sin_cambio: 838,
+      rechazadas: 0,
+      run_id: 'dc30099c-acf5-4c32-95ff-4ae0e527cc22'
+    },
+    registrado_en: ISODate('2026-06-02T21:19:04.293Z')
+  },
+  {
+    run_id: '5ae04a8d-6fef-4df4-a202-017764081146',
+    fuente: 'FIRMS',
+    estado: 'ok',
+    metricas: {
+      leidas: 838,
+      insertadas: 0,
+      actualizadas: 838,
+      sin_cambio: 0,
+      rechazadas: 0,
+      run_id: '5ae04a8d-6fef-4df4-a202-017764081146'
+    },
+    registrado_en: ISODate('2026-06-02T21:18:48.547Z')
+  },
+  {
+    run_id: 'local-d8-2026-06-02T20:46:38.558Z',
+    fuente: 'FIRMS',
+    estado: 'ok',
+    metricas: {
+      tipo: 'evidencia_local_docker',
+      filas_reales_cargadas: 0,
+      nota: 'Documento operativo local; no representa carga historica real.'
+    },
+    registrado_en: ISODate('2026-06-02T20:46:38.558Z')
+  }
+]
+
+[CDC-local] Interpretacion:
+- 'alta' demuestra carga inicial de registros reales FIRMS.
+- 'sin_cambio' aparece cuando se ejecuta la misma carga controlada otra vez.
+- 'modificacion' solo aparece si el origen real cambia o si se ejecuta una simulacion CDC marcada explicitamente como tal.
+- Este script no simula modificaciones para no presentar datos fabricados como evidencia real.
