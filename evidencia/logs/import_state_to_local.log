@@ -1,12 +1,1 @@
-[import] 2026-06-05T11:41:29-03:00
-[import] Levantando servicios locales
- Container proyecto-lidia-ec3-pedro-mongo-1 Running 
- Container proyecto-lidia-ec3-pedro-postgres-1 Running 
- Container proyecto-lidia-ec3-pedro-mongo-1 Waiting 
- Container proyecto-lidia-ec3-pedro-postgres-1 Waiting 
- Container proyecto-lidia-ec3-pedro-mongo-1 Healthy 
- Container proyecto-lidia-ec3-pedro-postgres-1 Healthy 
-[import] Restaurando PostgreSQL desde backups/postgres/jupyter_postgres_20260605_135457.dump
-The input is a PostgreSQL custom-format dump.
-Use the pg_restore command-line client to restore this dump to a database.
-
+[import] ERROR: no se encontro snapshot PostgreSQL. Use POSTGRES_SNAPSHOT=/ruta/archivo.sql

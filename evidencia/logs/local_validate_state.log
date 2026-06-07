@@ -1,10 +1,9 @@
-[local-validate] 2026-06-05T12:00:06-03:00
+[local-validate] 2026-06-05T17:37:00-03:00
 [local-validate] Compose: docker compose --env-file .env.docker.example -f docker-compose.yml
 [local-validate] Estado Docker
-NAME                                   IMAGE                                COMMAND                  SERVICE     CREATED        STATUS                    PORTS
-proyecto-lidia-ec3-pedro-mongo-1       mongo:7                              "docker-entrypoint.s…"   mongo       20 hours ago   Up 38 minutes (healthy)   0.0.0.0:27027->27017/tcp, [::]:27027->27017/tcp
-proyecto-lidia-ec3-pedro-postgres-1    postgres:16                          "docker-entrypoint.s…"   postgres    3 days ago     Up 38 minutes (healthy)   0.0.0.0:15432->5432/tcp, [::]:15432->5432/tcp
-proyecto-lidia-ec3-pedro-streamlit-1   proyecto-lidia-ec3-pedro-streamlit   "streamlit run dashb…"   streamlit   20 hours ago   Up 6 minutes              0.0.0.0:8501->8501/tcp, [::]:8501->8501/tcp
+NAME                                  IMAGE         COMMAND                  SERVICE    CREATED        STATUS                 PORTS
+proyecto-lidia-ec3-pedro-mongo-1      mongo:7       "docker-entrypoint.s…"   mongo      26 hours ago   Up 6 hours (healthy)   0.0.0.0:27027->27017/tcp, [::]:27027->27017/tcp
+proyecto-lidia-ec3-pedro-postgres-1   postgres:16   "docker-entrypoint.s…"   postgres   3 days ago     Up 6 hours (healthy)   0.0.0.0:15432->5432/tcp, [::]:15432->5432/tcp
 [local-validate] PostgreSQL: tablas, claves, conteos y reglas del dominio
   metrica  | valor 
 -----------+-------
@@ -208,46 +207,35 @@ proyecto-lidia-ec3-pedro-streamlit-1   proyecto-lidia-ec3-pedro-streamlit   "str
       registrado_en: ISODate('2026-06-01T02:50:15.960Z')
     },
     {
-      run_id: 'ec3-real-modis',
-      fuente: 'MODIS',
+      run_id: 'ec3-real-forecast',
+      fuente: 'FORECAST',
       estado: 'ok',
       metricas: {
-        filas_leidas: 266,
-        filas_insertadas: 133,
-        filas_actualizadas: 133,
+        filas_leidas: 1008,
+        filas_insertadas: 1008,
+        filas_actualizadas: 0,
         filas_rechazadas: 0,
         origen: 'audit.etl_runs PostgreSQL proyecto_lidia'
       },
       registrado_en: ISODate('2026-05-27T22:24:20.653Z'),
-      finalizado_en_pg: ISODate('2026-05-27T16:29:32.469Z')
+      finalizado_en_pg: ISODate('2026-05-27T16:19:26.536Z')
     },
     {
-      run_id: 'ec3-real-chirps',
-      fuente: 'CHIRPS',
+      run_id: 'ec3-real-firms',
+      fuente: 'FIRMS',
       estado: 'ok',
       metricas: {
-        filas_leidas: 1404,
-        filas_insertadas: 702,
+        filas_leidas: 3672055,
+        filas_insertadas: 2585805,
         filas_actualizadas: 0,
-        filas_rechazadas: 702,
+        filas_rechazadas: 1086250,
         origen: 'audit.etl_runs PostgreSQL proyecto_lidia'
       },
       registrado_en: ISODate('2026-05-27T22:24:20.653Z'),
-      finalizado_en_pg: ISODate('2026-05-27T16:19:07.487Z')
+      finalizado_en_pg: ISODate('2026-05-27T16:16:27.866Z')
     }
   ],
   snapshots_firms_sample: [
-    {
-      fecha: ISODate('2026-05-27T22:24:20.653Z'),
-      pais_codigo: 'BRA',
-      total_focos: 2116305,
-      resumen: {
-        frp_total_mw: 110094059.8,
-        frp_promedio_mw: 52.022,
-        origen: 'dw.fact_incendio agregado por pais',
-        periodo: '2018-2025'
-      }
-    },
     {
       fecha: ISODate('2026-05-27T22:24:20.653Z'),
       pais_codigo: 'ARG',
@@ -255,6 +243,17 @@ proyecto-lidia-ec3-pedro-streamlit-1   proyecto-lidia-ec3-pedro-streamlit   "str
       resumen: {
         frp_total_mw: 24899081,
         frp_promedio_mw: 53.892,
+        origen: 'dw.fact_incendio agregado por pais',
+        periodo: '2018-2025'
+      }
+    },
+    {
+      fecha: ISODate('2026-05-27T22:24:20.653Z'),
+      pais_codigo: 'BRA',
+      total_focos: 2116305,
+      resumen: {
+        frp_total_mw: 110094059.8,
+        frp_promedio_mw: 52.022,
         origen: 'dw.fact_incendio agregado por pais',
         periodo: '2018-2025'
       }
@@ -275,5 +274,5 @@ proyecto-lidia-ec3-pedro-streamlit-1   proyecto-lidia-ec3-pedro-streamlit   "str
 [local-validate] python3 -m compileall -q .
 [local-validate] python3 -m pytest -q tests
 ......................                                                   [100%]
-22 passed in 0.55s
-[local-validate] Finalizado: 2026-06-05T12:00:10-03:00
+22 passed in 0.84s
+[local-validate] Finalizado: 2026-06-05T17:37:04-03:00

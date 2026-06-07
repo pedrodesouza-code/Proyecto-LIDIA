@@ -1,9 +1,9 @@
 {
-  "generado_en": "2026-06-05T14:55:25.451268+00:00",
+  "generado_en": "2026-06-07T14:55:46.111559+00:00",
   "estado_general": "NO LISTO",
   "conteo_estados": {
-    "COMPLETO": 8,
-    "PARCIAL": 4,
+    "COMPLETO": 9,
+    "PARCIAL": 3,
     "FALTA": 1
   },
   "completos": [
@@ -11,6 +11,7 @@
     "D1 carga real y validación post-carga",
     "D2 NoSQL documental",
     "D3 integración y trazabilidad",
+    "D4 Change Data Capture",
     "D5 Testing y validación",
     "D5 consultas y dashboard coherente",
     "D7 Streamlit",
@@ -19,7 +20,6 @@
   "parciales": [
     "D3 ETL Python modular",
     "D3 idempotencia",
-    "D4 Change Data Capture",
     "D9 rendimiento"
   ],
   "faltantes": [
@@ -30,7 +30,7 @@
     {
       "Criterio": "D3 ETL Python modular",
       "Estado": "PARCIAL",
-      "Evidencia encontrada": "extractores=True; config_externa=True; secretos=3; logs_d3=0; ultima_exit_ok=False",
+      "Evidencia encontrada": "extractores=True; config_externa=True; secretos=6; logs_d3=0; ultima_exit_ok=False",
       "Riesgo": "Secretos o falta de evidencia de ejecución afectan entrega.",
       "Urgencia": "ALTA",
       "Acción recomendada": "Ejecutar D3 evidencia con PYTHONPATH correcto y guardar logs.",
@@ -41,7 +41,7 @@
     {
       "Criterio": "D3 ETL Python modular",
       "Estado": "PARCIAL",
-      "Evidencia encontrada": "extractores=True; config_externa=True; secretos=3; logs_d3=0; ultima_exit_ok=False",
+      "Evidencia encontrada": "extractores=True; config_externa=True; secretos=6; logs_d3=0; ultima_exit_ok=False",
       "Riesgo": "Secretos o falta de evidencia de ejecución afectan entrega.",
       "Urgencia": "ALTA",
       "Acción recomendada": "Ejecutar D3 evidencia con PYTHONPATH correcto y guardar logs.",
@@ -54,15 +54,6 @@
       "Riesgo": "Sin dos corridas consecutivas, idempotencia queda parcialmente demostrada.",
       "Urgencia": "MEDIA",
       "Acción recomendada": "Generar corrida 1 y 2 smoke con conteo antes/después.",
-      "¿Se puede terminar hoy?": "SI"
-    },
-    {
-      "Criterio": "D4 Change Data Capture",
-      "Estado": "PARCIAL",
-      "Evidencia encontrada": "logs_d4=0; log_ok=False; cdc_sql=[{'fuente': 'CAMS', 'tipo_evento': 'alta', 'n': 111700}, {'fuente': 'CHIRPS', 'tipo_evento': 'alta', 'n': 702}, {'fuente': 'CHIRPS', 'tipo_evento': 'rechazo', 'n': 702}, {'fuente': 'FIRMS', 'tipo_evento': 'alta', 'n': 5}, {'fuente': 'FIRMS', 'tipo_evento': 'modificacion', 'n': 2}, {'fuente': 'FIRMS', 'tipo_evento': 'rechazo', 'n': 9402}, {'fuente': 'FIRMS', 'tipo_evento': 'sin_cambio', 'n': 2}, {'fuente': 'INUMET', 'tipo_evento': 'alta', 'n': 9}, {'fuente': 'METEO', 'tipo_evento': 'alta', 'n': 254226}, {'fuente': 'METEO', 'tipo_evento': 'sin_cambio', 'n': 1}, {'fuente': 'MODIS', 'tipo_evento': 'alta', 'n': 154}, {'fuente': 'MODIS', 'tipo_evento': 'modificacion', 'n': 1968}, {'fuente': 'MODIS', 'tipo_evento': 'sin_cambio', 'n': 6}]; cdc_mongo=[]",
-      "Riesgo": "D4 solo es completo con evidencia SQL y MongoDB.",
-      "Urgencia": "MEDIA",
-      "Acción recomendada": "Reejecutar script D4 si falta MongoDB CDC o resumen exit_code 0.",
       "¿Se puede terminar hoy?": "SI"
     },
     {
@@ -79,7 +70,6 @@
   "condiciones_para_terminar_hoy": [
     "Ejecutar D3 evidencia con PYTHONPATH correcto y guardar logs.",
     "Generar corrida 1 y 2 smoke con conteo antes/después.",
-    "Reejecutar script D4 si falta MongoDB CDC o resumen exit_code 0.",
     "Guardar tabla de tiempos de vistas/pipeline y explicar impacto de índices y smoke vs carga completa."
   ]
 }

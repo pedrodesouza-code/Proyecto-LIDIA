@@ -1,0 +1,54 @@
+{"countries": ["URY", "ARG", "BRA"], "end_date": "2025-12-31", "estado": "inicio", "etapa": "pipeline", "fuente": "ALL", "max_records_per_source": 5000, "nota": "carga solicitada", "skip_mongo": false, "smoke": false, "start_date": "2025-01-01", "timestamp": "2026-06-07T15:12:37.382697+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.382782+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.383291+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 0, "filas_leidas": 5000, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.625149+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.625289+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 0, "filas_rechazadas": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.626709+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.626777+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "FIRMS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-07T15:12:37.639967+00:00"}
+{"duracion_segundos": 0.257, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "FIRMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.640249+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "METEO", "smoke": false, "timestamp": "2026-06-07T15:12:37.640568+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "METEO", "smoke": false, "timestamp": "2026-06-07T15:12:37.718186+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 0, "filas_leidas": 5000, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-07T15:12:37.731459+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 0, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-07T15:12:37.731546+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 0, "filas_rechazadas": 0, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-07T15:12:37.732592+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 0, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-07T15:12:37.732668+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "METEO", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-07T15:12:37.742788+00:00"}
+{"duracion_segundos": 0.102, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "METEO", "smoke": false, "timestamp": "2026-06-07T15:12:37.742919+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.743051+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.743414+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 0, "filas_leidas": 0, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.753581+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 0, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.753725+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 0, "filas_rechazadas": 0, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.754666+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 0, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.754736+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "CAMS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-07T15:12:37.764869+00:00"}
+{"duracion_segundos": 0.022, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "CAMS", "smoke": false, "timestamp": "2026-06-07T15:12:37.765203+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-07T15:12:37.765570+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-07T15:12:37.766333+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 0, "filas_leidas": 2886, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-07T15:12:37.787125+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 0, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-07T15:12:37.787286+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 0, "filas_rechazadas": 0, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-07T15:12:37.788751+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 0, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-07T15:12:37.788862+00:00"}
+{"estado": "ok", "etapa": "load", "filas_actualizadas": 0, "filas_insertadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "CHIRPS", "promocion_dw": true, "smoke": false, "timestamp": "2026-06-07T15:12:37.803452+00:00"}
+{"duracion_segundos": 0.038, "estado": "ok", "etapa": "pipeline", "filas_actualizadas": 0, "filas_cargadas": 0, "filas_insertadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "filas_sin_cambio": 0, "fuente": "CHIRPS", "smoke": false, "timestamp": "2026-06-07T15:12:37.803572+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-07T15:12:37.803678+00:00"}
+{"estado": "iniciado", "etapa": "extract", "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-07T15:12:37.803945+00:00"}
+{"estado": "ok", "etapa": "extract", "filas_filtradas": 63, "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-07T15:12:37.807442+00:00"}
+{"estado": "iniciado", "etapa": "transform", "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-07T15:12:37.807530+00:00"}
+{"estado": "ok", "etapa": "transform", "filas_aceptadas": 63, "filas_rechazadas": 0, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-07T15:12:37.813507+00:00"}
+{"estado": "iniciado", "etapa": "load", "filas_leidas": 63, "fuente": "MODIS", "smoke": false, "timestamp": "2026-06-07T15:12:37.813563+00:00"}
+{"duracion_segundos": 0.061, "error": "CardinalityViolation: ON CONFLICT DO UPDATE command cannot affect row a second time\nHINT:  Ensure that no rows proposed for insertion within the same command have duplicate constrained values.\n", "estado": "error", "etapa": "pipeline", "filas_cargadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "fuente": "MODIS", "timestamp": "2026-06-07T15:12:37.864199+00:00"}
+Traceback (most recent call last):
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/main.py", line 167, in <module>
+    raise SystemExit(main())
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/main.py", line 161, in main
+    run_source(source, options)
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/main.py", line 106, in run_source
+    result = load_staging(source, accepted, rejected, promote=not options.smoke)
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/load/postgres.py", line 83, in load_staging
+    _promote(cur, source)
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/load/postgres.py", line 168, in _promote
+    cur.execute("""INSERT INTO dw.dim_ubicacion
+psycopg2.errors.CardinalityViolation: ON CONFLICT DO UPDATE command cannot affect row a second time
+HINT:  Ensure that no rows proposed for insertion within the same command have duplicate constrained values.
+

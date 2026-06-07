@@ -127,8 +127,13 @@ def _promote(cur, source: str) -> None:
         if source == "INUMET":
             cur.execute("""INSERT INTO dw.dim_estacion_meteorologica
                 (codigo_estacion,nombre,departamento,latitud,longitud)
-                SELECT DISTINCT ubicacion, ubicacion, departamento, latitud, longitud FROM staging.stg_meteo
-                WHERE fuente='INUMET' AND latitud IS NOT NULL AND longitud IS NOT NULL
+                SELECT ubicacion AS codigo_estacion, MIN(ubicacion) AS nombre,
+                       MIN(departamento) AS departamento, MIN(latitud) AS latitud,
+                       MIN(longitud) AS longitud
+                FROM staging.stg_meteo
+                WHERE fuente='INUMET' AND ubicacion IS NOT NULL
+                  AND latitud IS NOT NULL AND longitud IS NOT NULL
+                GROUP BY ubicacion
                 ON CONFLICT (codigo_estacion) DO UPDATE SET departamento=EXCLUDED.departamento,
                   latitud=EXCLUDED.latitud, longitud=EXCLUDED.longitud""")
         cur.execute("""INSERT INTO dw.dim_clima
@@ -167,18 +172,22 @@ def _promote(cur, source: str) -> None:
     elif source == "MODIS":
         cur.execute("""INSERT INTO dw.dim_ubicacion
             (pais_codigo,pais_nombre,ubicacion,latitud,longitud)
-            SELECT DISTINCT pais_codigo,
+            SELECT pais_codigo,
                    CASE pais_codigo WHEN 'URY' THEN 'Uruguay' WHEN 'ARG' THEN 'Argentina' ELSE 'Brasil' END,
-                   ubicacion, latitud, longitud
+                   MIN(ubicacion) AS ubicacion, latitud, longitud
             FROM staging.stg_modis
             WHERE latitud IS NOT NULL AND longitud IS NOT NULL
+            GROUP BY pais_codigo, latitud, longitud
             ON CONFLICT (pais_codigo,latitud,longitud) DO UPDATE
             SET ubicacion=COALESCE(dw.dim_ubicacion.ubicacion, EXCLUDED.ubicacion)""")
         cur.execute("""INSERT INTO dw.dim_cobertura_vegetal (anio,ubicacion_id,codigo_cobertura,descripcion_cobertura)
-            SELECT s.anio,u.ubicacion_id,s.codigo_cobertura,s.descripcion_cobertura FROM staging.stg_modis s
+            SELECT s.anio,u.ubicacion_id,MIN(s.codigo_cobertura) AS codigo_cobertura,
+                   MIN(s.descripcion_cobertura) AS descripcion_cobertura
+            FROM staging.stg_modis s
             JOIN dw.dim_ubicacion u ON u.pais_codigo=s.pais_codigo
              AND u.latitud=s.latitud AND u.longitud=s.longitud
             WHERE s.latitud IS NOT NULL AND s.longitud IS NOT NULL
+            GROUP BY s.anio,u.ubicacion_id
             ON CONFLICT (anio,ubicacion_id) DO UPDATE SET codigo_cobertura=EXCLUDED.codigo_cobertura, descripcion_cobertura=EXCLUDED.descripcion_cobertura""")
     elif source == "CAMS":
         cur.execute("""INSERT INTO dw.dim_fecha (fecha, anio, mes, trimestre)
