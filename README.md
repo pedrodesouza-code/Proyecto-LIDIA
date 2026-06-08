@@ -36,7 +36,7 @@ encima del archivo real.
 ```bash
 cd /app/Proyecto-LIDIA
 set -a
-source config/.env
+. config/.env
 set +a
 python -m pip install -r requirements-utec.txt
 ```
