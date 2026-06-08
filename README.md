@@ -29,9 +29,15 @@ explicitamente el Data Warehouse de este proyecto.
 
 ## Configuracion
 
+En Jupyter/remoto se trabaja desde `/app/Proyecto-LIDIA` con `config/.env`
+ya configurado por el entorno. No es obligatorio copiar `config/.env.example`
+encima del archivo real.
+
 ```bash
-cp config/.env.example config/.env
-# Completar passwords y rutas locales; config/.env esta ignorado por Git.
+cd /app/Proyecto-LIDIA
+set -a
+source config/.env
+set +a
 python -m pip install -r requirements-utec.txt
 ```
 
@@ -45,17 +51,64 @@ y `pm10`/`pm10_media`.
 
 ## Base De Datos
 
-Con PostgreSQL disponible, ejecutar en orden:
+Con PostgreSQL disponible en Jupyter/remoto, cargar primero las variables del
+`config/.env` ya configurado:
 
 ```bash
-psql "$DATABASE_URL" -f sql/ddl/00_schemas.sql
-psql "$DATABASE_URL" -f sql/ddl/01_roles.sql
-psql "$DATABASE_URL" -f sql/ddl/02_Schema.sql
-psql "$DATABASE_URL" -f sql/ddl/03_indices.sql
-psql "$DATABASE_URL" -f sql/ddl/04_vistas.sql
+cd /app/Proyecto-LIDIA
+set -a
+source config/.env
+set +a
+```
+
+Luego ejecutar los DDL en orden usando host, puerto, usuario y base definidos
+en el entorno, sin depender de `DATABASE_URL`:
+
+```bash
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -f sql/ddl/00_schemas.sql
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -f sql/ddl/01_roles.sql
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -f sql/ddl/02_Schema.sql
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -f sql/ddl/03_indices.sql
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -f sql/ddl/04_vistas.sql
+
 # Opcionales segun ambiente:
-psql "$DATABASE_URL" -f sql/ddl/05_migracion_Sa.sql
-psql "$DATABASE_URL" -f sql/ddl/06_postgis_firms_migracion.sql
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -f sql/ddl/05_migracion_Sa.sql
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -f sql/ddl/06_postgis_firms_migracion.sql
 ```
 
 `staging` conserva metadata, registros normalizados y rechazos. `dw` aplica
