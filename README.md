@@ -57,7 +57,7 @@ Con PostgreSQL disponible en Jupyter/remoto, cargar primero las variables del
 ```bash
 cd /app/Proyecto-LIDIA
 set -a
-source config/.env
+. config/.env
 set +a
 ```
 
