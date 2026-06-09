@@ -1,0 +1,31 @@
+{"countries": ["URY"], "end_date": "2025-01-07", "estado": "inicio", "etapa": "pipeline", "fuente": "FIRMS", "max_records_per_source": 5000, "nota": "corrida controlada de evidencia; no es carga historica completa", "skip_mongo": true, "smoke": true, "start_date": "2025-01-01", "timestamp": "2026-06-09T19:55:14.473706+00:00"}
+{"estado": "iniciado", "etapa": "inicio", "fuente": "FIRMS", "particionado": true, "smoke": true, "timestamp": "2026-06-09T19:55:14.473943+00:00"}
+{"anio": 2025, "estado": "iniciado", "etapa": "extract", "fuente": "FIRMS", "particionado": true, "smoke": true, "timestamp": "2026-06-09T19:55:15.096147+00:00"}
+{"anio": 2025, "estado": "ok", "etapa": "extract", "filas_filtradas": 18, "filas_leidas": 18, "fuente": "FIRMS", "particionado": true, "smoke": true, "timestamp": "2026-06-09T19:55:15.305251+00:00"}
+{"anio": 2025, "estado": "iniciado", "etapa": "transform", "filas_leidas": 18, "fuente": "FIRMS", "lote": 1, "particionado": true, "smoke": true, "timestamp": "2026-06-09T19:55:15.305878+00:00"}
+{"anio": 2025, "estado": "ok", "etapa": "transform", "filas_aceptadas": 18, "filas_rechazadas": 0, "fuente": "FIRMS", "lote": 1, "particionado": true, "smoke": true, "timestamp": "2026-06-09T19:55:15.319371+00:00"}
+{"anio": 2025, "estado": "iniciado", "etapa": "load", "filas_leidas": 18, "fuente": "FIRMS", "lote": 1, "particionado": true, "smoke": true, "timestamp": "2026-06-09T19:55:15.319509+00:00"}
+{"duracion_segundos": 0.853, "error": "OperationalError: connection to server at \"localhost\" (127.0.0.1), port 5432 failed: fe_sendauth: no password supplied\n", "estado": "error", "etapa": "pipeline", "filas_cargadas": 0, "filas_leidas": 0, "filas_rechazadas": 0, "fuente": "FIRMS", "particionado": true, "timestamp": "2026-06-09T19:55:15.326501+00:00"}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/main.py", line 399, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/main.py", line 393, in main
+    run_source(source, options)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/main.py", line 318, in run_source
+    return run_firms_partitioned(options)
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/main.py", line 237, in run_firms_partitioned
+    result = load_staging("FIRMS", accepted, rejected, promote=not options.smoke)
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/load/postgres.py", line 49, in load_staging
+    with connect() as conn, conn.cursor() as cur:
+         ~~~~~~~^^
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/etl/load/postgres.py", line 33, in connect
+    return psycopg2.connect(**PG_CONFIG)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/var/data/python/lib/python3.13/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "localhost" (127.0.0.1), port 5432 failed: fe_sendauth: no password supplied
+

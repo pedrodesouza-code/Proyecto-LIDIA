@@ -68,6 +68,15 @@ def load_staging(source: str, accepted: list[dict], rejected: list[dict], promot
             prior = cur.fetchone()
             values = [Json(row[col]) if col == "raw_payload" else row.get(col) for col in columns]
             if prior is None:
+                cur.execute(
+                    sql.SQL("SELECT natural_key FROM staging.{} WHERE record_hash=%s").format(sql.Identifier(table)),
+                    (row["record_hash"],),
+                )
+                duplicate_hash = cur.fetchone()
+                if duplicate_hash is not None:
+                    counts["sin_cambio"] += 1
+                    _event(cur, run_id, source, row["record_hash"], "sin_cambio", {"motivo": "record_hash_existente"})
+                    continue
                 cur.execute(insert_stmt, values)
                 counts["insertadas"] += 1
                 _event(cur, run_id, source, row["record_hash"], "alta")
