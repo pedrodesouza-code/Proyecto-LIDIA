@@ -1,34 +1,45 @@
+# Configuracion sensible
+.env
+.env.*
+.env.local
+config/.env
+config/.env.*
+config/utec.env
+docker/.env
 implementation/config/.env
 implementation/config/utec.env
 implementation/docker/.env
+
+# Datos locales / datasets no versionados
+data/raw/
+data/processed/
 implementation/data/
-implementation/logs/
-evidencia/logs/*.jsonl
-!evidencia/logs/
-!evidencia/logs/validacion_local.txt
+*.csv
 *.parquet
 *.shp
 *.shx
 *.dbf
+*.prj
+*.cpg
+*.zip
+
+# Logs y evidencia local temporal
+implementation/logs/
+evidencia/logs/*.jsonl
+!evidencia/logs/
+!evidencia/logs/validacion_local.txt
 
 # Python cache
 __pycache__/
+*.pyc
 *.py[cod]
 .pytest_cache/
-
-# Local secrets
-.env
-.env.local
-config/.env
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
 
 # Material legacy/no entregable
 _no_entregar/
-config/utec.env
-docker/.env
-.ipynb_checkpoints/
-**/.ipynb_checkpoints/
 .env.docker
-data/raw/
 backups/
 
 # Backups y snapshots de bases
