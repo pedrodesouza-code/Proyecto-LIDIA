@@ -18,7 +18,7 @@ explicitamente el Data Warehouse de este proyecto.
 ## Contenido Implementado
 
 - `sql/ddl/`: esquemas `staging`, `dw`, `audit`, roles, modelo
-  estrella, indices, vistas, migracion legacy segura y PostGIS opcional FIRMS.
+  estrella, indices, vistas, migracion legacy segura.
 - `etl/`: extractores por fuente, validacion, rechazos,
   promociones al DW y CDC mediante clave natural mas hash SHA-256.
 - `nosql/`: schemas y consultas MongoDB para raw payloads, metadata, logs,
@@ -103,12 +103,6 @@ PGPASSWORD="$POSTGRES_PASSWORD" psql \
   -U "$POSTGRES_USER" \
   -d "$POSTGRES_DB" \
   -f sql/ddl/05_migracion_Sa.sql
-PGPASSWORD="$POSTGRES_PASSWORD" psql \
-  -h "$POSTGRES_HOST" \
-  -p "$POSTGRES_PORT" \
-  -U "$POSTGRES_USER" \
-  -d "$POSTGRES_DB" \
-  -f sql/ddl/06_postgis_firms_migracion.sql
 ```
 
 `staging` conserva metadata, registros normalizados y rechazos. `dw` aplica
@@ -210,7 +204,7 @@ ambiental agregado, evitando atribuciones de causalidad o responsabilidad.
 
 La implementacion incluye DDL ejecutable, pipeline Python modular, persistencia
 documental complementaria, dashboard SQL y tests unitarios de reglas
-criticas. PostGIS agrega geometria de FIRMS de forma opcional y separada.
+criticas. Los focos FIRMS se trabajan con latitud y longitud.
 
 ## Pendientes Verificables
 

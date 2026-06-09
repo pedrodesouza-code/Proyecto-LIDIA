@@ -1,6 +1,6 @@
 # Docker Local
 
-Este `compose` levanta PostgreSQL/PostGIS, MongoDB y Streamlit para validacion local.
+Este `compose` levanta PostgreSQL, MongoDB y Streamlit para validacion local.
 Copiar `.env.example` a `.env` local y cambiar passwords antes de iniciarlo.
 
 ```bash
