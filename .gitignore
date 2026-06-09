@@ -54,3 +54,4 @@ data/reference/
 
 # Logs stdout generados por corridas locales
 evidencia/logs/*.stdout.log
+evidencia/logs/export_state_from_jupyter_*.log
