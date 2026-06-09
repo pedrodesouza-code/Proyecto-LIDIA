@@ -147,3 +147,53 @@ def test_firms_principal_local_cubre_2018_y_2025_si_existe():
     assert "CHL" not in countries
     assert "temperatura_c" not in frame.columns
     assert any(column in frame.columns for column in ("brillo_ti4", "brightness", "brillo_termico"))
+
+
+def test_meteo_principal_local_llega_a_2025_si_existe():
+    path = Path("data/processed/meteo_2018_2025.parquet")
+    if not path.exists():
+        return
+
+    frame = pd.read_parquet(path)
+    fecha_hora = pd.to_datetime(frame.get("fecha_hora_utc"), errors="coerce", utc=True)
+    fecha = pd.to_datetime(frame.get("fecha"), errors="coerce", utc=True)
+    dates = fecha_hora.fillna(fecha)
+    countries = set(frame["pais_codigo"].astype(str).str.upper())
+
+    assert dates.min().date().isoformat() == "2018-01-01"
+    assert dates.max() >= pd.Timestamp("2025-12-31", tz="UTC")
+    assert {"URY", "ARG", "BRA"}.issubset(countries)
+    assert countries <= {"URY", "ARG", "BRA"}
+    assert {"temperature_2m", "relative_humidity_2m", "wind_speed_10m", "wind_direction_10m", "rain", "surface_pressure"}.issubset(frame.columns)
+
+
+def test_modis_principal_local_usa_solo_anios_y_paises_validos_si_existe():
+    path = Path("data/processed/modis_2018_2025.parquet")
+    if not path.exists():
+        return
+
+    frame = pd.read_parquet(path)
+    years = set(pd.to_numeric(frame["anio"], errors="coerce").dropna().astype(int))
+    countries = set(frame["pais_codigo"].astype(str).str.upper())
+
+    assert years
+    assert min(years) >= 2018
+    assert max(years) <= 2025
+    assert countries <= {"URY", "ARG", "BRA"}
+    assert {"anio", "pais_codigo", "ubicacion", "codigo_cobertura", "descripcion_cobertura"}.issubset(frame.columns)
+
+
+def test_chirps_principal_local_llega_a_2025_sin_chile_si_existe():
+    path = Path("data/processed/chirps_2018_2025.parquet")
+    if not path.exists():
+        return
+
+    frame = pd.read_parquet(path)
+    dates = pd.to_datetime(frame["fecha"], errors="coerce", utc=True)
+    countries = set(frame["pais_codigo"].astype(str).str.upper())
+
+    assert dates.min().date().isoformat() == "2018-01-01"
+    assert dates.max() >= pd.Timestamp("2025-12-01", tz="UTC")
+    assert countries <= {"URY", "ARG", "BRA"}
+    assert "CHL" not in countries
+    assert (pd.to_numeric(frame["precipitacion_mm"], errors="coerce") >= 0).all()

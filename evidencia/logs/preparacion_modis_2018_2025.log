@@ -1,0 +1,144 @@
+{
+  "estado": "ok",
+  "fuente": "MODIS",
+  "archivos_modis_encontrados": [
+    "/home/pepo/Datos completos/MODIS/modis_lc_type1_lidia_ury_arg_bra.csv",
+    "/home/pepo/Datos completos/MODIS/modis_arg_bra_2018_2021_zenodo.csv",
+    "/home/pepo/Datos completos/MODIS/modis_todos.csv",
+    "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/modis_lc.parquet"
+  ],
+  "auditorias": [
+    {
+      "ruta": "/home/pepo/Datos completos/MODIS/modis_lc_type1_lidia_ury_arg_bra.csv",
+      "filas": 181,
+      "columnas": [
+        "anio",
+        "pais_codigo",
+        "ubicacion",
+        "latitud",
+        "longitud",
+        "codigo_cobertura",
+        "descripcion_cobertura",
+        "archivo",
+        "fuente_descarga"
+      ],
+      "anio_min": 2018,
+      "anio_max": 2024,
+      "conteo_anios": {
+        "2018": 31,
+        "2019": 31,
+        "2020": 31,
+        "2021": 31,
+        "2022": 19,
+        "2023": 19,
+        "2024": 19
+      },
+      "conteo_paises": {
+        "ARG": 24,
+        "BRA": 24,
+        "URY": 133
+      }
+    },
+    {
+      "ruta": "/home/pepo/Datos completos/MODIS/modis_arg_bra_2018_2021_zenodo.csv",
+      "filas": 48,
+      "columnas": [
+        "anio",
+        "pais_codigo",
+        "ubicacion",
+        "latitud",
+        "longitud",
+        "codigo_cobertura",
+        "descripcion_cobertura",
+        "archivo",
+        "fuente_descarga"
+      ],
+      "anio_min": 2018,
+      "anio_max": 2021,
+      "conteo_anios": {
+        "2018": 12,
+        "2019": 12,
+        "2020": 12,
+        "2021": 12
+      },
+      "conteo_paises": {
+        "ARG": 24,
+        "BRA": 24
+      }
+    },
+    {
+      "ruta": "/home/pepo/Datos completos/MODIS/modis_todos.csv",
+      "filas": 266,
+      "columnas": [
+        "archivo",
+        "punto",
+        "lat",
+        "lon",
+        "valor"
+      ],
+      "anio_min": null,
+      "anio_max": null,
+      "conteo_anios": {},
+      "conteo_paises": {}
+    },
+    {
+      "ruta": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/modis_lc.parquet",
+      "filas": 63,
+      "columnas": [
+        "pais",
+        "punto",
+        "anio",
+        "lc_type1",
+        "fuente",
+        "lc_descripcion",
+        "combustibilidad"
+      ],
+      "anio_min": 2018,
+      "anio_max": 2024,
+      "conteo_anios": {
+        "2018": 9,
+        "2019": 9,
+        "2020": 9,
+        "2021": 9,
+        "2022": 9,
+        "2023": 9,
+        "2024": 9
+      },
+      "conteo_paises": {
+        "ARG": 28,
+        "BRA": 35
+      }
+    }
+  ],
+  "archivo_final": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/modis_2018_2025.parquet",
+  "filas_finales": 244,
+  "anios_finales": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "conteo_anios_final": {
+    "2018": 40,
+    "2019": 40,
+    "2020": 40,
+    "2021": 40,
+    "2022": 28,
+    "2023": 28,
+    "2024": 28
+  },
+  "conteo_paises_final": {
+    "ARG": 52,
+    "BRA": 59,
+    "URY": 133
+  },
+  "hay_2025": false,
+  "hay_uruguay": true,
+  "pendientes_reales": [
+    "MODIS 2025 no disponible localmente"
+  ],
+  "nota": "No se generan coberturas sinteticas; solo se consolidan archivos MODIS locales reales."
+}

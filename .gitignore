@@ -48,3 +48,9 @@ backups/
 *.sql.gz
 *.archive
 *.tar.gz
+
+# Datos auxiliares geoespaciales locales usados para clasificación, no versionados
+data/reference/
+
+# Logs stdout generados por corridas locales
+evidencia/logs/*.stdout.log
