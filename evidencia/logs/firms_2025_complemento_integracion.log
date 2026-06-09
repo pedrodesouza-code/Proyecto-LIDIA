@@ -1,0 +1,24 @@
+{
+  "historico_inicial_filas": 2585806,
+  "complemento_original_filas": 3708772,
+  "complemento_util_filas": 285690,
+  "filas_antes_de_deduplicar": 2871496,
+  "filas_finales": 2871496,
+  "duplicados_eliminados": 0,
+  "fecha_min_final": "2018-01-01",
+  "fecha_max_final": "2025-12-31",
+  "conteo_por_pais_final": {
+    "ARG": 510120,
+    "BRA": 2352851,
+    "URY": 8525
+  },
+  "conteo_por_pais_complemento_util": {
+    "ARG": 48103,
+    "BRA": 236545,
+    "URY": 1042
+  },
+  "chl_final": 0,
+  "archivo_final": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025.parquet",
+  "backup": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025_before_2025_complement.parquet",
+  "brightness_descripcion": "brillo_termico_pixel_satelital_no_temperatura_aire"
+}

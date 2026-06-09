@@ -1,0 +1,21 @@
+{
+  "input_rows": 3672055,
+  "output_file": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025.parquet",
+  "output_rows": 2585806,
+  "fecha_min": "2018-01-01",
+  "fecha_max": "2025-01-01",
+  "conteo_por_pais": {
+    "ARG": 462017,
+    "BRA": 2116306,
+    "URY": 7483
+  },
+  "clasificacion_total": {
+    "SIN_PAIS": 1026546,
+    "ARG": 462017,
+    "BRA": 2116306,
+    "CHL": 59703,
+    "URY": 7483
+  },
+  "chl_eliminado": true,
+  "brightness_descripcion": "brillo_termico_pixel_satelital_no_temperatura_aire"
+}

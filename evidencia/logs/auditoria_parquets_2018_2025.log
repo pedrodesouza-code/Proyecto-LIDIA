@@ -1,0 +1,590 @@
+# Auditoria Parquet 2018-2025
+
+| archivo | filas | fecha min | fecha max | fuera 2018-2025 | paises fuera alcance | NRT |
+|---|---:|---|---|---|---|---|
+| cams_2018_2025.parquet | 58108 | 2018-01-01 | 2025-12-31 | False | - | False |
+| cams_nrt_procesado.parquet | 828 | 2026-03-12 | 2026-05-15 | True | - | True |
+| cams_procesado_todos.parquet | 98449 | 2018-01-01 | 2026-03-29 | True | - | False |
+| chirps_2018_2025.parquet | 2262 | 2018-01-01 | 2024-12-01 | False | - | False |
+| chirps_sa.parquet | 2886 | 2018-01-01 | 2024-12-01 | False | CHL | False |
+| firms_2018_2025.parquet | 2871496 | 2018-01-01 | 2025-12-31 | False | - | False |
+| firms_2018_2025_before_2025_complement.parquet | 2585806 | 2018-01-01 | 2025-01-01 | False | - | False |
+| firms_nrt_procesado.parquet | 5283 | 2026-05-11 | 2026-05-15 | True | CHL | True |
+| firms_procesado.parquet | 1946361 | 2024-01-01 | 2026-03-31 | True | CHL | False |
+| inumet_2018_2025.parquet | 224369 | 2020-01-01 | 2025-12-31 | False | - | False |
+| inumet_procesado.parquet | 242126 | 2020-01-01 | 2026-04-17 | True | - | False |
+| meteo_2018_2025.parquet | 53788 | 2018-01-01 | 2024-12-31 | False | - | False |
+| meteo_procesado_todos.parquet | 88087 | 2011-06-04 | 2024-12-31 | True | - | False |
+| modis_2018_2025.parquet | 63 | 2018-01-01 | 2024-01-01 | False | - | False |
+| modis_lc.parquet | 63 | 2018-01-01 | 2024-01-01 | False | - | False |
+
+```json
+[
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/cams_2018_2025.parquet",
+    "nombre": "cams_2018_2025.parquet",
+    "size_bytes": 407453,
+    "filas": 58108,
+    "columnas": [
+      "fecha",
+      "punto",
+      "pm10_media",
+      "pm10_max",
+      "pm10_p95",
+      "horas_validas",
+      "pm2_5_media",
+      "pm2_5_max",
+      "aerosol_optical_depth_media",
+      "european_aqi_media",
+      "european_aqi_max",
+      "latitud",
+      "longitud",
+      "supera_oms_pm10",
+      "nivel_pm10",
+      "pais_codigo"
+    ],
+    "columna_temporal_detectada": "fecha",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2025-12-31",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "URY": 35095,
+      "BRA": 12785,
+      "ARG": 10228
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": true
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/cams_nrt_procesado.parquet",
+    "nombre": "cams_nrt_procesado.parquet",
+    "size_bytes": 35650,
+    "filas": 828,
+    "columnas": [
+      "fecha",
+      "punto",
+      "pm10_media",
+      "pm10_max",
+      "pm2_5_media",
+      "pm2_5_max",
+      "aerosol_optical_depth_media",
+      "aerosol_optical_depth_max",
+      "european_aqi_media",
+      "european_aqi_max",
+      "pm10_p95",
+      "horas_validas",
+      "latitud",
+      "longitud",
+      "supera_oms_pm10",
+      "nivel_pm10"
+    ],
+    "columna_temporal_detectada": "fecha",
+    "nulos_temporales": 0,
+    "fecha_min": "2026-03-12",
+    "fecha_max": "2026-05-15",
+    "fuera_2018_2025": true,
+    "filas_fuera_2018_2025": 828,
+    "paises_detectados": {
+      "BRA": 320,
+      "ARG": 256,
+      "": 153,
+      "URY": 99
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": true,
+    "principal_recomendado": false
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/cams_procesado_todos.parquet",
+    "nombre": "cams_procesado_todos.parquet",
+    "size_bytes": 680837,
+    "filas": 98449,
+    "columnas": [
+      "fecha",
+      "punto",
+      "pm10_media",
+      "pm10_max",
+      "pm10_p95",
+      "horas_validas",
+      "pm2_5_media",
+      "pm2_5_max",
+      "aerosol_optical_depth_media",
+      "european_aqi_media",
+      "european_aqi_max",
+      "latitud",
+      "longitud",
+      "supera_oms_pm10",
+      "nivel_pm10"
+    ],
+    "columna_temporal_detectada": "fecha",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2026-03-29",
+    "fuera_2018_2025": true,
+    "filas_fuera_2018_2025": 2355,
+    "paises_detectados": {
+      "": 39130,
+      "URY": 36153,
+      "BRA": 12870,
+      "ARG": 10296
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": false
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/chirps_2018_2025.parquet",
+    "nombre": "chirps_2018_2025.parquet",
+    "size_bytes": 34092,
+    "filas": 2262,
+    "columnas": [
+      "punto",
+      "pais",
+      "fecha",
+      "precipitacion_mm",
+      "fuente",
+      "anio",
+      "mes",
+      "anio_mes",
+      "precipitacion_anomalia_pct",
+      "deficit_hidrico",
+      "pais_codigo"
+    ],
+    "columna_temporal_detectada": "fecha",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2024-12-01",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "URY": 1560,
+      "BRA": 390,
+      "ARG": 312
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": true
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/chirps_sa.parquet",
+    "nombre": "chirps_sa.parquet",
+    "size_bytes": 43090,
+    "filas": 2886,
+    "columnas": [
+      "punto",
+      "pais",
+      "fecha",
+      "precipitacion_mm",
+      "fuente",
+      "anio",
+      "mes",
+      "anio_mes",
+      "precipitacion_anomalia_pct",
+      "deficit_hidrico"
+    ],
+    "columna_temporal_detectada": "fecha",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2024-12-01",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "URY": 1560,
+      "CHL": 624,
+      "BRA": 390,
+      "ARG": 312
+    },
+    "paises_fuera_alcance": [
+      "CHL"
+    ],
+    "contiene_paises_fuera_alcance": true,
+    "es_nrt": false,
+    "principal_recomendado": false
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025.parquet",
+    "nombre": "firms_2018_2025.parquet",
+    "size_bytes": 56744240,
+    "filas": 2871496,
+    "columnas": [
+      "latitud",
+      "longitud",
+      "brillo_ti4",
+      "scan",
+      "track",
+      "fecha_adq",
+      "hora_adq_hhmm",
+      "satelite",
+      "instrumento",
+      "confianza_raw",
+      "version",
+      "brillo_ti5",
+      "potencia_radiativa",
+      "dia_noche",
+      "type",
+      "pais",
+      "pais_codigo",
+      "confianza_num",
+      "hora_adq",
+      "es_diurno"
+    ],
+    "columna_temporal_detectada": "fecha_adq",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2025-12-31",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "BRA": 2352851,
+      "ARG": 510120,
+      "URY": 8525
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": true
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025_before_2025_complement.parquet",
+    "nombre": "firms_2018_2025_before_2025_complement.parquet",
+    "size_bytes": 51047106,
+    "filas": 2585806,
+    "columnas": [
+      "latitud",
+      "longitud",
+      "brillo_ti4",
+      "scan",
+      "track",
+      "fecha_adq",
+      "hora_adq_hhmm",
+      "satelite",
+      "instrumento",
+      "confianza_raw",
+      "version",
+      "brillo_ti5",
+      "potencia_radiativa",
+      "dia_noche",
+      "type",
+      "pais",
+      "pais_codigo",
+      "confianza_num",
+      "hora_adq",
+      "es_diurno"
+    ],
+    "columna_temporal_detectada": "fecha_adq",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2025-01-01",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "BRA": 2116306,
+      "ARG": 462017,
+      "URY": 7483
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": false
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet",
+    "nombre": "firms_nrt_procesado.parquet",
+    "size_bytes": 175329,
+    "filas": 5283,
+    "columnas": [
+      "latitud",
+      "longitud",
+      "brillo_ti4",
+      "scan",
+      "track",
+      "fecha_adq",
+      "hora_adq_hhmm",
+      "satelite",
+      "instrumento",
+      "confianza_raw",
+      "version",
+      "brillo_ti5",
+      "potencia_radiativa",
+      "dia_noche",
+      "pais",
+      "confianza_num",
+      "hora_adq",
+      "es_diurno"
+    ],
+    "columna_temporal_detectada": "fecha_adq",
+    "nulos_temporales": 0,
+    "fecha_min": "2026-05-11",
+    "fecha_max": "2026-05-15",
+    "fuera_2018_2025": true,
+    "filas_fuera_2018_2025": 5283,
+    "paises_detectados": {
+      "BRA": 2930,
+      "ARG": 1334,
+      "CHL": 945,
+      "URY": 74
+    },
+    "paises_fuera_alcance": [
+      "CHL"
+    ],
+    "contiene_paises_fuera_alcance": true,
+    "es_nrt": true,
+    "principal_recomendado": false
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_procesado.parquet",
+    "nombre": "firms_procesado.parquet",
+    "size_bytes": 44788022,
+    "filas": 1946361,
+    "columnas": [
+      "latitud",
+      "longitud",
+      "brillo_ti4",
+      "scan",
+      "track",
+      "fecha_adq",
+      "hora_adq_hhmm",
+      "satelite",
+      "instrumento",
+      "confianza_raw",
+      "version",
+      "brillo_ti5",
+      "potencia_radiativa",
+      "dia_noche",
+      "type",
+      "pais",
+      "confianza_num",
+      "hora_adq",
+      "es_diurno"
+    ],
+    "columna_temporal_detectada": "fecha_adq",
+    "nulos_temporales": 0,
+    "fecha_min": "2024-01-01",
+    "fecha_max": "2026-03-31",
+    "fuera_2018_2025": true,
+    "filas_fuera_2018_2025": 24104,
+    "paises_detectados": {
+      "BRA": 1737010,
+      "CHL": 109824,
+      "ARG": 96232,
+      "URY": 3295
+    },
+    "paises_fuera_alcance": [
+      "CHL"
+    ],
+    "contiene_paises_fuera_alcance": true,
+    "es_nrt": false,
+    "principal_recomendado": false
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/inumet_2018_2025.parquet",
+    "nombre": "inumet_2018_2025.parquet",
+    "size_bytes": 1150570,
+    "filas": 224369,
+    "columnas": [
+      "fecha_hora_utc",
+      "pais_codigo",
+      "ubicacion",
+      "departamento",
+      "latitud",
+      "longitud",
+      "temperatura_c",
+      "humedad_pct",
+      "fuente"
+    ],
+    "columna_temporal_detectada": "fecha_hora_utc",
+    "nulos_temporales": 0,
+    "fecha_min": "2020-01-01",
+    "fecha_max": "2025-12-31",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "URY": 224369
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": true
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/inumet_procesado.parquet",
+    "nombre": "inumet_procesado.parquet",
+    "size_bytes": 1239855,
+    "filas": 242126,
+    "columnas": [
+      "fecha_hora_utc",
+      "pais_codigo",
+      "ubicacion",
+      "departamento",
+      "latitud",
+      "longitud",
+      "temperatura_c",
+      "humedad_pct",
+      "fuente"
+    ],
+    "columna_temporal_detectada": "fecha_hora_utc",
+    "nulos_temporales": 0,
+    "fecha_min": "2020-01-01",
+    "fecha_max": "2026-04-17",
+    "fuera_2018_2025": true,
+    "filas_fuera_2018_2025": 17757,
+    "paises_detectados": {
+      "URY": 242126
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": false
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/meteo_2018_2025.parquet",
+    "nombre": "meteo_2018_2025.parquet",
+    "size_bytes": 918678,
+    "filas": 53788,
+    "columnas": [
+      "fecha",
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "relative_humidity_2m_min",
+      "relative_humidity_2m_max",
+      "wind_speed_10m_max",
+      "wind_direction_10m_dominant",
+      "precipitation_sum",
+      "et0_fao_evapotranspiration",
+      "punto",
+      "latitud",
+      "longitud",
+      "riesgo_temp",
+      "riesgo_humedad",
+      "riesgo_viento",
+      "riesgo_sequia",
+      "indice_riesgo",
+      "nivel_riesgo",
+      "pais_codigo"
+    ],
+    "columna_temporal_detectada": "fecha",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2024-12-31",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "URY": 30775,
+      "BRA": 12785,
+      "ARG": 10228
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": true
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/meteo_procesado_todos.parquet",
+    "nombre": "meteo_procesado_todos.parquet",
+    "size_bytes": 1471371,
+    "filas": 88087,
+    "columnas": [
+      "fecha",
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "relative_humidity_2m_min",
+      "relative_humidity_2m_max",
+      "wind_speed_10m_max",
+      "wind_direction_10m_dominant",
+      "precipitation_sum",
+      "et0_fao_evapotranspiration",
+      "punto",
+      "latitud",
+      "longitud",
+      "riesgo_temp",
+      "riesgo_humedad",
+      "riesgo_viento",
+      "riesgo_sequia",
+      "indice_riesgo",
+      "nivel_riesgo"
+    ],
+    "columna_temporal_detectada": "fecha",
+    "nulos_temporales": 0,
+    "fecha_min": "2011-06-04",
+    "fecha_max": "2024-12-31",
+    "fuera_2018_2025": true,
+    "filas_fuera_2018_2025": 1058,
+    "paises_detectados": {
+      "": 33701,
+      "URY": 31373,
+      "BRA": 12785,
+      "ARG": 10228
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": false
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/modis_2018_2025.parquet",
+    "nombre": "modis_2018_2025.parquet",
+    "size_bytes": 5180,
+    "filas": 63,
+    "columnas": [
+      "pais",
+      "punto",
+      "anio",
+      "lc_type1",
+      "fuente",
+      "lc_descripcion",
+      "combustibilidad",
+      "pais_codigo"
+    ],
+    "columna_temporal_detectada": "anio",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2024-01-01",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "BRA": 35,
+      "ARG": 28
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": true
+  },
+  {
+    "archivo": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/modis_lc.parquet",
+    "nombre": "modis_lc.parquet",
+    "size_bytes": 4702,
+    "filas": 63,
+    "columnas": [
+      "pais",
+      "punto",
+      "anio",
+      "lc_type1",
+      "fuente",
+      "lc_descripcion",
+      "combustibilidad"
+    ],
+    "columna_temporal_detectada": "anio",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2024-01-01",
+    "fuera_2018_2025": false,
+    "filas_fuera_2018_2025": 0,
+    "paises_detectados": {
+      "BRA": 35,
+      "ARG": 28
+    },
+    "paises_fuera_alcance": [],
+    "contiene_paises_fuera_alcance": false,
+    "es_nrt": false,
+    "principal_recomendado": false
+  }
+]
+```

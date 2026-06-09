@@ -1,0 +1,287 @@
+# Auditoria FIRMS historico 2018-2025
+
+| ruta | filas | desde | hasta | paises | CHL | principal EC3 | errores |
+|---|---:|---|---|---|---|---|---|
+| /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025.parquet | 2871496 | 2018-01-01 | 2025-12-31 | BRA:2352851, ARG:510120, URY:8525 | False | True | - |
+| /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025_before_2025_complement.parquet | 2585806 | 2018-01-01 | 2025-01-01 | BRA:2116306, ARG:462017, URY:7483 | False | True | - |
+| /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet | 5283 | 2026-05-11 | 2026-05-15 | BRA:2930, ARG:1334, CHL:945, URY:74 | True | False | fecha_minima_posterior_a_2018_01_01, contiene_chl, archivo_nrt_no_valido_como_principal |
+| /home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_procesado.parquet | 1946361 | 2024-01-01 | 2026-03-31 | BRA:1737010, CHL:109824, ARG:96232, URY:3295 | True | False | fecha_minima_posterior_a_2018_01_01, contiene_chl |
+| /home/pepo/Datos completos/firms/firms_nrt_procesado.parquet | 5283 | 2026-05-11 | 2026-05-15 | BRA:2930, ARG:1334, CHL:945, URY:74 | True | False | fecha_minima_posterior_a_2018_01_01, contiene_chl, archivo_nrt_no_valido_como_principal |
+
+Seleccionado: `/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025.parquet`
+
+Nota: si el historico remoto `/app/Proyecto-LIDIA/data/raw/firms/firms_shapefile_2018_2025.parquet` no aparece en este log, no era accesible desde el entorno local durante la auditoria.
+
+```json
+{
+  "selected": {
+    "ruta": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025.parquet",
+    "size_bytes": 56744240,
+    "es_nrt": false,
+    "filas": 2871496,
+    "columnas": [
+      "latitud",
+      "longitud",
+      "brillo_ti4",
+      "scan",
+      "track",
+      "fecha_adq",
+      "hora_adq_hhmm",
+      "satelite",
+      "instrumento",
+      "confianza_raw",
+      "version",
+      "brillo_ti5",
+      "potencia_radiativa",
+      "dia_noche",
+      "type",
+      "pais",
+      "pais_codigo",
+      "confianza_num",
+      "hora_adq",
+      "es_diurno"
+    ],
+    "columna_temporal_detectada": "fecha_adq",
+    "nulos_temporales": 0,
+    "fecha_min": "2018-01-01",
+    "fecha_max": "2025-12-31",
+    "paises_detectados": {
+      "BRA": 2352851,
+      "ARG": 510120,
+      "URY": 8525
+    },
+    "contiene_chl": false,
+    "tiene_ury_arg_bra": true,
+    "contiene_brightness": true,
+    "brightness_descripcion": "brillo_termico_pixel_satelital",
+    "errores_principal": [],
+    "sirve_como_principal_ec3": true
+  },
+  "profiles": [
+    {
+      "ruta": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025.parquet",
+      "size_bytes": 56744240,
+      "es_nrt": false,
+      "filas": 2871496,
+      "columnas": [
+        "latitud",
+        "longitud",
+        "brillo_ti4",
+        "scan",
+        "track",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite",
+        "instrumento",
+        "confianza_raw",
+        "version",
+        "brillo_ti5",
+        "potencia_radiativa",
+        "dia_noche",
+        "type",
+        "pais",
+        "pais_codigo",
+        "confianza_num",
+        "hora_adq",
+        "es_diurno"
+      ],
+      "columna_temporal_detectada": "fecha_adq",
+      "nulos_temporales": 0,
+      "fecha_min": "2018-01-01",
+      "fecha_max": "2025-12-31",
+      "paises_detectados": {
+        "BRA": 2352851,
+        "ARG": 510120,
+        "URY": 8525
+      },
+      "contiene_chl": false,
+      "tiene_ury_arg_bra": true,
+      "contiene_brightness": true,
+      "brightness_descripcion": "brillo_termico_pixel_satelital",
+      "errores_principal": [],
+      "sirve_como_principal_ec3": true
+    },
+    {
+      "ruta": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_2018_2025_before_2025_complement.parquet",
+      "size_bytes": 51047106,
+      "es_nrt": false,
+      "filas": 2585806,
+      "columnas": [
+        "latitud",
+        "longitud",
+        "brillo_ti4",
+        "scan",
+        "track",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite",
+        "instrumento",
+        "confianza_raw",
+        "version",
+        "brillo_ti5",
+        "potencia_radiativa",
+        "dia_noche",
+        "type",
+        "pais",
+        "pais_codigo",
+        "confianza_num",
+        "hora_adq",
+        "es_diurno"
+      ],
+      "columna_temporal_detectada": "fecha_adq",
+      "nulos_temporales": 0,
+      "fecha_min": "2018-01-01",
+      "fecha_max": "2025-01-01",
+      "paises_detectados": {
+        "BRA": 2116306,
+        "ARG": 462017,
+        "URY": 7483
+      },
+      "contiene_chl": false,
+      "tiene_ury_arg_bra": true,
+      "contiene_brightness": true,
+      "brightness_descripcion": "brillo_termico_pixel_satelital",
+      "errores_principal": [],
+      "sirve_como_principal_ec3": true
+    },
+    {
+      "ruta": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_nrt_procesado.parquet",
+      "size_bytes": 175329,
+      "es_nrt": true,
+      "filas": 5283,
+      "columnas": [
+        "latitud",
+        "longitud",
+        "brillo_ti4",
+        "scan",
+        "track",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite",
+        "instrumento",
+        "confianza_raw",
+        "version",
+        "brillo_ti5",
+        "potencia_radiativa",
+        "dia_noche",
+        "pais",
+        "confianza_num",
+        "hora_adq",
+        "es_diurno"
+      ],
+      "columna_temporal_detectada": "fecha_adq",
+      "nulos_temporales": 0,
+      "fecha_min": "2026-05-11",
+      "fecha_max": "2026-05-15",
+      "paises_detectados": {
+        "BRA": 2930,
+        "ARG": 1334,
+        "CHL": 945,
+        "URY": 74
+      },
+      "contiene_chl": true,
+      "tiene_ury_arg_bra": true,
+      "contiene_brightness": true,
+      "brightness_descripcion": "brillo_termico_pixel_satelital",
+      "errores_principal": [
+        "fecha_minima_posterior_a_2018_01_01",
+        "contiene_chl",
+        "archivo_nrt_no_valido_como_principal"
+      ],
+      "sirve_como_principal_ec3": false
+    },
+    {
+      "ruta": "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/data/processed/firms_procesado.parquet",
+      "size_bytes": 44788022,
+      "es_nrt": false,
+      "filas": 1946361,
+      "columnas": [
+        "latitud",
+        "longitud",
+        "brillo_ti4",
+        "scan",
+        "track",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite",
+        "instrumento",
+        "confianza_raw",
+        "version",
+        "brillo_ti5",
+        "potencia_radiativa",
+        "dia_noche",
+        "type",
+        "pais",
+        "confianza_num",
+        "hora_adq",
+        "es_diurno"
+      ],
+      "columna_temporal_detectada": "fecha_adq",
+      "nulos_temporales": 0,
+      "fecha_min": "2024-01-01",
+      "fecha_max": "2026-03-31",
+      "paises_detectados": {
+        "BRA": 1737010,
+        "CHL": 109824,
+        "ARG": 96232,
+        "URY": 3295
+      },
+      "contiene_chl": true,
+      "tiene_ury_arg_bra": true,
+      "contiene_brightness": true,
+      "brightness_descripcion": "brillo_termico_pixel_satelital",
+      "errores_principal": [
+        "fecha_minima_posterior_a_2018_01_01",
+        "contiene_chl"
+      ],
+      "sirve_como_principal_ec3": false
+    },
+    {
+      "ruta": "/home/pepo/Datos completos/firms/firms_nrt_procesado.parquet",
+      "size_bytes": 175329,
+      "es_nrt": true,
+      "filas": 5283,
+      "columnas": [
+        "latitud",
+        "longitud",
+        "brillo_ti4",
+        "scan",
+        "track",
+        "fecha_adq",
+        "hora_adq_hhmm",
+        "satelite",
+        "instrumento",
+        "confianza_raw",
+        "version",
+        "brillo_ti5",
+        "potencia_radiativa",
+        "dia_noche",
+        "pais",
+        "confianza_num",
+        "hora_adq",
+        "es_diurno"
+      ],
+      "columna_temporal_detectada": "fecha_adq",
+      "nulos_temporales": 0,
+      "fecha_min": "2026-05-11",
+      "fecha_max": "2026-05-15",
+      "paises_detectados": {
+        "BRA": 2930,
+        "ARG": 1334,
+        "CHL": 945,
+        "URY": 74
+      },
+      "contiene_chl": true,
+      "tiene_ury_arg_bra": true,
+      "contiene_brightness": true,
+      "brightness_descripcion": "brillo_termico_pixel_satelital",
+      "errores_principal": [
+        "fecha_minima_posterior_a_2018_01_01",
+        "contiene_chl",
+        "archivo_nrt_no_valido_como_principal"
+      ],
+      "sirve_como_principal_ec3": false
+    }
+  ]
+}
+```

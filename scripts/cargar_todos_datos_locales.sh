@@ -71,14 +71,20 @@ COMPOSE=(docker compose --env-file "$DOCKER_ENV" -f docker-compose.yml)
 export PAGER=cat
 export PSQL_PAGER=cat
 
-FIRMS_FILE_PATH="$PROJECT_ROOT/data/processed/firms_procesado.parquet"
+FIRMS_FILE_PATH="$PROJECT_ROOT/data/processed/firms_2018_2025.parquet"
+[[ -f "$FIRMS_FILE_PATH" ]] || FIRMS_FILE_PATH="$PROJECT_ROOT/data/processed/firms_procesado.parquet"
 [[ -f "$FIRMS_FILE_PATH" ]] || FIRMS_FILE_PATH="$PROJECT_ROOT/data/processed/firms_nrt_procesado.parquet"
-METEO_FILE_PATH="$PROJECT_ROOT/data/processed/meteo_procesado_todos.parquet"
-CAMS_FILE_PATH="$PROJECT_ROOT/data/processed/cams_procesado_todos.parquet"
+METEO_FILE_PATH="$PROJECT_ROOT/data/processed/meteo_2018_2025.parquet"
+[[ -f "$METEO_FILE_PATH" ]] || METEO_FILE_PATH="$PROJECT_ROOT/data/processed/meteo_procesado_todos.parquet"
+CAMS_FILE_PATH="$PROJECT_ROOT/data/processed/cams_2018_2025.parquet"
+[[ -f "$CAMS_FILE_PATH" ]] || CAMS_FILE_PATH="$PROJECT_ROOT/data/processed/cams_procesado_todos.parquet"
 [[ -f "$CAMS_FILE_PATH" ]] || CAMS_FILE_PATH="$PROJECT_ROOT/data/processed/cams_nrt_procesado.parquet"
-CHIRPS_FILE_PATH="$PROJECT_ROOT/data/processed/chirps_sa.parquet"
-MODIS_FILE_PATH="$PROJECT_ROOT/data/processed/modis_lc.parquet"
-INUMET_FILE_PATH="$PROJECT_ROOT/data/processed/inumet_procesado.parquet"
+CHIRPS_FILE_PATH="$PROJECT_ROOT/data/processed/chirps_2018_2025.parquet"
+[[ -f "$CHIRPS_FILE_PATH" ]] || CHIRPS_FILE_PATH="$PROJECT_ROOT/data/processed/chirps_sa.parquet"
+MODIS_FILE_PATH="$PROJECT_ROOT/data/processed/modis_2018_2025.parquet"
+[[ -f "$MODIS_FILE_PATH" ]] || MODIS_FILE_PATH="$PROJECT_ROOT/data/processed/modis_lc.parquet"
+INUMET_FILE_PATH="$PROJECT_ROOT/data/processed/inumet_2018_2025.parquet"
+[[ -f "$INUMET_FILE_PATH" ]] || INUMET_FILE_PATH="$PROJECT_ROOT/data/processed/inumet_procesado.parquet"
 
 SOURCES_TO_LOAD=()
 if require_file "$FIRMS_FILE_PATH" "FIRMS"; then
