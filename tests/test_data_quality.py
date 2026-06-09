@@ -235,6 +235,26 @@ def test_extract_cams_api_controlada(monkeypatch):
     assert {"fecha_hora_utc", "pm2_5", "pm10", "latitud", "longitud"}.issubset(frame.columns)
 
 
+def test_extract_cams_aplica_limite_despues_de_filtrar_pm(monkeypatch):
+    from etl.extract import extract_cams
+
+    raw = pd.DataFrame(
+        [
+            {"fecha": "2018-01-01", "punto": "Montevideo", "pais_codigo": "URY", "pm2_5_media": None, "pm10_media": None},
+            {"fecha": "2022-08-04", "punto": "Montevideo", "pais_codigo": "URY", "pm2_5_media": 4.0, "pm10_media": 10.0},
+            {"fecha": "2022-08-05", "punto": "Montevideo", "pais_codigo": "URY", "pm2_5_media": 5.0, "pm10_media": 11.0},
+        ]
+    )
+    monkeypatch.setattr(extract_cams, "read_source", lambda *args, **kwargs: raw)
+    monkeypatch.setenv("LIDIA_MAX_RECORDS_PER_SOURCE", "1")
+
+    frame = extract_cams.extract()
+
+    assert len(frame) == 1
+    assert frame.iloc[0]["fecha"] == "2022-08-04"
+    assert frame.iloc[0]["pm2_5_media"] == 4.0
+
+
 def test_cams_normaliza_pm25_pm10():
     accepted, rejected = normalize("CAMS", pd.DataFrame([
         {"date": "2024-01-01T00:00:00Z", "pais": "URY", "location": "Montevideo",
@@ -244,6 +264,27 @@ def test_cams_normaliza_pm25_pm10():
     assert accepted[0]["fuente"] == "CAMS"
     assert accepted[0]["pm25"] == 4.1
     assert accepted[0]["pm10"] == 12.8
+
+
+def test_cams_normaliza_esquema_agregado_real_2018_2025():
+    accepted, rejected = normalize("CAMS", pd.DataFrame([
+        {
+            "fecha": "2022-08-04",
+            "punto": "Buenos_Aires",
+            "pais_codigo": "ARG",
+            "latitud": -34.61,
+            "longitud": -58.37,
+            "pm2_5_media": 5.8875,
+            "pm10_media": 8.795833,
+        }
+    ]))
+
+    assert rejected == []
+    assert accepted[0]["fuente"] == "CAMS"
+    assert accepted[0]["fecha"] == "2022-08-04"
+    assert accepted[0]["ubicacion"] == "Buenos_Aires"
+    assert accepted[0]["pm25"] == 5.8875
+    assert accepted[0]["pm10"] == 8.795833
 
 
 def test_modelo_declara_integridad_referencial_y_restricciones():

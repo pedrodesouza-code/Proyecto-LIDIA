@@ -133,11 +133,17 @@ def extract(path=None) -> pd.DataFrame:
     para dejar la dimension preparada sin inventar datos.
     """
     try:
-        frame = read_source("CAMS", path)
+        max_records_env = os.environ.pop("LIDIA_MAX_RECORDS_PER_SOURCE", None)
+        try:
+            frame = read_source("CAMS", path)
+        finally:
+            if max_records_env is not None:
+                os.environ["LIDIA_MAX_RECORDS_PER_SOURCE"] = max_records_env
         pm_columns = [column for column in ("pm25", "pm2_5", "pm2_5_media", "pm10", "pm10_media") if column in frame.columns]
         if pm_columns:
-            return frame.loc[frame[pm_columns].notna().any(axis=1)].reset_index(drop=True)
-        return frame
+            frame = frame.loc[frame[pm_columns].notna().any(axis=1)].reset_index(drop=True)
+        max_records = _max_records()
+        return frame.head(max_records) if max_records else frame
     except FileNotFoundError:
         if _api_enabled():
             return _extract_api()

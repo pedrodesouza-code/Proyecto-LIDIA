@@ -132,7 +132,7 @@ def _jsonsafe(value: Any) -> Any:
 
 
 def _location(raw: dict[str, Any]) -> str:
-    return str(_value(raw, "ubicacion", "location", "punto", "estacion") or "")
+    return str(_value(raw, "ubicacion", "punto", "location", "estacion") or "")
 
 
 def _location_key(raw: dict[str, Any]) -> str:

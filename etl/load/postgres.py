@@ -204,11 +204,12 @@ def _promote(cur, source: str) -> None:
             FROM staging.stg_calidad_aire ON CONFLICT (fecha) DO NOTHING""")
         cur.execute("""INSERT INTO dw.dim_ubicacion
             (pais_codigo,pais_nombre,ubicacion,latitud,longitud)
-            SELECT DISTINCT pais_codigo,
+            SELECT pais_codigo,
                    CASE pais_codigo WHEN 'URY' THEN 'Uruguay' WHEN 'ARG' THEN 'Argentina' ELSE 'Brasil' END,
-                   ubicacion, latitud, longitud
+                   MIN(ubicacion) AS ubicacion, latitud, longitud
             FROM staging.stg_calidad_aire
             WHERE latitud IS NOT NULL AND longitud IS NOT NULL
+            GROUP BY pais_codigo, latitud, longitud
             ON CONFLICT (pais_codigo,latitud,longitud) DO UPDATE
             SET ubicacion=COALESCE(dw.dim_ubicacion.ubicacion, EXCLUDED.ubicacion)""")
         cur.execute("""INSERT INTO dw.dim_calidad_aire (fecha_id,ubicacion_id,pm25,pm10,fuente,observacion)
