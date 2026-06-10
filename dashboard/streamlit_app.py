@@ -577,30 +577,87 @@ with activity:
     else:
         st.info("No hay datos mensuales para los filtros seleccionados.")
 
-    region = query(
-        """SELECT pais_codigo, region, focos, frp_promedio_mw
-           FROM dw.v_incendios_region
-           WHERE pais_codigo = ANY(%s)
-           ORDER BY focos DESC LIMIT 15""",
-        (selected,),
+region = query(
+    """SELECT pais_codigo,
+              NULLIF(TRIM(region), '') AS region,
+              focos,
+              frp_promedio_mw
+       FROM dw.v_incendios_region
+       WHERE pais_codigo = ANY(%s)
+       ORDER BY focos DESC""",
+    (selected,),
+)
+region = numeric_cols(region, ["focos", "frp_promedio_mw"])
+
+# Normalización defensiva para no mostrar "sin region" como si fuera una región real.
+if not region.empty:
+    region["region_normalizada"] = (
+        region["region"]
+        .fillna("Sin región/departamento informado")
+        .astype(str)
+        .str.strip()
     )
-    region = numeric_cols(region, ["focos", "frp_promedio_mw"])
-    st.subheader("Regiones con mayor actividad")
-    st.caption("Ranking de regiones según cantidad de focos detectados, conservando los datos de la vista del Data Warehouse.")
+
+    region["region_es_informada"] = ~region["region_normalizada"].str.lower().isin(
+        [
+            "sin region",
+            "sin región",
+            "sin_region",
+            "none",
+            "null",
+            "",
+            "sin región/departamento informado",
+        ]
+    )
+
+    region_informada = region[region["region_es_informada"]].copy()
+else:
+    region_informada = pd.DataFrame()
+
+st.subheader("Distribución territorial disponible")
+st.caption(
+    "Ranking territorial según la información regional disponible en el Data Warehouse. "
+    "Si la fuente no tiene región o departamento asociado, el dashboard no inventa ese dato."
+)
+
+if not region_informada.empty:
+    region_plot = region_informada.sort_values("focos", ascending=False).head(15)
+
+    fig_region = px.bar(
+        region_plot.sort_values("focos", ascending=True),
+        x="focos",
+        y="region_normalizada",
+        color="pais_codigo",
+        orientation="h",
+        color_discrete_map=COLOR_PAIS,
+        labels={
+            "focos": "Focos",
+            "region_normalizada": "Región / departamento informado",
+            "pais_codigo": "País",
+        },
+        title="Top 15 regiones/departamentos con dato informado",
+        hover_data={"frp_promedio_mw": ":.2f"},
+    )
+    st.plotly_chart(polish(fig_region, 470), use_container_width=True, config=PLOT_CONFIG)
+    st.dataframe(
+        region_plot[["pais_codigo", "region_normalizada", "focos", "frp_promedio_mw"]],
+        width="stretch",
+        hide_index=True,
+    )
+else:
+    st.warning(
+        "No hay regiones o departamentos informados para los filtros seleccionados. "
+        "La vista dw.v_incendios_region devuelve registros sin región asociada. "
+        "Por lo tanto, el análisis territorial queda limitado a país hasta incorporar "
+        "una asociación espacial administrativa válida."
+    )
+
     if not region.empty:
-        fig_region = px.bar(
-            region.sort_values("focos", ascending=True),
-            x="focos",
-            y="region",
-            color="pais_codigo",
-            orientation="h",
-            color_discrete_map=COLOR_PAIS,
-            labels={"focos": "Focos", "region": "Región", "pais_codigo": "País"},
-            title="Top 15 regiones por focos",
-            hover_data={"frp_promedio_mw": ":.2f"},
+        st.dataframe(
+            region[["pais_codigo", "region_normalizada", "focos", "frp_promedio_mw"]],
+            width="stretch",
+            hide_index=True,
         )
-        st.plotly_chart(polish(fig_region, 470), use_container_width=True, config=PLOT_CONFIG)
-    st.dataframe(region, width="stretch", hide_index=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Ambiente
