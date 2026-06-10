@@ -1037,9 +1037,9 @@ with environment:
         """WITH clasificado AS (
                SELECT pais_codigo, focos, frp_promedio_mw,
                       CASE
-                          WHEN humedad_media_pct < 30 THEN 'Baja (<30%)'
-                          WHEN humedad_media_pct >= 30 AND humedad_media_pct < 60 THEN 'Media (30%–59%)'
-                          WHEN humedad_media_pct >= 60 THEN 'Alta (≥60%)'
+                          WHEN humedad_media_pct < 30 THEN 'Baja (<30%%)'
+                          WHEN humedad_media_pct >= 30 AND humedad_media_pct < 60 THEN 'Media (30%%–59%%)'
+                          WHEN humedad_media_pct >= 60 THEN 'Alta (≥60%%)'
                       END AS rango_humedad
                FROM dw.v_incendios_clima
                WHERE pais_codigo = ANY(%s)
@@ -1053,9 +1053,9 @@ with environment:
            GROUP BY pais_codigo, rango_humedad
            ORDER BY pais_codigo,
                     CASE rango_humedad
-                        WHEN 'Baja (<30%)' THEN 1
-                        WHEN 'Media (30%–59%)' THEN 2
-                        WHEN 'Alta (≥60%)' THEN 3
+                        WHEN 'Baja (<30%%)' THEN 1
+                        WHEN 'Media (30%%–59%%)' THEN 2
+                        WHEN 'Alta (≥60%%)' THEN 3
                         ELSE 4
                     END""",
         params,
