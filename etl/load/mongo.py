@@ -8,13 +8,30 @@ from pymongo import MongoClient
 
 from config.settings import MONGO_CONFIG
 
+_CLIENT = None
 
-def database():
+
+def _mongo_uri() -> str:
     auth = ""
     if MONGO_CONFIG["user"] and MONGO_CONFIG["password"]:
         auth = f"{MONGO_CONFIG['user']}:{MONGO_CONFIG['password']}@"
-    uri = f"mongodb://{auth}{MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}/?authSource={MONGO_CONFIG['auth_source']}"
-    return MongoClient(uri, serverSelectionTimeoutMS=5000)[MONGO_CONFIG["database"]]
+    return f"mongodb://{auth}{MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}/?authSource={MONGO_CONFIG['auth_source']}"
+
+
+def get_client() -> MongoClient:
+    """Reuse one MongoClient per process to avoid PyMongo thread growth."""
+    global _CLIENT
+    if _CLIENT is None:
+        _CLIENT = MongoClient(
+            _mongo_uri(),
+            serverSelectionTimeoutMS=5000,
+            maxPoolSize=5,
+        )
+    return _CLIENT
+
+
+def database():
+    return get_client()[MONGO_CONFIG["database"]]
 
 
 def configure_collections() -> None:
