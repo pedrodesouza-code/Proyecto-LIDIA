@@ -85,10 +85,10 @@ INUMET_HUMEDAD_FILE = os.getenv("INUMET_HUMEDAD_FILE", "")
 
 PG_CONFIG = {
     "host": os.getenv("POSTGRES_HOST", "localhost"),
-    "port": int(os.getenv("POSTGRES_PORT", "5432")),
+    "port": int(os.getenv("POSTGRES_PORT", "15432")),
     "dbname": os.getenv("LIDIA_POSTGRES_DB", os.getenv("POSTGRES_DB", "proyecto_lidia")),
-    "user": os.getenv("POSTGRES_USER", "lidia_etl_user"),
-    "password": os.getenv("POSTGRES_PASSWORD", ""),
+    "user": os.getenv("POSTGRES_USER", "lidia"),
+    "password": os.getenv("POSTGRES_PASSWORD", "local_lidia"),
 }
 
 MONGO_CONFIG = {
@@ -96,7 +96,7 @@ MONGO_CONFIG = {
     "port": int(os.getenv("MONGO_PORT", "27017")),
     "database": os.getenv("MONGO_DB", "proyecto_lidia"),
     "user": os.getenv("MONGO_USER", ""),
-    "password": os.getenv("MONGO_PASSWORD", ""),
+    "password": os.getenv("MONGO_PASSWORD", "local_lidia"),
     "auth_source": os.getenv("MONGO_AUTH_SOURCE", "admin"),
 }
 MONGO_ENABLED = os.getenv("MONGO_ENABLED", "false").lower() in {"1", "true", "yes"}
