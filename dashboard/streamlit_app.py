@@ -512,48 +512,73 @@ with activity:
         st.info("No hay datos mensuales de Uruguay para el período seleccionado.")
 
     uy_region = query(
-        """WITH base AS (
-               SELECT pais_codigo,
-                      NULLIF(TRIM(region), '') AS region,
-                      SUM(focos)::bigint AS focos,
-                      AVG(frp_promedio_mw) AS frp_promedio_mw
-               FROM dw.v_incendios_region
-               WHERE pais_codigo = 'URY'
-               GROUP BY pais_codigo, NULLIF(TRIM(region), '')
-           )
-           SELECT pais_codigo, region, focos, frp_promedio_mw,
-                  CASE
-                      WHEN region IS NULL THEN FALSE
-                      WHEN LOWER(region) IN ('sin region', 'sin región', 'sin_region', 'none', 'null') THEN FALSE
-                      ELSE TRUE
-                  END AS territorio_informado
-           FROM base
-           ORDER BY focos DESC
-           LIMIT 12"""
+        """SELECT u.pais_codigo,
+                  NULLIF(TRIM(u.region), '') AS region,
+                  COUNT(*)::bigint AS cantidad_focos,
+                  ROUND(AVG(f.frp_mw), 3) AS frp_promedio_mw
+           FROM dw.fact_incendio f
+           JOIN dw.dim_ubicacion u ON f.ubicacion_id = u.ubicacion_id
+           JOIN dw.dim_fecha d ON f.fecha_id = d.fecha_id
+           WHERE u.pais_codigo = 'URY'
+             AND d.anio BETWEEN %s AND %s
+             AND u.region IS NOT NULL
+             AND TRIM(u.region) <> ''
+           GROUP BY u.pais_codigo, NULLIF(TRIM(u.region), '')
+           ORDER BY cantidad_focos DESC""",
+        (period[0], period[1]),
     )
-    uy_region = numeric_cols(uy_region, ["focos", "frp_promedio_mw"])
-    uy_region_informada = uy_region.loc[uy_region.get("territorio_informado", False).eq(True)].copy() if not uy_region.empty else pd.DataFrame()
-    if not uy_region_informada.empty:
-        st.subheader("Uruguay: distribución territorial disponible")
+    uy_region = numeric_cols(uy_region, ["cantidad_focos", "frp_promedio_mw"])
+    st.subheader("Uruguay: análisis territorial por región administrativa")
+    if not uy_region.empty:
         fig_uy_region = px.bar(
-            uy_region_informada.sort_values("focos", ascending=True),
-            x="focos",
+            uy_region.sort_values("cantidad_focos", ascending=True),
+            x="cantidad_focos",
             y="region",
             orientation="h",
-            labels={"focos": "Focos", "region": "Territorio informado"},
-            title="Uruguay: territorios informados en el DW",
+            labels={"cantidad_focos": "Focos", "region": "Región administrativa"},
+            title="Uruguay: focos por región administrativa informada",
             hover_data={"frp_promedio_mw": ":.2f"},
         )
         fig_uy_region.update_traces(marker_color=COLOR_PAIS["URY"])
         st.plotly_chart(polish(fig_uy_region, 430), use_container_width=True, config=PLOT_CONFIG)
-    elif not uy_region.empty:
-        st.warning(
-            "No hay región/departamento asociado en el DW para Uruguay. "
-            "El análisis territorial queda limitado a país hasta incorporar una asociación espacial administrativa válida."
-        )
-    if not uy_region.empty:
-        st.caption("Tabla de respaldo: valores territoriales disponibles en la vista, sin asumir que sean departamentos reales.")
         st.dataframe(uy_region, width="stretch", hide_index=True)
+    else:
+        st.info(
+            "No hay región administrativa disponible para los focos FIRMS con las fuentes actuales. "
+            "FIRMS aporta coordenadas puntuales, pero no departamento. Para evitar asignaciones no trazables, "
+            "el análisis departamental de incendios queda pendiente hasta incorporar límites administrativos válidos."
+        )
+
+    inumet_departamentos = query(
+        """SELECT region AS departamento,
+                  COUNT(DISTINCT ubicacion_id)::bigint AS cantidad_ubicaciones
+           FROM dw.dim_ubicacion
+           WHERE pais_codigo = 'URY'
+             AND region IS NOT NULL
+             AND TRIM(region) <> ''
+           GROUP BY region
+           ORDER BY region"""
+    )
+    inumet_departamentos = numeric_cols(inumet_departamentos, ["cantidad_ubicaciones"])
+    st.subheader("Cobertura de estaciones INUMET por departamento")
+    st.caption(
+        "Esta sección describe ubicaciones meteorológicas con departamento trazable. "
+        "No representa incendios por departamento salvo que los focos tengan región administrativa asociada."
+    )
+    if not inumet_departamentos.empty:
+        fig_inumet_region = px.bar(
+            inumet_departamentos.sort_values("cantidad_ubicaciones", ascending=True),
+            x="cantidad_ubicaciones",
+            y="departamento",
+            orientation="h",
+            labels={"cantidad_ubicaciones": "Ubicaciones con región", "departamento": "Departamento"},
+            title="Ubicaciones INUMET/meteorológicas con departamento disponible",
+        )
+        fig_inumet_region.update_traces(marker_color=COLOR_PAIS["URY"])
+        st.plotly_chart(polish(fig_inumet_region, 380), use_container_width=True, config=PLOT_CONFIG)
+        st.dataframe(inumet_departamentos, width="stretch", hide_index=True)
+    else:
+        st.info("No hay departamentos INUMET cargados en `dw.dim_ubicacion.region` para Uruguay.")
 
     st.subheader("Comparación regional como contexto")
     st.markdown(
@@ -728,61 +753,57 @@ with activity:
         st.info("No hay datos mensuales para los filtros seleccionados.")
 
     region = query(
-        """WITH base AS (
-               SELECT pais_codigo,
-                      NULLIF(TRIM(region), '') AS region,
-                      SUM(focos)::bigint AS focos,
-                      AVG(frp_promedio_mw) AS frp_promedio_mw
-               FROM dw.v_incendios_region
-               WHERE pais_codigo = ANY(%s)
-               GROUP BY pais_codigo, NULLIF(TRIM(region), '')
-           )
-           SELECT pais_codigo, region, focos, frp_promedio_mw,
-                  CASE
-                      WHEN region IS NULL THEN FALSE
-                      WHEN LOWER(region) IN ('sin region', 'sin región', 'sin_region', 'none', 'null') THEN FALSE
-                      ELSE TRUE
-                  END AS territorio_informado
-           FROM base
-           ORDER BY focos DESC
-           LIMIT 15""",
-        (regional_selected,),
+        """SELECT u.pais_codigo,
+                  NULLIF(TRIM(u.region), '') AS region,
+                  COUNT(*)::bigint AS cantidad_focos,
+                  ROUND(AVG(f.frp_mw), 3) AS frp_promedio_mw
+           FROM dw.fact_incendio f
+           JOIN dw.dim_ubicacion u ON f.ubicacion_id = u.ubicacion_id
+           JOIN dw.dim_fecha d ON f.fecha_id = d.fecha_id
+           WHERE u.pais_codigo = ANY(%s)
+             AND d.anio BETWEEN %s AND %s
+             AND u.region IS NOT NULL
+             AND TRIM(u.region) <> ''
+           GROUP BY u.pais_codigo, NULLIF(TRIM(u.region), '')
+           ORDER BY cantidad_focos DESC""",
+        regional_params,
     )
-    region = numeric_cols(region, ["focos", "frp_promedio_mw"])
-    if not region.empty:
-        region["region_tabla"] = region["region"].fillna("No informado")
-        region_informada = region.loc[region["territorio_informado"].eq(True)].copy()
-    else:
-        region_informada = pd.DataFrame()
+    region = numeric_cols(region, ["cantidad_focos", "frp_promedio_mw"])
 
-    st.subheader("Distribución territorial disponible")
+    st.subheader("Análisis territorial por región administrativa")
     st.caption(
-        "Se grafican solo territorios informados por el DW. Valores como 'sin region', vacío, none o null "
-        "se tratan como no informados y no se presentan como regiones reales."
+        "Solo se usan valores reales de `dw.dim_ubicacion.region`. El dashboard no reemplaza región con ubicación, "
+        "coordenadas ni puntos de monitoreo."
     )
-    if not region_informada.empty:
+    if not region.empty:
+        available_region_countries = sorted(region["pais_codigo"].dropna().unique().tolist())
+        default_region_country = "URY" if "URY" in available_region_countries else available_region_countries[0]
+        region_country = st.selectbox(
+            "País para análisis territorial",
+            available_region_countries,
+            index=available_region_countries.index(default_region_country),
+            key="region_pais",
+        )
+        region_filtered = region.loc[region["pais_codigo"].eq(region_country)].copy()
         fig_region = px.bar(
-            region_informada.sort_values("focos", ascending=True),
-            x="focos",
+            region_filtered.sort_values("cantidad_focos", ascending=True),
+            x="cantidad_focos",
             y="region",
             color="pais_codigo",
             orientation="h",
             color_discrete_map=COLOR_PAIS,
-            labels={"focos": "Focos", "region": "Territorio informado", "pais_codigo": "País"},
-            title="Territorios informados por focos",
+            labels={"cantidad_focos": "Focos", "region": "Región administrativa", "pais_codigo": "País"},
+            title=f"Focos por región administrativa informada ({region_country})",
             hover_data={"frp_promedio_mw": ":.2f"},
         )
         st.plotly_chart(polish(fig_region, 470), use_container_width=True, config=PLOT_CONFIG)
-    elif not region.empty:
-        st.warning(
-            "No hay región/departamento asociado en el DW. El análisis territorial queda limitado a país "
-            "hasta incorporar una asociación espacial administrativa válida."
+        st.dataframe(region_filtered, width="stretch", hide_index=True)
+    else:
+        st.info(
+            "No hay región administrativa disponible para los focos FIRMS con las fuentes actuales. "
+            "FIRMS aporta coordenadas puntuales, pero no departamento. Para evitar asignaciones no trazables, "
+            "el análisis departamental queda pendiente hasta incorporar límites administrativos válidos."
         )
-    st.caption(
-        "Tabla de respaldo con valores devueltos por la vista; no se interpretan valores no informados "
-        "como departamentos reales."
-    )
-    st.dataframe(region, width="stretch", hide_index=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Ambiente

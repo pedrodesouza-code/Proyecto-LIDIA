@@ -1,0 +1,21 @@
+2026-06-13 15:47:10.418 
+Warning: the config option 'server.enableCORS=false' is not compatible with
+'server.enableXsrfProtection=true'.
+As a result, 'server.enableCORS' is being overridden to 'true'.
+
+More information:
+In order to protect against CSRF attacks, we send a cookie with each request.
+To do so, we must specify allowable origins, which places a restriction on
+cross-origin resource sharing.
+
+If cross origin resource sharing is required, please disable server.enableXsrfProtection.
+            
+2026-06-13 15:47:10.803 Uvicorn server started on 0.0.0.0:18501
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:18501
+  Network URL: http://192.168.1.14:18501
+  External URL: http://179.26.20.155:18501
+
+  Stopping...
