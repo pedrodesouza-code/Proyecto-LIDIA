@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/scripts/cargar_regiones_administrativas.py", line 265, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/scripts/cargar_regiones_administrativas.py", line 250, in main
+    result = load_regions(
+        Path(selected_file).expanduser(),
+    ...<3 lines>...
+        args.fuente_cartografica.strip(),
+    )
+  File "/home/pepo/Datos completos/Proyecto-LIDIA-ec3-pedro/scripts/cargar_regiones_administrativas.py", line 158, in load_regions
+    raise ValueError(
+    ...<4 lines>...
+    )
+ValueError: La capa geográfica no contiene polígonos. Tipos encontrados: {'MultiLineString': 19}. Para asignar departamentos por point-in-polygon se requiere Polygon/MultiPolygon; no se usan límites lineales ni bounding boxes.
+exit_code=1

@@ -103,12 +103,56 @@ PGPASSWORD="$POSTGRES_PASSWORD" psql \
   -U "$POSTGRES_USER" \
   -d "$POSTGRES_DB" \
   -f sql/ddl/05_migracion_Sa.sql
+
+# Opcional si PostgreSQL tiene PostGIS y existe una capa real de departamentos:
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -f sql/ddl/06_regiones_administrativas.sql
 ```
 
 `staging` conserva metadata, registros normalizados y rechazos. `dw` aplica
 esquema estrella con `fact_incendio` FIRMS y dimensiones de fecha, ubicacion,
 clima, precipitacion, cobertura, calidad del aire nullable y estaciones
 INUMET. `audit` registra corridas y eventos CDC.
+
+La asignacion de departamentos por coordenadas queda preparada mediante
+`dw.ref_region_administrativa` y PostGIS, pero solo debe ejecutarse con una
+capa cartografica real de departamentos. El proyecto no inventa regiones por
+bounding boxes ni por estacion INUMET cercana.
+
+Para cargar departamentos de Uruguay por coordenadas se requiere una capa
+poligonal real (`Polygon` o `MultiPolygon`) con los 19 departamentos. La capa
+local `data/reference/departamentos.geojson`, cuando existe, corresponde a
+limites lineales SALB (`MultiLineString`) y se conserva como referencia, pero no
+se usa para `point-in-polygon`. Una carga valida se ejecuta asi:
+
+```bash
+PYTHONPATH=. python3 scripts/cargar_regiones_administrativas.py \
+  --file data/reference/uruguay_departamentos/departamentos_uruguay.geojson \
+  --pais URY \
+  --nivel departamento \
+  --region-column NOMBRE \
+  --fuente-cartografica "IDE Uruguay / Servicio Geografico Militar"
+```
+
+Si el servicio oficial IDE/ArcGIS esta disponible, el mismo script puede intentar
+descargar la capa poligonal oficial antes de cargarla:
+
+```bash
+PYTHONPATH=. python3 scripts/cargar_regiones_administrativas.py \
+  --download-ide-uy \
+  --pais URY \
+  --nivel departamento \
+  --fuente-cartografica "IDE Uruguay / Servicio Geografico Militar"
+```
+
+Si PostgreSQL local se levanta con Docker, la imagen configurada es PostGIS. En
+un volumen PostgreSQL ya existente puede ser necesario ejecutar manualmente
+`sql/ddl/06_regiones_administrativas.sql`; no se deben borrar volumenes de datos
+solo para activar esta evidencia.
 
 ## ETL Y CDC
 

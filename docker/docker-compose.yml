@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16
+    image: postgis/postgis:16-3.4
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-proyecto_lidia}
       POSTGRES_USER: ${POSTGRES_ADMIN_USER:-postgres}
@@ -17,6 +17,7 @@ services:
       - ../sql/ddl/02_Schema.sql:/docker-entrypoint-initdb.d/03_schema.sql:ro
       - ../sql/ddl/03_indices.sql:/docker-entrypoint-initdb.d/04_indices.sql:ro
       - ../sql/ddl/04_vistas.sql:/docker-entrypoint-initdb.d/05_vistas.sql:ro
+      - ../sql/ddl/06_regiones_administrativas.sql:/docker-entrypoint-initdb.d/06_regiones_administrativas.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_ADMIN_USER:-postgres} -d ${POSTGRES_DB:-proyecto_lidia}"]
       interval: 10s

@@ -320,6 +320,37 @@ def test_region_se_puebla_solo_desde_departamento_trazable():
     assert "idx_ubicacion_pais_region" in indexes
 
 
+def test_region_administrativa_usa_postgis_sin_bounding_boxes():
+    root = Path(__file__).parents[1]
+    ddl = (root / "sql" / "ddl" / "06_regiones_administrativas.sql").read_text(encoding="utf-8")
+    script = (root / "scripts" / "cargar_regiones_administrativas.py").read_text(encoding="utf-8")
+
+    assert "dw.ref_region_administrativa" in ddl
+    assert "geometry(MultiPolygon, 4326)" in ddl
+    assert "CREATE EXTENSION IF NOT EXISTS postgis" in ddl
+    assert "ST_Contains" in ddl
+    assert "ST_SetSRID(ST_Point(u.longitud::double precision, u.latitud::double precision), 4326)" in ddl
+    assert "(u.region IS NULL OR TRIM(u.region) = '')" in ddl
+    assert "u.latitud BETWEEN" not in ddl
+    assert "u.longitud BETWEEN" not in ddl
+    assert "nearest" not in ddl.lower()
+    assert "No se encontró una capa real" in script or "No se asignan regiones por coordenadas" in script
+    assert "no contiene polígonos" in script
+    assert "no se usan límites lineales ni bounding boxes" in script
+    assert "IDE_UY_DEPARTAMENTOS_URL" in script
+    assert "--download-ide-uy" in script
+
+
+def test_docker_local_usa_postgis_para_regiones():
+    root = Path(__file__).parents[1]
+    compose = (root / "docker-compose.yml").read_text(encoding="utf-8")
+    compose_legacy = (root / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
+    assert "postgis/postgis:16-3.4" in compose
+    assert "./sql/ddl/06_regiones_administrativas.sql" in compose
+    assert "postgis/postgis:16-3.4" in compose_legacy
+    assert "../sql/ddl/06_regiones_administrativas.sql" in compose_legacy
+
+
 def test_asociacion_ambiental_usa_haversine_pais_y_periodos():
     root = Path(__file__).parents[1]
     ddl = (root / "sql" / "ddl" / "02_Schema.sql").read_text(encoding="utf-8")
