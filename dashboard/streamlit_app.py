@@ -448,9 +448,9 @@ elif section == "D-H. Ambiente":
         """WITH base AS (
               SELECT pais_codigo, focos, frp_promedio_mw,
                      CASE
-                       WHEN humedad_media_pct < 40 THEN 'Baja (<40%)'
-                       WHEN humedad_media_pct <= 70 THEN 'Media (40%-70%)'
-                       ELSE 'Alta (>70%)'
+                       WHEN humedad_media_pct < 40 THEN 'Baja (<40%%)'
+                       WHEN humedad_media_pct <= 70 THEN 'Media (40%%-70%%)'
+                       ELSE 'Alta (>70%%)'
                      END AS rango_humedad
               FROM dw.v_incendios_clima
               WHERE pais_codigo = ANY(%s)

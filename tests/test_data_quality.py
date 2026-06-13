@@ -368,6 +368,9 @@ def test_dashboard_responde_diez_preguntas_y_usa_consultas_agregadas():
     assert "SECTION_OPTIONS" in dashboard
     assert "dw.mv_dashboard_focos_pais_periodo" in dashboard
     assert "dw.mv_dashboard_incendios_precipitacion" in dashboard
+    assert "Baja (<40%%)" in dashboard
+    assert "Media (40%%-70%%)" in dashboard
+    assert "Alta (>70%%)" in dashboard
     assert "CREATE MATERIALIZED VIEW dw.mv_dashboard_focos_pais_periodo" in (root / "sql" / "ddl" / "04_vistas.sql").read_text(encoding="utf-8")
     assert "Sección A — Resumen ejecutivo" in dashboard
     assert "1. ¿Qué evolución temporal presentan los focos de calor en Uruguay?" in dashboard
