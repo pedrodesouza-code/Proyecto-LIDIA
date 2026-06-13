@@ -303,7 +303,21 @@ def test_modelo_declara_integridad_referencial_y_restricciones():
     assert "presion_superficie_hpa" in ddl
     assert "dw.dim_calidad_aire" in ddl
     assert "staging.stg_calidad_aire" in ddl
+    assert "region VARCHAR(100)" in ddl
     assert "brillo_termico" in ddl
+
+
+def test_region_se_puebla_solo_desde_departamento_trazable():
+    root = Path(__file__).parents[1]
+    loader = (root / "etl" / "load" / "postgres.py").read_text(encoding="utf-8")
+    views = (root / "sql" / "ddl" / "04_vistas.sql").read_text(encoding="utf-8")
+    indexes = (root / "sql" / "ddl" / "03_indices.sql").read_text(encoding="utf-8")
+
+    assert "MIN(NULLIF(TRIM(departamento), '')) AS region" in loader
+    assert "SET region=COALESCE(EXCLUDED.region, dw.dim_ubicacion.region)" in loader
+    assert "NULLIF(TRIM(u.region), '') AS region" in views
+    assert "COALESCE(u.region, u.ubicacion" not in views
+    assert "idx_ubicacion_pais_region" in indexes
 
 
 def test_asociacion_ambiental_usa_haversine_pais_y_periodos():

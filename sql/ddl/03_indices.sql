@@ -6,6 +6,7 @@ CREATE INDEX IF NOT EXISTS idx_fact_frp ON dw.fact_incendio (frp_mw DESC) WHERE 
 CREATE INDEX IF NOT EXISTS idx_fecha_anio_mes ON dw.dim_fecha (anio, mes);
 CREATE INDEX IF NOT EXISTS idx_ubicacion_pais ON dw.dim_ubicacion (pais_codigo);
 CREATE INDEX IF NOT EXISTS idx_ubicacion_pais_coordenadas ON dw.dim_ubicacion (pais_codigo, latitud, longitud);
+CREATE INDEX IF NOT EXISTS idx_ubicacion_pais_region ON dw.dim_ubicacion (pais_codigo, region) WHERE region IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_clima_ubicacion_fecha ON dw.dim_clima (ubicacion_id, fecha_id);
 CREATE INDEX IF NOT EXISTS idx_clima_fecha_fuente_ubicacion ON dw.dim_clima (fecha_id, fuente, ubicacion_id, fecha_hora_utc);
 CREATE INDEX IF NOT EXISTS idx_clima_ubicacion_instante ON dw.dim_clima (ubicacion_id, fecha_hora_utc);

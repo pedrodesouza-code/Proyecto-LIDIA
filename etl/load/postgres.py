@@ -127,12 +127,19 @@ def _promote(cur, source: str) -> None:
         cur.execute("""INSERT INTO dw.dim_fecha (fecha, anio, mes, trimestre)
             SELECT DISTINCT fecha, EXTRACT(YEAR FROM fecha), EXTRACT(MONTH FROM fecha), EXTRACT(QUARTER FROM fecha)
             FROM staging.stg_meteo WHERE fuente=%s ON CONFLICT (fecha) DO NOTHING""", (source,))
-        cur.execute("""INSERT INTO dw.dim_ubicacion (pais_codigo,pais_nombre,ubicacion,latitud,longitud)
-            SELECT DISTINCT pais_codigo, CASE pais_codigo WHEN 'URY' THEN 'Uruguay' WHEN 'ARG' THEN 'Argentina' ELSE 'Brasil' END,
-                   ubicacion, latitud, longitud FROM staging.stg_meteo
+        cur.execute("""INSERT INTO dw.dim_ubicacion (pais_codigo,pais_nombre,region,ubicacion,latitud,longitud)
+            SELECT pais_codigo,
+                   CASE pais_codigo WHEN 'URY' THEN 'Uruguay' WHEN 'ARG' THEN 'Argentina' ELSE 'Brasil' END,
+                   MIN(NULLIF(TRIM(departamento), '')) AS region,
+                   MIN(ubicacion) AS ubicacion,
+                   latitud,
+                   longitud
+            FROM staging.stg_meteo
             WHERE fuente=%s AND latitud IS NOT NULL AND longitud IS NOT NULL
+            GROUP BY pais_codigo, latitud, longitud
             ON CONFLICT (pais_codigo,latitud,longitud) DO UPDATE
-            SET ubicacion=COALESCE(dw.dim_ubicacion.ubicacion, EXCLUDED.ubicacion)""", (source,))
+            SET region=COALESCE(EXCLUDED.region, dw.dim_ubicacion.region),
+                ubicacion=COALESCE(dw.dim_ubicacion.ubicacion, EXCLUDED.ubicacion)""", (source,))
         if source == "INUMET":
             cur.execute("""INSERT INTO dw.dim_estacion_meteorologica
                 (codigo_estacion,nombre,departamento,latitud,longitud)

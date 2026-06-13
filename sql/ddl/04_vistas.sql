@@ -10,11 +10,11 @@ JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
 GROUP BY u.pais_codigo, u.pais_nombre, fch.anio, fch.mes;
 
 CREATE OR REPLACE VIEW dw.v_incendios_region AS
-SELECT u.pais_codigo, COALESCE(u.region, u.ubicacion, 'Sin region') AS region,
+SELECT u.pais_codigo, NULLIF(TRIM(u.region), '') AS region,
        COUNT(*)::bigint AS focos, ROUND(AVG(i.frp_mw), 3) AS frp_promedio_mw
 FROM dw.fact_incendio i
 JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
-GROUP BY u.pais_codigo, COALESCE(u.region, u.ubicacion, 'Sin region');
+GROUP BY u.pais_codigo, NULLIF(TRIM(u.region), '');
 
 CREATE OR REPLACE VIEW dw.v_incendios_clima AS
 SELECT u.pais_codigo, fch.fecha, COUNT(*)::bigint AS focos,
