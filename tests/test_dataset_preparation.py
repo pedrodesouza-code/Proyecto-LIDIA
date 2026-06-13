@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pandas as pd
+import pyarrow.parquet as pq
 
 from scripts.preparar_datasets_2018_2025 import prepare_source
 from scripts.auditar_firms_historico_2018_2025 import validate_firms_principal_profile
@@ -137,16 +138,32 @@ def test_firms_principal_local_cubre_2018_y_2025_si_existe():
     if not path.exists():
         return
 
-    frame = pd.read_parquet(path)
-    dates = pd.to_datetime(frame["fecha_adq"], errors="coerce", utc=True)
-    countries = set(frame["pais_codigo"].astype(str).str.upper())
+    parquet = pq.ParquetFile(path)
+    columns = set(parquet.schema_arrow.names)
+    date_column = "fecha_adq" if "fecha_adq" in columns else "acq_date"
+    required = [date_column, "pais_codigo"]
+    min_date = None
+    max_date = None
+    countries = set()
 
-    assert dates.min().date().isoformat() == "2018-01-01"
-    assert dates.max() >= pd.Timestamp("2025-01-02", tz="UTC")
+    for batch in parquet.iter_batches(batch_size=100_000, columns=required):
+        chunk = batch.to_pandas()
+        dates = pd.to_datetime(chunk[date_column], errors="coerce", utc=True).dropna()
+        if not dates.empty:
+            batch_min = dates.min()
+            batch_max = dates.max()
+            min_date = batch_min if min_date is None or batch_min < min_date else min_date
+            max_date = batch_max if max_date is None or batch_max > max_date else max_date
+        countries.update(chunk["pais_codigo"].astype(str).str.upper().dropna())
+
+    assert min_date is not None
+    assert max_date is not None
+    assert min_date.date().isoformat() == "2018-01-01"
+    assert max_date >= pd.Timestamp("2025-01-02", tz="UTC")
     assert {"URY", "ARG", "BRA"}.issubset(countries)
     assert "CHL" not in countries
-    assert "temperatura_c" not in frame.columns
-    assert any(column in frame.columns for column in ("brillo_ti4", "brightness", "brillo_termico"))
+    assert "temperatura_c" not in columns
+    assert any(column in columns for column in ("brillo_ti4", "brightness", "brillo_termico"))
 
 
 def test_meteo_principal_local_llega_a_2025_si_existe():
@@ -154,17 +171,36 @@ def test_meteo_principal_local_llega_a_2025_si_existe():
     if not path.exists():
         return
 
-    frame = pd.read_parquet(path)
-    fecha_hora = pd.to_datetime(frame.get("fecha_hora_utc"), errors="coerce", utc=True)
-    fecha = pd.to_datetime(frame.get("fecha"), errors="coerce", utc=True)
-    dates = fecha_hora.fillna(fecha)
-    countries = set(frame["pais_codigo"].astype(str).str.upper())
+    parquet = pq.ParquetFile(path)
+    columns = set(parquet.schema_arrow.names)
+    date_columns = [column for column in ("fecha_hora_utc", "fecha") if column in columns]
+    assert date_columns
+    batch_columns = date_columns + ["pais_codigo"]
+    min_date = None
+    max_date = None
+    countries = set()
 
-    assert dates.min().date().isoformat() == "2018-01-01"
-    assert dates.max() >= pd.Timestamp("2025-12-31", tz="UTC")
+    for batch in parquet.iter_batches(batch_size=100_000, columns=batch_columns):
+        chunk = batch.to_pandas()
+        dates = pd.Series(pd.NaT, index=chunk.index, dtype="datetime64[ns, UTC]")
+        for column in date_columns:
+            parsed = pd.to_datetime(chunk[column], errors="coerce", utc=True)
+            dates = dates.fillna(parsed)
+        dates = dates.dropna()
+        if not dates.empty:
+            batch_min = dates.min()
+            batch_max = dates.max()
+            min_date = batch_min if min_date is None or batch_min < min_date else min_date
+            max_date = batch_max if max_date is None or batch_max > max_date else max_date
+        countries.update(chunk["pais_codigo"].astype(str).str.upper().dropna())
+
+    assert min_date is not None
+    assert max_date is not None
+    assert min_date.date().isoformat() == "2018-01-01"
+    assert max_date >= pd.Timestamp("2025-12-31", tz="UTC")
     assert {"URY", "ARG", "BRA"}.issubset(countries)
     assert countries <= {"URY", "ARG", "BRA"}
-    assert {"temperature_2m", "relative_humidity_2m", "wind_speed_10m", "wind_direction_10m", "rain", "surface_pressure"}.issubset(frame.columns)
+    assert {"temperature_2m", "relative_humidity_2m", "wind_speed_10m", "wind_direction_10m", "rain", "surface_pressure"}.issubset(columns)
 
 
 def test_modis_principal_local_usa_solo_anios_y_paises_validos_si_existe():

@@ -353,9 +353,35 @@ def test_vista_zona_espacial_no_fabrica_departamentos():
     assert "zona_espacial" in views
     assert "COALESCE(u.region, u.ubicacion" not in views
     assert "Zonas geográficas con mayor concentración de focos" in dashboard
-    assert "No representan departamentos administrativos" in dashboard
-    assert "Celdas espaciales FIRMS, no departamentos" in dashboard
+    assert "Las celdas espaciales no representan departamentos administrativos" in dashboard
     assert "Focos FIRMS por departamento" in dashboard
+
+
+def test_dashboard_responde_diez_preguntas_y_usa_consultas_agregadas():
+    root = Path(__file__).parents[1]
+    dashboard = (root / "dashboard" / "streamlit_app.py").read_text(encoding="utf-8")
+
+    assert "@st.cache_data(ttl=300" in dashboard
+    assert "def run_query" in dashboard
+    assert "SELECT * FROM dw.fact_incendio" not in dashboard
+    assert "brightness" not in dashboard.lower()
+    assert "SECTION_OPTIONS" in dashboard
+    assert "dw.mv_dashboard_focos_pais_periodo" in dashboard
+    assert "dw.mv_dashboard_incendios_precipitacion" in dashboard
+    assert "CREATE MATERIALIZED VIEW dw.mv_dashboard_focos_pais_periodo" in (root / "sql" / "ddl" / "04_vistas.sql").read_text(encoding="utf-8")
+    assert "Sección A — Resumen ejecutivo" in dashboard
+    assert "1. ¿Qué evolución temporal presentan los focos de calor en Uruguay?" in dashboard
+    assert "2. ¿Qué diferencias descriptivas se observan entre Uruguay, Argentina y Brasil?" in dashboard
+    assert "3. ¿Qué asociación se observa entre temperatura media diaria y cantidad de focos?" in dashboard
+    assert "4. ¿Cómo varía la cantidad de focos en períodos con baja humedad relativa?" in dashboard
+    assert "5. ¿Qué diferencias se observan en PM2.5 y PM10 durante mayor actividad de focos?" in dashboard
+    assert "6. ¿Qué patrones se observan entre precipitación mensual CHIRPS y focos?" in dashboard
+    assert "7. ¿Qué tipos de cobertura vegetal aparecen asociados a las zonas analizadas?" in dashboard
+    assert "8. ¿Qué zonas geográficas de Uruguay presentan mayor concentración de focos?" in dashboard
+    assert "9. ¿Qué porcentaje de cobertura de datos tiene calidad del aire por período?" in dashboard
+    assert "10. ¿Qué registros deben ser rechazados o tratados por problemas de calidad ETL?" in dashboard
+    assert "estación INUMET" not in dashboard
+    assert "No representa incendios por departamento" not in dashboard
 
 
 def test_docker_local_usa_postgis_para_regiones():

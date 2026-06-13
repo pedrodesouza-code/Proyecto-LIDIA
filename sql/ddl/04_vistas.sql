@@ -95,8 +95,28 @@ SELECT
     (SELECT COUNT(*)::bigint FROM staging.rechazos_etl) AS rechazos_detallados
 FROM audit.etl_runs;
 
+-- Resumenes materializados para Streamlit.
+-- Evitan recalcular uniones sobre millones de focos en cada interaccion del dashboard.
+DROP MATERIALIZED VIEW IF EXISTS dw.mv_dashboard_focos_pais_periodo;
+CREATE MATERIALIZED VIEW dw.mv_dashboard_focos_pais_periodo AS
+SELECT *
+FROM dw.v_incendios_pais_periodo;
+
+CREATE INDEX IF NOT EXISTS idx_mv_dashboard_focos_pais_periodo
+    ON dw.mv_dashboard_focos_pais_periodo (pais_codigo, anio, mes);
+
+DROP MATERIALIZED VIEW IF EXISTS dw.mv_dashboard_incendios_precipitacion;
+CREATE MATERIALIZED VIEW dw.mv_dashboard_incendios_precipitacion AS
+SELECT *
+FROM dw.v_incendios_precipitacion;
+
+CREATE INDEX IF NOT EXISTS idx_mv_dashboard_incendios_precipitacion
+    ON dw.mv_dashboard_incendios_precipitacion (pais_codigo, anio, mes);
+
 GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
     dw.v_focos_zona_espacial, dw.v_focos_zona_espacial_ury,
     dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
     dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline,
-    dw.v_resumen_calidad_pipeline TO lidia_dashboard;
+    dw.v_resumen_calidad_pipeline,
+    dw.mv_dashboard_focos_pais_periodo, dw.mv_dashboard_incendios_precipitacion
+    TO lidia_dashboard;

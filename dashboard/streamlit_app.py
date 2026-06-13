@@ -13,8 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config.settings import PG_CONFIG
 
 
-@st.cache_data(ttl=120, show_spinner=False)
-def query(statement: str, params=()) -> pd.DataFrame:
+@st.cache_data(ttl=300, show_spinner=False)
+def run_query(statement: str, params=()) -> pd.DataFrame:
     with psycopg2.connect(**PG_CONFIG) as connection:
         with connection.cursor() as cursor:
             cursor.execute(statement, params)
@@ -22,9 +22,13 @@ def query(statement: str, params=()) -> pd.DataFrame:
             return pd.DataFrame(cursor.fetchall(), columns=columns)
 
 
+def query(statement: str, params=()) -> pd.DataFrame:
+    return run_query(statement, params)
+
+
 def query_optional(statement: str, params=(), missing_message: str | None = None) -> pd.DataFrame:
     try:
-        return query(statement, params)
+        return run_query(statement, params)
     except psycopg2.Error as exc:
         if missing_message:
             st.info(missing_message)
@@ -33,9 +37,6 @@ def query_optional(statement: str, params=(), missing_message: str | None = None
         return pd.DataFrame()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Configuración visual general
-# ─────────────────────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Proyecto LIDIA - EC3",
     layout="wide",
@@ -47,14 +48,10 @@ st.markdown(
     <style>
         :root {
             --navy: #0B1F33;
-            --navy-2: #123C69;
             --blue: #2563EB;
-            --blue-soft: #60A5FA;
             --cyan: #22D3EE;
-            --cyan-soft: #CFFAFE;
-            --orange: #F59E0B;
             --green: #34D399;
-            --green-soft: #D1FAE5;
+            --orange: #F59E0B;
             --bg: #F5F9FF;
             --panel: #FFFFFF;
             --text: #1E293B;
@@ -67,19 +64,17 @@ st.markdown(
             background:
                 radial-gradient(circle at 8% 3%, rgba(37, 99, 235, .15), transparent 32%),
                 radial-gradient(circle at 93% 5%, rgba(34, 211, 238, .18), transparent 28%),
-                radial-gradient(circle at 60% 100%, rgba(52, 211, 153, .12), transparent 30%),
                 linear-gradient(180deg, #F8FBFF 0%, #EEF6FF 100%);
         }
 
         .block-container {
             padding-top: 1.1rem;
             padding-bottom: 2.8rem;
-            max-width: 1480px;
+            max-width: 1450px;
         }
 
         [data-testid="stSidebar"] {
             background: linear-gradient(180deg, #0B1F33 0%, #123C69 52%, #0E7490 125%);
-            border-right: 1px solid rgba(255,255,255,.10);
         }
 
         [data-testid="stSidebar"] p,
@@ -92,21 +87,9 @@ st.markdown(
             color: #F8FAFC;
         }
 
-        [data-testid="stSidebar"] [data-baseweb="select"] > div,
-        [data-testid="stSidebar"] input {
-            background-color: rgba(255,255,255,.08);
-            border-color: rgba(255,255,255,.25);
-            color: #FFFFFF;
-        }
-
         h1, h2, h3 {
             color: var(--navy);
             letter-spacing: -.03em;
-        }
-
-        h1 {
-            font-size: 2.35rem;
-            line-height: 1.12;
         }
 
         .hero {
@@ -117,15 +100,6 @@ st.markdown(
             box-shadow: var(--shadow);
             border: 1px solid rgba(255,255,255,.12);
             margin-bottom: 1.1rem;
-        }
-
-        .hero-kicker {
-            text-transform: uppercase;
-            letter-spacing: .14em;
-            font-size: .75rem;
-            font-weight: 750;
-            color: rgba(255,255,255,.78);
-            margin-bottom: .45rem;
         }
 
         .hero h1 {
@@ -158,18 +132,6 @@ st.markdown(
             font-size: .82rem;
         }
 
-        .side-title {
-            font-size: 1.2rem;
-            font-weight: 780;
-            margin-bottom: .28rem;
-        }
-
-        .side-subtitle {
-            color: rgba(255,255,255,.78);
-            font-size: .86rem;
-            line-height: 1.45;
-        }
-
         .side-card {
             border-radius: 16px;
             padding: .9rem .95rem;
@@ -199,48 +161,6 @@ st.markdown(
             padding: .9rem 1rem;
             box-shadow: var(--shadow);
         }
-
-        [data-testid="stMetricLabel"] {
-            color: var(--muted);
-        }
-
-        [data-testid="stMetricValue"] {
-            color: var(--navy);
-            font-weight: 780;
-        }
-
-        [data-testid="stTabs"] button {
-            font-weight: 680;
-        }
-
-        [data-testid="stDataFrame"] {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 16px rgba(15,23,42,.04);
-        }
-
-
-        /* Ajustes para evitar el rojo por defecto de Streamlit en filtros */
-        [data-baseweb="tag"] {
-            background-color: #2563EB !important;
-            border-color: #60A5FA !important;
-            color: #FFFFFF !important;
-        }
-
-        [data-baseweb="tag"] span {
-            color: #FFFFFF !important;
-        }
-
-        [data-testid="stSlider"] [role="slider"] {
-            background-color: #22D3EE !important;
-            border-color: #22D3EE !important;
-            box-shadow: 0 0 0 3px rgba(34, 211, 238, .22) !important;
-        }
-
-        [data-testid="stSlider"] div {
-            accent-color: #22D3EE !important;
-        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -254,12 +174,30 @@ COLOR_PAIS = {
     "ARG": "#22D3EE",
     "BRA": "#34D399",
 }
-
 COLOR_SEQUENCE = ["#2563EB", "#22D3EE", "#34D399", "#F59E0B", "#123C69", "#14B8A6"]
 COLOR_SCALE_BLUE = ["#E0F2FE", "#BAE6FD", "#60A5FA", "#2563EB", "#123C69"]
-COLOR_SCALE_MIX = ["#E0F2FE", "#A7F3D0", "#22D3EE", "#2563EB", "#123C69"]
-
 PLOT_CONFIG = {"displaylogo": False, "responsive": True, "modeBarButtonsToRemove": ["lasso2d", "select2d"]}
+
+PREGUNTAS = [
+    "1. Evolución temporal de focos de calor en Uruguay.",
+    "2. Diferencias descriptivas entre Uruguay, Argentina y Brasil.",
+    "3. Asociación entre temperatura media diaria y focos.",
+    "4. Focos en períodos con baja humedad relativa.",
+    "5. PM2.5 y PM10 en días de mayor actividad, si hay cobertura válida.",
+    "6. Precipitación mensual CHIRPS y focos de calor.",
+    "7. Cobertura vegetal MODIS asociada a zonas analizadas.",
+    "8. Zonas geográficas de Uruguay con mayor concentración de focos.",
+    "9. Cobertura porcentual de calidad del aire por período.",
+    "10. Rechazos y problemas de calidad del proceso ETL.",
+]
+
+SECTION_OPTIONS = [
+    "A. Resumen",
+    "B-C. Temporal y región",
+    "D-H. Ambiente",
+    "I. Zonas Uruguay",
+    "F-J. Calidad y ETL",
+]
 
 
 def fmt_int(value) -> str:
@@ -274,17 +212,13 @@ def fmt_float(value, decimals: int = 2) -> str:
     return f"{float(value):,.{decimals}f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
-
-
 def numeric_cols(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
-    """Convierte columnas numéricas que llegan desde PostgreSQL como Decimal/object.
-    Esto evita errores de Plotly al usar size, color o ejes numéricos.
-    """
     df = df.copy()
     for col in cols:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
+
 
 def polish(fig: go.Figure, height: int = 380) -> go.Figure:
     fig.update_layout(
@@ -300,283 +234,370 @@ def polish(fig: go.Figure, height: int = 380) -> go.Figure:
     return fig
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Datos y filtros
-# ─────────────────────────────────────────────────────────────────────────────
-countries = query(
-    """SELECT DISTINCT pais_codigo, pais_nombre
-       FROM dw.v_incendios_pais_periodo
-       WHERE pais_codigo IN ('URY', 'ARG', 'BRA')
-       ORDER BY pais_nombre"""
+def add_question(label: str) -> None:
+    st.markdown(f"### {label}")
+
+
+countries = pd.DataFrame(
+    [
+        {"pais_codigo": "URY", "pais_nombre": "Uruguay"},
+        {"pais_codigo": "ARG", "pais_nombre": "Argentina"},
+        {"pais_codigo": "BRA", "pais_nombre": "Brasil"},
+    ]
 )
 
 with st.sidebar:
     st.markdown(
         """
-        <div class="side-title">Proyecto LIDIA · EC3</div>
-        <div class="side-subtitle">Dashboard conectado al Data Warehouse PostgreSQL.</div>
         <div class="side-card">
-            <b>Alcance visible</b><br>
-            Uruguay, Argentina y Brasil<br><br>
-            <b>Período disponible</b><br>
-            2018–2025<br><br>
-            <b>Tipo de análisis</b><br>
-            Incendios y variables ambientales integradas.
+            <b>Proyecto LIDIA EC3</b><br>
+            PostgreSQL Data Warehouse<br>
+            Uruguay en foco; Argentina y Brasil como contexto.
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-    st.markdown("### Filtros")
     mode = st.radio(
         "Modo de lectura",
         ["Uruguay en foco", "Comparativo regional"],
-        help=(
-            "Uruguay es el foco principal del proyecto. Argentina y Brasil se mantienen "
-            "como contexto comparativo, sin ocultar ni alterar datos."
-        ),
+        help="Uruguay es el foco principal. ARG/BRA se mantienen como comparación contextual.",
     )
     selected_manual = st.multiselect(
-        "Países",
+        "Países para consultas regionales",
         countries["pais_codigo"].tolist(),
         default=["URY"],
-        help=(
-            "Por defecto se abre Uruguay. ARG y BRA quedan disponibles para comparar "
-            "cuando se usa el modo Comparativo regional."
-        ),
     )
     if not selected_manual:
         selected_manual = ["URY"]
     selected = ["URY"] if mode == "Uruguay en foco" else selected_manual
     regional_selected = ["URY", "ARG", "BRA"] if mode == "Uruguay en foco" else selected
     period = st.slider("Período", 2018, 2025, (2018, 2025))
+    section = st.radio(
+        "Sección analítica",
+        SECTION_OPTIONS,
+        help="Cada sección ejecuta solo sus consultas agregadas para reducir tiempos de carga.",
+    )
 
-params = (selected, period[0], period[1])
 regional_params = (regional_selected, period[0], period[1])
-uy_params = (["URY"], period[0], period[1])
 
-monthly = query(
-    """SELECT pais_codigo, pais_nombre, anio, mes, focos, frp_promedio_mw, frp_total_mw
-       FROM dw.v_incendios_pais_periodo
-       WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s
-       ORDER BY anio, mes, pais_codigo""",
-    params,
-)
-monthly = numeric_cols(monthly, ["anio", "mes", "focos", "frp_promedio_mw", "frp_total_mw"])
-regional_monthly = query(
-    """SELECT pais_codigo, pais_nombre, anio, mes, focos, frp_promedio_mw, frp_total_mw
-       FROM dw.v_incendios_pais_periodo
-       WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s
-       ORDER BY anio, mes, pais_codigo""",
-    regional_params,
-)
-regional_monthly = numeric_cols(regional_monthly, ["anio", "mes", "focos", "frp_promedio_mw", "frp_total_mw"])
-uy_monthly = query(
-    """SELECT pais_codigo, pais_nombre, anio, mes, focos, frp_promedio_mw, frp_total_mw
-       FROM dw.v_incendios_pais_periodo
-       WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s
-       ORDER BY anio, mes""",
-    uy_params,
-)
-uy_monthly = numeric_cols(uy_monthly, ["anio", "mes", "focos", "frp_promedio_mw", "frp_total_mw"])
-summary = query(
-    """SELECT COALESCE(SUM(focos), 0)::bigint AS focos,
-              COALESCE(SUM(frp_total_mw), 0) AS frp_total,
-              COALESCE(SUM(frp_total_mw) / NULLIF(SUM(focos), 0), 0) AS frp_promedio,
-              COUNT(DISTINCT pais_codigo) AS paises,
-              COUNT(DISTINCT (anio, mes)) AS meses
-       FROM dw.v_incendios_pais_periodo
-       WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s""",
-    params,
-)
-summary = numeric_cols(summary, ["focos", "frp_total", "frp_promedio", "paises", "meses"]).iloc[0]
-uy_summary = query(
-    """SELECT COALESCE(SUM(focos), 0)::bigint AS focos,
-              COALESCE(SUM(frp_total_mw), 0) AS frp_total,
-              COALESCE(SUM(frp_total_mw) / NULLIF(SUM(focos), 0), 0) AS frp_promedio,
-              COUNT(DISTINCT (anio, mes)) AS meses
-       FROM dw.v_incendios_pais_periodo
-       WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s""",
-    uy_params,
-)
-uy_summary = numeric_cols(uy_summary, ["focos", "frp_total", "frp_promedio", "meses"]).iloc[0]
-quality = query(
-    """SELECT altas, modificaciones, descartes_auditoria, rechazos_detallados
-       FROM dw.v_resumen_calidad_pipeline"""
-)
-quality = numeric_cols(quality, ["altas", "modificaciones", "descartes_auditoria", "rechazos_detallados"]).iloc[0]
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Encabezado
-# ─────────────────────────────────────────────────────────────────────────────
 st.markdown(
     f"""
     <div class="hero">
-        <div class="hero-kicker">Proyecto LIDIA · Ingeniería de Datos</div>
-        <h1>Incendios y variables ambientales</h1>
+        <h1>Proyecto LIDIA: incendios y variables ambientales</h1>
         <p>
-            Panel interactivo para explorar la actividad de focos FIRMS, la intensidad radiativa FRP
-            y variables ambientales integradas en el Data Warehouse PostgreSQL. La vista mantiene el
-            foco principal en Uruguay y conserva Argentina y Brasil como contexto comparativo dentro
-            del período 2018–2025.
+            Dashboard analítico para responder las preguntas EC3 sobre focos FIRMS, clima Open-Meteo,
+            precipitación CHIRPS, calidad del aire CAMS/Open-Meteo Air Quality, cobertura MODIS e INUMET.
+            El brillo térmico FIRMS se trata como brillo satelital, no como temperatura del aire.
         </p>
         <div class="chips">
             <span class="chip">Modo: {mode}</span>
-            <span class="chip">Consulta principal: {", ".join(selected)}</span>
-            <span class="chip">Contexto regional: {", ".join(regional_selected)}</span>
+            <span class="chip">Países: {", ".join(regional_selected)}</span>
             <span class="chip">Período: {period[0]}–{period[1]}</span>
-            <span class="chip">Data Warehouse PostgreSQL</span>
-            <span class="chip">FIRMS · CHIRPS · MODIS · CAMS/Open-Meteo</span>
+            <span class="chip">Sin departamentos inventados</span>
         </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    """
-    <div class="section-note">
-        <b>Lectura general:</b> Uruguay es la lectura principal del tablero. Argentina y Brasil se usan como
-        contexto comparativo regional. No se reemplazan, normalizan ni ocultan resultados: solo se cambia
-        la forma visual de lectura sobre los mismos datos consultados desde PostgreSQL.
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+if section == "A. Resumen":
+    country_summary = query(
+        """SELECT pais_codigo, pais_nombre,
+                  COALESCE(SUM(focos), 0)::bigint AS focos,
+                  COALESCE(SUM(frp_total_mw), 0) AS frp_total_mw,
+                  COALESCE(SUM(frp_total_mw) / NULLIF(SUM(focos), 0), 0) AS frp_promedio_mw,
+                  COUNT(DISTINCT (anio, mes)) AS meses
+           FROM dw.mv_dashboard_focos_pais_periodo
+           WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s
+           GROUP BY pais_codigo, pais_nombre
+           ORDER BY pais_codigo""",
+        regional_params,
+    )
+    country_summary = numeric_cols(country_summary, ["focos", "frp_total_mw", "frp_promedio_mw", "meses"])
+    air_coverage_kpi = query_optional(
+        """SELECT
+                  ROUND(100.0 * COUNT(pm25) / NULLIF(COUNT(*), 0), 2) AS cobertura_pm25_pct,
+                  ROUND(100.0 * COUNT(pm10) / NULLIF(COUNT(*), 0), 2) AS cobertura_pm10_pct
+           FROM dw.v_calidad_aire_alta_actividad
+           WHERE pais_codigo = 'URY'
+             AND EXTRACT(YEAR FROM fecha) BETWEEN %s AND %s""",
+        (period[0], period[1]),
+    )
+    air_coverage_kpi = numeric_cols(air_coverage_kpi, ["cobertura_pm25_pct", "cobertura_pm10_pct"])
+    st.subheader("Sección A — Resumen ejecutivo")
+    st.caption("KPIs agregados desde PostgreSQL; no se cargan tablas crudas.")
+    kpi_cols = st.columns(6)
+    for idx, country in enumerate(["URY", "ARG", "BRA"]):
+        row = country_summary.loc[country_summary["pais_codigo"].eq(country)]
+        value = row.iloc[0]["focos"] if not row.empty else 0
+        kpi_cols[idx].metric(f"Focos {country}", fmt_int(value))
+    uy_row = country_summary.loc[country_summary["pais_codigo"].eq("URY")]
+    uy_frp = uy_row.iloc[0]["frp_promedio_mw"] if not uy_row.empty else 0
+    uy_meses = uy_row.iloc[0]["meses"] if not uy_row.empty else 0
+    pm25_cov = air_coverage_kpi.iloc[0]["cobertura_pm25_pct"] if not air_coverage_kpi.empty else 0
+    kpi_cols[3].metric("FRP promedio URY", fmt_float(uy_frp, 2))
+    kpi_cols[4].metric("Meses URY", fmt_int(uy_meses))
+    kpi_cols[5].metric("Cobertura PM2.5 URY", f"{fmt_float(pm25_cov, 1)}%")
+    st.markdown("#### Preguntas analíticas cubiertas")
+    st.write("\n".join(f"- {item}" for item in PREGUNTAS))
 
-# ─────────────────────────────────────────────────────────────────────────────
-# KPIs
-# ─────────────────────────────────────────────────────────────────────────────
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("Focos FIRMS", fmt_int(summary.focos))
-c2.metric("FRP total (MW)", fmt_float(summary.frp_total, 1))
-c3.metric("FRP promedio (MW)", fmt_float(summary.frp_promedio, 2))
-c4.metric("Países con datos", int(summary.paises))
-c5, c6, c7, c8 = st.columns(4)
-c5.metric("Meses cubiertos", int(summary.meses))
-c6.metric("Altas CDC", fmt_int(quality.altas))
-c7.metric("Modificaciones CDC", fmt_int(quality.modificaciones))
-c8.metric("Rechazos detallados", fmt_int(quality.rechazos_detallados))
+elif section == "B-C. Temporal y región":
+    monthly_regional = query(
+        """SELECT pais_codigo, pais_nombre, anio, mes, focos, frp_promedio_mw, frp_total_mw
+           FROM dw.mv_dashboard_focos_pais_periodo
+           WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s
+           ORDER BY anio, mes, pais_codigo""",
+        regional_params,
+    )
+    monthly_regional = numeric_cols(monthly_regional, ["anio", "mes", "focos", "frp_promedio_mw", "frp_total_mw"])
+    monthly_ury = monthly_regional.loc[monthly_regional["pais_codigo"].eq("URY")].copy()
+    country_summary = query(
+        """SELECT pais_codigo, pais_nombre,
+                  COALESCE(SUM(focos), 0)::bigint AS focos,
+                  COALESCE(SUM(frp_total_mw), 0) AS frp_total_mw,
+                  COALESCE(SUM(frp_total_mw) / NULLIF(SUM(focos), 0), 0) AS frp_promedio_mw,
+                  COUNT(DISTINCT (anio, mes)) AS meses
+           FROM dw.mv_dashboard_focos_pais_periodo
+           WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s
+           GROUP BY pais_codigo, pais_nombre
+           ORDER BY pais_codigo""",
+        regional_params,
+    )
+    country_summary = numeric_cols(country_summary, ["focos", "frp_total_mw", "frp_promedio_mw", "meses"])
+    add_question("1. ¿Qué evolución temporal presentan los focos de calor en Uruguay?")
+    if not monthly_ury.empty:
+        monthly_ury["periodo"] = pd.to_datetime(dict(year=monthly_ury["anio"], month=monthly_ury["mes"], day=1))
+        fig = px.line(
+            monthly_ury,
+            x="periodo",
+            y="focos",
+            markers=True,
+            labels={"periodo": "Mes", "focos": "Focos"},
+            title="Uruguay: focos mensuales FIRMS",
+        )
+        fig.update_traces(line=dict(width=3, color=COLOR_PAIS["URY"]), marker=dict(color=COLOR_PAIS["URY"], size=7))
+        st.plotly_chart(polish(fig, 410), use_container_width=True, config=PLOT_CONFIG)
+    else:
+        st.info("No hay focos mensuales de Uruguay para el período seleccionado.")
 
-activity, environment, tracking = st.tabs(["Actividad", "Ambiente", "Calidad y CDC"])
+    add_question("2. ¿Qué diferencias descriptivas se observan entre Uruguay, Argentina y Brasil?")
+    if not country_summary.empty:
+        c1, c2 = st.columns(2)
+        with c1:
+            fig_total = px.bar(
+                country_summary.sort_values("focos", ascending=True),
+                x="focos",
+                y="pais_nombre",
+                color="pais_nombre",
+                orientation="h",
+                color_discrete_map=COLOR_PAIS,
+                labels={"focos": "Focos", "pais_nombre": "País"},
+                title="Focos totales por país",
+            )
+            fig_total.update_xaxes(type="log", title="Focos (escala log para contexto regional)")
+            fig_total.update_layout(showlegend=False)
+            st.plotly_chart(polish(fig_total, 390), use_container_width=True, config=PLOT_CONFIG)
+        with c2:
+            yearly = monthly_regional.groupby(["pais_codigo", "pais_nombre", "anio"], as_index=False).agg(
+                focos=("focos", "sum"),
+                frp_promedio_mw=("frp_promedio_mw", "mean"),
+            )
+            fig_year = px.line(
+                yearly,
+                x="anio",
+                y="focos",
+                color="pais_nombre",
+                markers=True,
+                color_discrete_map=COLOR_PAIS,
+                labels={"anio": "Año", "focos": "Focos", "pais_nombre": "País"},
+                title="Evolución anual por país",
+            )
+            st.plotly_chart(polish(fig_year, 390), use_container_width=True, config=PLOT_CONFIG)
+        st.dataframe(country_summary, width="stretch", hide_index=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Actividad
-# ─────────────────────────────────────────────────────────────────────────────
-with activity:
-    st.subheader("Uruguay en foco")
+elif section == "D-H. Ambiente":
+    st.subheader("Secciones D-H — Ambiente e incendios")
+    add_question("3. ¿Qué asociación se observa entre temperatura media diaria y cantidad de focos?")
+    temp_daily = query(
+        """SELECT pais_codigo, fecha, focos, frp_promedio_mw, temperatura_media_c, humedad_media_pct
+           FROM dw.v_incendios_clima
+           WHERE pais_codigo = 'URY'
+             AND EXTRACT(YEAR FROM fecha) BETWEEN %s AND %s
+             AND temperatura_media_c IS NOT NULL
+           ORDER BY fecha""",
+        (period[0], period[1]),
+    )
+    temp_daily = numeric_cols(temp_daily, ["focos", "frp_promedio_mw", "temperatura_media_c", "humedad_media_pct"])
+    if not temp_daily.empty:
+        fig_temp = px.scatter(
+            temp_daily,
+            x="temperatura_media_c",
+            y="focos",
+            size="frp_promedio_mw",
+            color_discrete_sequence=[COLOR_PAIS["URY"]],
+            labels={"temperatura_media_c": "Temperatura media diaria (°C)", "focos": "Focos"},
+            title="Temperatura meteorológica real vs focos diarios",
+            hover_data={"fecha": True, "humedad_media_pct": ":.1f"},
+        )
+        st.plotly_chart(polish(fig_temp, 410), use_container_width=True, config=PLOT_CONFIG)
+    else:
+        st.info("No hay temperatura meteorológica asociada a focos de Uruguay para el período seleccionado.")
+
+    add_question("4. ¿Cómo varía la cantidad de focos en períodos con baja humedad relativa?")
+    humidity = query(
+        """WITH base AS (
+              SELECT pais_codigo, focos, frp_promedio_mw,
+                     CASE
+                       WHEN humedad_media_pct < 40 THEN 'Baja (<40%)'
+                       WHEN humedad_media_pct <= 70 THEN 'Media (40%-70%)'
+                       ELSE 'Alta (>70%)'
+                     END AS rango_humedad
+              FROM dw.v_incendios_clima
+              WHERE pais_codigo = ANY(%s)
+                AND EXTRACT(YEAR FROM fecha) BETWEEN %s AND %s
+                AND humedad_media_pct IS NOT NULL
+           )
+           SELECT pais_codigo, rango_humedad,
+                  SUM(focos)::bigint AS cantidad_focos,
+                  ROUND(AVG(frp_promedio_mw), 2) AS frp_promedio_mw
+           FROM base
+           GROUP BY pais_codigo, rango_humedad
+           ORDER BY pais_codigo, rango_humedad""",
+        regional_params,
+    )
+    humidity = numeric_cols(humidity, ["cantidad_focos", "frp_promedio_mw"])
+    if not humidity.empty:
+        fig_hum = px.bar(
+            humidity,
+            x="rango_humedad",
+            y="cantidad_focos",
+            color="pais_codigo",
+            barmode="group",
+            color_discrete_map=COLOR_PAIS,
+            labels={"rango_humedad": "Rango de humedad", "cantidad_focos": "Focos"},
+            title="Focos por rango de humedad relativa",
+            hover_data={"frp_promedio_mw": ":.2f"},
+        )
+        st.plotly_chart(polish(fig_hum, 410), use_container_width=True, config=PLOT_CONFIG)
+    else:
+        st.info("No hay humedad relativa asociada para los filtros seleccionados.")
+
+    add_question("6. ¿Qué patrones se observan entre precipitación mensual CHIRPS y focos?")
+    rain = query(
+        """SELECT pais_codigo, anio, mes, focos, precipitacion_mm_promedio
+           FROM dw.mv_dashboard_incendios_precipitacion
+           WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s
+           ORDER BY anio, mes, pais_codigo""",
+        regional_params,
+    )
+    rain = numeric_cols(rain, ["anio", "mes", "focos", "precipitacion_mm_promedio"])
+    if not rain.empty:
+        rain["periodo"] = pd.to_datetime(dict(year=rain["anio"], month=rain["mes"], day=1))
+        rain_ury = rain.loc[rain["pais_codigo"].eq("URY")]
+        fig_rain = go.Figure()
+        fig_rain.add_trace(go.Bar(x=rain_ury["periodo"], y=rain_ury["focos"], name="Focos URY", marker_color=COLOR_PAIS["URY"]))
+        fig_rain.add_trace(go.Scatter(
+            x=rain_ury["periodo"],
+            y=rain_ury["precipitacion_mm_promedio"],
+            name="Precipitación promedio",
+            yaxis="y2",
+            mode="lines+markers",
+            line=dict(color="#F59E0B", width=3),
+        ))
+        fig_rain.update_layout(
+            title="Uruguay: focos y precipitación mensual",
+            yaxis=dict(title="Focos"),
+            yaxis2=dict(title="Precipitación mm", overlaying="y", side="right"),
+        )
+        st.plotly_chart(polish(fig_rain, 410), use_container_width=True, config=PLOT_CONFIG)
+    else:
+        st.info("No hay precipitación CHIRPS asociada para los filtros seleccionados.")
+
+    add_question("7. ¿Qué tipos de cobertura vegetal aparecen asociados a las zonas analizadas?")
+    cover = query(
+        """SELECT pais_codigo, cobertura, focos, frp_promedio_mw
+           FROM dw.v_incendios_cobertura
+           WHERE pais_codigo = ANY(%s)
+           ORDER BY focos DESC
+           LIMIT 20""",
+        (regional_selected,),
+    )
+    cover = numeric_cols(cover, ["focos", "frp_promedio_mw"])
+    cover_valid = cover.loc[~cover["cobertura"].fillna("").str.contains("Sin dato", case=False, regex=False)]
+    if not cover_valid.empty:
+        fig_cover = px.bar(
+            cover_valid.sort_values("focos", ascending=True),
+            x="focos",
+            y="cobertura",
+            color="pais_codigo",
+            orientation="h",
+            color_discrete_map=COLOR_PAIS,
+            labels={"focos": "Focos", "cobertura": "Cobertura vegetal"},
+            title="Focos por cobertura vegetal MODIS",
+            hover_data={"frp_promedio_mw": ":.2f"},
+        )
+        st.plotly_chart(polish(fig_cover, 430), use_container_width=True, config=PLOT_CONFIG)
+    else:
+        st.info("No hay cobertura vegetal MODIS asociada a los focos para los filtros seleccionados.")
+
+elif section == "I. Zonas Uruguay":
+    st.subheader("Zonas geográficas con mayor concentración de focos")
+    add_question("8. ¿Qué zonas geográficas de Uruguay presentan mayor concentración de focos?")
     st.markdown(
         """
         <div class="section-note">
-            Lectura principal del EC3: Uruguay se muestra primero para evitar que el volumen mayor de
-            focos de Argentina y Brasil domine visualmente la interpretación. Los países vecinos quedan
-            disponibles debajo como contexto comparativo.
+            Las celdas espaciales no representan departamentos administrativos. Son zonas derivadas
+            de coordenadas FIRMS. El análisis departamental formal requiere una capa poligonal válida.
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-    uy_k1, uy_k2, uy_k3, uy_k4 = st.columns(4)
-    uy_k1.metric("Focos Uruguay", fmt_int(uy_summary.focos))
-    uy_k2.metric("FRP total Uruguay (MW)", fmt_float(uy_summary.frp_total, 1))
-    uy_k3.metric("FRP promedio Uruguay (MW)", fmt_float(uy_summary.frp_promedio, 2))
-    uy_k4.metric("Meses cubiertos Uruguay", int(uy_summary.meses))
-
-    if not uy_monthly.empty:
-        uy_chart = uy_monthly.assign(
-            periodo=pd.to_datetime(dict(year=uy_monthly["anio"], month=uy_monthly["mes"], day=1))
-        )
-        uy_left, uy_right = st.columns(2)
-        with uy_left:
-            fig_uy_focos = px.line(
-                uy_chart,
-                x="periodo",
-                y="focos",
-                markers=True,
-                labels={"periodo": "Período", "focos": "Focos"},
-                title="Uruguay: evolución mensual de focos",
-            )
-            fig_uy_focos.update_traces(line=dict(width=3, color=COLOR_PAIS["URY"]), marker=dict(size=7, color=COLOR_PAIS["URY"]))
-            st.plotly_chart(polish(fig_uy_focos, 390), use_container_width=True, config=PLOT_CONFIG)
-        with uy_right:
-            fig_uy_frp = px.bar(
-                uy_chart,
-                x="periodo",
-                y="frp_total_mw",
-                labels={"periodo": "Período", "frp_total_mw": "FRP total (MW)"},
-                title="Uruguay: FRP mensual",
-            )
-            fig_uy_frp.update_traces(marker_color=COLOR_PAIS["URY"])
-            st.plotly_chart(polish(fig_uy_frp, 390), use_container_width=True, config=PLOT_CONFIG)
-    else:
-        st.info("No hay datos mensuales de Uruguay para el período seleccionado.")
-
-    st.subheader("Zonas geográficas con mayor concentración de focos")
-    st.caption(
-        "Las zonas espaciales se calculan a partir de una grilla generada con las coordenadas de FIRMS. "
-        "No representan departamentos administrativos. El análisis departamental requiere una capa poligonal válida."
-    )
-    zona_ury = query_optional(
+    zones = query_optional(
         """SELECT zona_espacial, latitud_grilla, longitud_grilla, cantidad_focos, frp_promedio_mw
-           FROM dw.v_focos_zona_espacial
-           WHERE pais_codigo = 'URY'
+           FROM dw.v_focos_zona_espacial_ury
            ORDER BY cantidad_focos DESC
            LIMIT 20""",
-        missing_message=(
-            "La vista `dw.v_focos_zona_espacial` aún no está disponible. "
-            "Ejecute `sql/ddl/04_vistas.sql` para habilitar el análisis por grilla espacial."
-        ),
+        missing_message="La vista dw.v_focos_zona_espacial_ury todavía no está aplicada en PostgreSQL.",
     )
-    zona_ury = numeric_cols(zona_ury, ["latitud_grilla", "longitud_grilla", "cantidad_focos", "frp_promedio_mw"])
-    if not zona_ury.empty:
-        left_zone, right_zone = st.columns([1.25, 1])
-        with left_zone:
-            fig_zona = px.bar(
-                zona_ury.sort_values("cantidad_focos", ascending=True),
+    zones = numeric_cols(zones, ["latitud_grilla", "longitud_grilla", "cantidad_focos", "frp_promedio_mw"])
+    if not zones.empty:
+        left, right = st.columns([1.2, 1])
+        with left:
+            fig_zones = px.bar(
+                zones.sort_values("cantidad_focos", ascending=True),
                 x="cantidad_focos",
                 y="zona_espacial",
                 orientation="h",
                 labels={"cantidad_focos": "Focos", "zona_espacial": "Zona geográfica"},
-                title="Uruguay: top zonas geográficas por focos FIRMS",
-                hover_data={
-                    "latitud_grilla": ":.1f",
-                    "longitud_grilla": ":.1f",
-                    "frp_promedio_mw": ":.2f",
-                },
+                title="Top 20 celdas espaciales FIRMS en Uruguay",
+                hover_data={"frp_promedio_mw": ":.2f", "latitud_grilla": ":.1f", "longitud_grilla": ":.1f"},
             )
-            fig_zona.update_traces(marker_color=COLOR_PAIS["URY"])
-            st.plotly_chart(polish(fig_zona, 460), use_container_width=True, config=PLOT_CONFIG)
-        with right_zone:
-            if {"latitud_grilla", "longitud_grilla"}.issubset(zona_ury.columns):
-                map_zona = zona_ury.rename(columns={"latitud_grilla": "lat", "longitud_grilla": "lon"})
-                fig_zona_map = px.scatter_mapbox(
-                    map_zona,
-                    lat="lat",
-                    lon="lon",
-                    size="cantidad_focos",
-                    color="cantidad_focos",
-                    hover_name="zona_espacial",
-                    hover_data={"frp_promedio_mw": ":.2f", "lat": ":.1f", "lon": ":.1f"},
-                    color_continuous_scale=COLOR_SCALE_BLUE,
-                    zoom=5.4,
-                    height=460,
-                    title="Celdas espaciales FIRMS, no departamentos",
-                )
-                fig_zona_map.update_layout(
-                    mapbox_style="carto-positron",
-                    margin=dict(l=0, r=0, t=45, b=0),
-                    paper_bgcolor="rgba(0,0,0,0)",
-                )
-                st.plotly_chart(fig_zona_map, use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(zona_ury, width="stretch", hide_index=True)
+            fig_zones.update_traces(marker_color=COLOR_PAIS["URY"])
+            st.plotly_chart(polish(fig_zones, 470), use_container_width=True, config=PLOT_CONFIG)
+        with right:
+            map_zones = zones.rename(columns={"latitud_grilla": "lat", "longitud_grilla": "lon"})
+            fig_map = px.scatter_mapbox(
+                map_zones,
+                lat="lat",
+                lon="lon",
+                size="cantidad_focos",
+                color="cantidad_focos",
+                hover_name="zona_espacial",
+                hover_data={"frp_promedio_mw": ":.2f"},
+                color_continuous_scale=COLOR_SCALE_BLUE,
+                zoom=5.4,
+                height=470,
+                title="Distribución visual de celdas, no departamentos",
+            )
+            fig_map.update_layout(mapbox_style="carto-positron", margin=dict(l=0, r=0, t=45, b=0))
+            st.plotly_chart(fig_map, use_container_width=True, config=PLOT_CONFIG)
+        st.dataframe(zones, width="stretch", hide_index=True)
     else:
-        st.info("No hay zonas geográficas FIRMS disponibles para Uruguay con el período seleccionado.")
+        st.info("No hay celdas espaciales FIRMS disponibles para Uruguay.")
 
-    uy_region = query(
-        """SELECT u.pais_codigo,
-                  NULLIF(TRIM(u.region), '') AS region,
-                  COUNT(*)::bigint AS cantidad_focos,
-                  ROUND(AVG(f.frp_mw), 3) AS frp_promedio_mw
+    real_departments = query(
+        """SELECT NULLIF(TRIM(u.region), '') AS region,
+                  COUNT(*)::bigint AS focos
            FROM dw.fact_incendio f
            JOIN dw.dim_ubicacion u ON f.ubicacion_id = u.ubicacion_id
            JOIN dw.dim_fecha d ON f.fecha_id = d.fecha_id
@@ -584,704 +605,86 @@ with activity:
              AND d.anio BETWEEN %s AND %s
              AND u.region IS NOT NULL
              AND TRIM(u.region) <> ''
-           GROUP BY u.pais_codigo, NULLIF(TRIM(u.region), '')
-           ORDER BY cantidad_focos DESC""",
+           GROUP BY NULLIF(TRIM(u.region), '')
+           ORDER BY focos DESC""",
         (period[0], period[1]),
     )
-    uy_region = numeric_cols(uy_region, ["cantidad_focos", "frp_promedio_mw"])
-    st.subheader("Uruguay: departamentos reales, si están disponibles")
-    if not uy_region.empty:
-        fig_uy_region = px.bar(
-            uy_region.sort_values("cantidad_focos", ascending=True),
-            x="cantidad_focos",
-            y="region",
-            orientation="h",
-            labels={"cantidad_focos": "Focos", "region": "Departamento"},
-            title="Focos FIRMS por departamento",
-            hover_data={"frp_promedio_mw": ":.2f"},
-        )
-        fig_uy_region.update_traces(marker_color=COLOR_PAIS["URY"])
-        st.plotly_chart(polish(fig_uy_region, 430), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(uy_region, width="stretch", hide_index=True)
-    else:
+    if real_departments.empty:
         st.info(
-            "El análisis de focos FIRMS por departamento queda pendiente hasta cargar una capa poligonal válida "
-            "de departamentos de Uruguay. Mientras tanto, use la sección de zonas geográficas por grilla espacial."
+            "El análisis de focos FIRMS por departamento queda pendiente hasta cargar una capa Polygon/MultiPolygon "
+            "válida. El dashboard no usa ubicación, puntos INUMET ni coordenadas como reemplazo de departamento."
         )
-
-    inumet_departamentos = query(
-        """SELECT region AS departamento,
-                  COUNT(DISTINCT ubicacion_id)::bigint AS cantidad_ubicaciones
-           FROM dw.dim_ubicacion
-           WHERE pais_codigo = 'URY'
-             AND region IS NOT NULL
-             AND TRIM(region) <> ''
-           GROUP BY region
-           ORDER BY region"""
-    )
-    inumet_departamentos = numeric_cols(inumet_departamentos, ["cantidad_ubicaciones"])
-    st.subheader("Cobertura de estaciones INUMET por departamento")
-    st.caption(
-        "Esta sección describe ubicaciones meteorológicas con departamento trazable. "
-        "No representa incendios por departamento salvo que los focos tengan región administrativa asociada."
-    )
-    if not inumet_departamentos.empty:
-        fig_inumet_region = px.bar(
-            inumet_departamentos.sort_values("cantidad_ubicaciones", ascending=True),
-            x="cantidad_ubicaciones",
-            y="departamento",
-            orientation="h",
-            labels={"cantidad_ubicaciones": "Ubicaciones con región", "departamento": "Departamento"},
-            title="Ubicaciones INUMET/meteorológicas con departamento disponible",
-        )
-        fig_inumet_region.update_traces(marker_color=COLOR_PAIS["URY"])
-        st.plotly_chart(polish(fig_inumet_region, 380), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(inumet_departamentos, width="stretch", hide_index=True)
     else:
-        st.info("No hay departamentos INUMET cargados en `dw.dim_ubicacion.region` para Uruguay.")
+        st.subheader("Focos FIRMS por departamento")
+        st.dataframe(real_departments, width="stretch", hide_index=True)
 
-    st.subheader("Comparación regional como contexto")
-    st.markdown(
-        """
-        <div class="section-note">
-            Esta sección conserva Uruguay, Argentina y Brasil como contexto. Para que los volúmenes de
-            Argentina/Brasil no oculten la señal uruguaya, se priorizan participación porcentual, índice
-            base 100 por país y FRP promedio además de valores absolutos.
-        </div>
-        """,
-        unsafe_allow_html=True,
+elif section == "F-J. Calidad y ETL":
+    quality_summary = query_optional(
+        """SELECT altas, modificaciones, descartes_auditoria, rechazos_detallados
+           FROM dw.v_resumen_calidad_pipeline"""
     )
-
-    if not regional_monthly.empty:
-        chart = regional_monthly.assign(
-            periodo=pd.to_datetime(dict(year=regional_monthly["anio"], month=regional_monthly["mes"], day=1))
-        )
-        chart = chart.sort_values(["pais_codigo", "periodo"]).copy()
-        first_by_country = chart.groupby("pais_codigo")["focos"].transform(
-            lambda values: values[values > 0].iloc[0] if (values > 0).any() else 0
-        )
-        chart["indice_base_100"] = chart["focos"] / first_by_country.replace(0, pd.NA) * 100
-        monthly_total = chart.groupby("periodo")["focos"].transform("sum")
-        chart["participacion_pct"] = chart["focos"] / monthly_total.replace(0, pd.NA) * 100
-
-        left, right = st.columns([1.45, 1])
-        with left:
-            fig_line = px.line(
-                chart,
-                x="periodo",
-                y="indice_base_100",
-                color="pais_nombre",
-                markers=True,
-                color_discrete_map=COLOR_PAIS,
-                labels={"periodo": "Período", "indice_base_100": "Índice base 100", "pais_nombre": "País"},
-                title="Evolución mensual comparada, índice base 100 por país",
-            )
-            fig_line.update_traces(line=dict(width=3), marker=dict(size=7))
-            st.plotly_chart(polish(fig_line, 420), use_container_width=True, config=PLOT_CONFIG)
-
-        with right:
-            pais_total = monthly.groupby(["pais_codigo", "pais_nombre"], as_index=False).agg(
-                focos=("focos", "sum"), frp_total_mw=("frp_total_mw", "sum")
-            )
-            pais_total = numeric_cols(pais_total, ["focos", "frp_total_mw"])
-            fig_bar = px.bar(
-                pais_total.sort_values("frp_total_mw", ascending=True),
-                x="frp_total_mw",
-                y="pais_nombre",
-                orientation="h",
-                color="pais_nombre",
-                color_discrete_map=COLOR_PAIS,
-                labels={"frp_total_mw": "FRP total (MW)", "pais_nombre": "País"},
-                title="FRP total por país",
-                hover_data={"focos": True, "pais_codigo": True},
-            )
-            fig_bar.update_xaxes(type="log", title="FRP total (MW, escala log)")
-            fig_bar.update_layout(showlegend=False)
-            st.plotly_chart(polish(fig_bar, 420), use_container_width=True, config=PLOT_CONFIG)
-
-        map_left, map_right = st.columns([1.25, 1])
-        with map_left:
-            st.subheader("Mapa comparativo por país")
-            st.caption("Mapa coroplético con polígonos reales de país. El color representa la cantidad total de focos para el período filtrado.")
-            fig_map = px.choropleth(
-                pais_total,
-                locations="pais_codigo",
-                locationmode="ISO-3",
-                color="focos",
-                hover_name="pais_nombre",
-                hover_data={"focos": True, "frp_total_mw": ":.1f", "pais_codigo": False},
-                color_continuous_scale=COLOR_SCALE_MIX,
-                labels={"focos": "Focos"},
-                scope="south america",
-            )
-            fig_map.update_geos(
-                fitbounds="locations",
-                visible=True,
-                showcountries=True,
-                countrycolor="#D8E7F5",
-                showcoastlines=True,
-                coastlinecolor="#B6CBE0",
-                showland=True,
-                landcolor="#F8FBFF",
-                showocean=True,
-                oceancolor="#DDF7FF",
-                lakecolor="#DDF7FF",
-                bgcolor="rgba(0,0,0,0)",
-            )
-            fig_map.update_layout(
-                height=470,
-                margin=dict(l=0, r=0, t=8, b=0),
-                paper_bgcolor="rgba(0,0,0,0)",
-                geo=dict(bgcolor="rgba(0,0,0,0)"),
-                coloraxis_colorbar=dict(title="Focos"),
-            )
-            st.plotly_chart(fig_map, use_container_width=True, config=PLOT_CONFIG)
-
-        with map_right:
-            st.subheader("Distribución porcentual")
-            st.caption("Participación de cada país seleccionado dentro del total de focos del filtro actual.")
-            fig_donut = px.pie(
-                pais_total,
-                names="pais_nombre",
-                values="focos",
-                hole=.55,
-                color="pais_nombre",
-                color_discrete_map=COLOR_PAIS,
-                title="Participación por país",
-            )
-            fig_donut.update_traces(textposition="inside", textinfo="percent+label")
-            fig_donut.update_layout(
-                height=470,
-                paper_bgcolor="rgba(0,0,0,0)",
-                margin=dict(l=12, r=12, t=50, b=15),
-                legend=dict(orientation="h", y=-.08),
-            )
-            st.plotly_chart(fig_donut, use_container_width=True, config=PLOT_CONFIG)
-
-        st.subheader("Patrón mensual y anual")
-        st.caption("Estas vistas usan la misma tabla mensual para observar diferencias por año, mes y país.")
-        h1, h2 = st.columns([1.1, 1])
-        with h1:
-            yearly = chart.groupby(["anio", "pais_nombre"], as_index=False).agg(
-                focos=("focos", "sum"),
-                frp_total_mw=("frp_total_mw", "sum"),
-                frp_promedio_mw=("frp_promedio_mw", "mean"),
-            )
-            fig_year = px.bar(
-                yearly,
-                x="anio",
-                y="frp_promedio_mw",
-                color="pais_nombre",
-                barmode="group",
-                color_discrete_map=COLOR_PAIS,
-                labels={"anio": "Año", "frp_promedio_mw": "FRP promedio (MW)", "pais_nombre": "País"},
-                title="FRP promedio por año y país",
-                hover_data={"focos": True, "frp_total_mw": ":.1f"},
-            )
-            st.plotly_chart(polish(fig_year, 390), use_container_width=True, config=PLOT_CONFIG)
-
-        with h2:
-            heat = chart.groupby(["anio", "mes"], as_index=False).agg(participacion_pct=("participacion_pct", "mean"))
-            if not heat.empty:
-                heat_pivot = heat.pivot(index="anio", columns="mes", values="participacion_pct").fillna(0)
-                fig_heat = px.imshow(
-                    heat_pivot,
-                    color_continuous_scale=COLOR_SCALE_BLUE,
-                    labels=dict(x="Mes", y="Año", color="Participación %"),
-                    title="Participación porcentual mensual promedio",
-                    aspect="auto",
-                )
-                st.plotly_chart(polish(fig_heat, 390), use_container_width=True, config=PLOT_CONFIG)
-
-        st.subheader("Relación entre focos y FRP promedio")
-        st.caption("Cada punto representa un registro mensual por país. El tamaño se basa en el FRP total mensual.")
-        bubble = chart.dropna(subset=["focos", "frp_promedio_mw", "frp_total_mw"]).copy()
-        if not bubble.empty:
-            fig_bubble = px.scatter(
-                bubble,
-                x="focos",
-                y="frp_promedio_mw",
-                size="frp_total_mw",
-                color="pais_nombre",
-                color_discrete_map=COLOR_PAIS,
-                hover_data={"anio": True, "mes": True, "frp_total_mw": ":.1f"},
-                labels={"focos": "Focos mensuales", "frp_promedio_mw": "FRP promedio (MW)", "pais_nombre": "País"},
-                title="Focos mensuales vs FRP promedio",
-            )
-            st.plotly_chart(polish(fig_bubble, 430), use_container_width=True, config=PLOT_CONFIG)
-    else:
-        st.info("No hay datos mensuales para los filtros seleccionados.")
-
-    region = query(
-        """SELECT u.pais_codigo,
-                  NULLIF(TRIM(u.region), '') AS region,
-                  COUNT(*)::bigint AS cantidad_focos,
-                  ROUND(AVG(f.frp_mw), 3) AS frp_promedio_mw
-           FROM dw.fact_incendio f
-           JOIN dw.dim_ubicacion u ON f.ubicacion_id = u.ubicacion_id
-           JOIN dw.dim_fecha d ON f.fecha_id = d.fecha_id
-           WHERE u.pais_codigo = ANY(%s)
-             AND d.anio BETWEEN %s AND %s
-             AND u.region IS NOT NULL
-             AND TRIM(u.region) <> ''
-           GROUP BY u.pais_codigo, NULLIF(TRIM(u.region), '')
-           ORDER BY cantidad_focos DESC""",
-        regional_params,
-    )
-    region = numeric_cols(region, ["cantidad_focos", "frp_promedio_mw"])
-
-    st.subheader("Análisis territorial por región administrativa")
-    st.caption(
-        "Solo se usan valores reales de `dw.dim_ubicacion.region`. El dashboard no reemplaza región con ubicación, "
-        "coordenadas ni puntos de monitoreo."
-    )
-    if not region.empty:
-        available_region_countries = sorted(region["pais_codigo"].dropna().unique().tolist())
-        default_region_country = "URY" if "URY" in available_region_countries else available_region_countries[0]
-        region_country = st.selectbox(
-            "País para análisis territorial",
-            available_region_countries,
-            index=available_region_countries.index(default_region_country),
-            key="region_pais",
-        )
-        region_filtered = region.loc[region["pais_codigo"].eq(region_country)].copy()
-        fig_region = px.bar(
-            region_filtered.sort_values("cantidad_focos", ascending=True),
-            x="cantidad_focos",
-            y="region",
-            color="pais_codigo",
-            orientation="h",
-            color_discrete_map=COLOR_PAIS,
-            labels={"cantidad_focos": "Focos", "region": "Región administrativa", "pais_codigo": "País"},
-            title=f"Focos por región administrativa informada ({region_country})",
-            hover_data={"frp_promedio_mw": ":.2f"},
-        )
-        st.plotly_chart(polish(fig_region, 470), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(region_filtered, width="stretch", hide_index=True)
-    else:
-        st.info(
-            "No hay región administrativa disponible para los focos FIRMS con las fuentes actuales. "
-            "FIRMS aporta coordenadas puntuales, pero no departamento. Para evitar asignaciones no trazables, "
-            "el análisis departamental queda pendiente hasta incorporar límites administrativos válidos."
-        )
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Ambiente
-# ─────────────────────────────────────────────────────────────────────────────
-with environment:
-    
-    st.subheader("Cruces ambientales disponibles")
-    
-    st.markdown(
-        """
-        <div class="section-note">
-            Esta sección presenta vistas que relacionan la actividad de incendios con variables climáticas,
-            precipitación mensual y cobertura vegetal. Las tablas conservan los valores originales consultados.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    climate = query(
-        """SELECT pais_codigo, fecha, focos, frp_promedio_mw, temperatura_media_c, humedad_media_pct
-           FROM dw.v_incendios_clima
-           WHERE pais_codigo = ANY(%s) AND EXTRACT(YEAR FROM fecha) BETWEEN %s AND %s
-           ORDER BY fecha DESC LIMIT 90""",
-        regional_params,
-    )
-    rain = query(
-        """SELECT pais_codigo, anio, mes, focos, precipitacion_mm_promedio
-           FROM dw.v_incendios_precipitacion
-           WHERE pais_codigo = ANY(%s) AND anio BETWEEN %s AND %s
-           ORDER BY anio, mes""",
-        regional_params,
-    )
-    cover = query(
-        """SELECT pais_codigo, cobertura, focos, frp_promedio_mw
-           FROM dw.v_incendios_cobertura
-           WHERE pais_codigo = ANY(%s) ORDER BY focos DESC""",
-        (regional_selected,),
-    )
-    climate_uy = query(
-        """SELECT pais_codigo, fecha, focos, frp_promedio_mw, temperatura_media_c, humedad_media_pct
-           FROM dw.v_incendios_clima
-           WHERE pais_codigo = 'URY' AND EXTRACT(YEAR FROM fecha) BETWEEN %s AND %s
-           ORDER BY fecha DESC LIMIT 90""",
-        (period[0], period[1]),
-    )
-    rain_uy = query(
-        """SELECT pais_codigo, anio, mes, focos, precipitacion_mm_promedio
-           FROM dw.v_incendios_precipitacion
-           WHERE pais_codigo = 'URY' AND anio BETWEEN %s AND %s
-           ORDER BY anio, mes""",
-        (period[0], period[1]),
-    )
-    cover_uy = query(
-        """SELECT pais_codigo, cobertura, focos, frp_promedio_mw
-           FROM dw.v_incendios_cobertura
-           WHERE pais_codigo = 'URY' ORDER BY focos DESC""",
-    )
-    air_uy = query(
-        """SELECT pais_codigo, fecha, focos, pm25, pm10, estado_dato
-           FROM dw.v_calidad_aire_alta_actividad
-           WHERE pais_codigo = 'URY' ORDER BY fecha DESC LIMIT 30""",
-    )
-    climate = numeric_cols(climate, ["focos", "frp_promedio_mw", "temperatura_media_c", "humedad_media_pct"])
-    rain = numeric_cols(rain, ["anio", "mes", "focos", "precipitacion_mm_promedio"])
-    cover = numeric_cols(cover, ["focos", "frp_promedio_mw"])
-    climate_uy = numeric_cols(climate_uy, ["focos", "frp_promedio_mw", "temperatura_media_c", "humedad_media_pct"])
-    rain_uy = numeric_cols(rain_uy, ["anio", "mes", "focos", "precipitacion_mm_promedio"])
-    cover_uy = numeric_cols(cover_uy, ["focos", "frp_promedio_mw"])
-    air_uy = numeric_cols(air_uy, ["focos", "pm25", "pm10"])
-
-    st.subheader("Uruguay: ambiente en foco")
-    st.caption("Primera lectura de clima, precipitación, cobertura vegetal y calidad del aire para Uruguay.")
-    uy_env_left, uy_env_right = st.columns(2)
-    with uy_env_left:
-        if not rain_uy.empty:
-            rain_uy_plot = rain_uy.assign(periodo=pd.to_datetime(dict(year=rain_uy["anio"], month=rain_uy["mes"], day=1)))
-            fig_rain_uy = go.Figure()
-            fig_rain_uy.add_trace(go.Bar(x=rain_uy_plot["periodo"], y=rain_uy_plot["focos"], name="Focos", marker_color=COLOR_PAIS["URY"]))
-            fig_rain_uy.add_trace(go.Scatter(
-                x=rain_uy_plot["periodo"],
-                y=rain_uy_plot["precipitacion_mm_promedio"],
-                name="Precipitación promedio",
-                yaxis="y2",
-                mode="lines+markers",
-                line=dict(color="#F59E0B", width=3),
-            ))
-            fig_rain_uy.update_layout(
-                title="Uruguay: focos y precipitación mensual",
-                yaxis=dict(title="Focos"),
-                yaxis2=dict(title="Precipitación mm", overlaying="y", side="right"),
-            )
-            st.plotly_chart(polish(fig_rain_uy, 390), use_container_width=True, config=PLOT_CONFIG)
-        else:
-            st.info("No hay precipitación asociada para Uruguay en el período seleccionado.")
-    with uy_env_right:
-        if not climate_uy.empty:
-            climate_uy_plot = climate_uy.copy()
-            climate_uy_plot["fecha"] = pd.to_datetime(climate_uy_plot["fecha"])
-            fig_climate_uy = px.scatter(
-                climate_uy_plot,
-                x="temperatura_media_c",
-                y="humedad_media_pct",
-                size="focos",
-                color_discrete_sequence=[COLOR_PAIS["URY"]],
-                hover_data={"fecha": True, "frp_promedio_mw": ":.2f"},
-                labels={"temperatura_media_c": "Temperatura media (°C)", "humedad_media_pct": "Humedad media (%)"},
-                title="Uruguay: temperatura, humedad y focos",
-            )
-            st.plotly_chart(polish(fig_climate_uy, 390), use_container_width=True, config=PLOT_CONFIG)
-        else:
-            st.info("No hay clima asociado para Uruguay en el período seleccionado.")
-
-    uy_env_c1, uy_env_c2 = st.columns(2)
-    with uy_env_c1:
-        if not cover_uy.empty:
-            fig_cover_uy = px.bar(
-                cover_uy.sort_values("focos", ascending=True),
-                x="focos",
-                y="cobertura",
-                orientation="h",
-                labels={"focos": "Focos", "cobertura": "Cobertura"},
-                title="Uruguay: focos por cobertura vegetal",
-                hover_data={"frp_promedio_mw": ":.2f"},
-            )
-            fig_cover_uy.update_traces(marker_color=COLOR_PAIS["URY"])
-            st.plotly_chart(polish(fig_cover_uy, 390), use_container_width=True, config=PLOT_CONFIG)
-        else:
-            st.info("No hay cobertura vegetal asociada para Uruguay.")
-    with uy_env_c2:
-        if not air_uy.empty:
-            fig_air_uy = px.scatter(
-                air_uy,
-                x="pm10",
-                y="pm25",
-                size="focos",
-                color_discrete_sequence=[COLOR_PAIS["URY"]],
-                hover_data={"fecha": True, "estado_dato": True},
-                labels={"pm10": "PM10", "pm25": "PM2.5"},
-                title="Uruguay: calidad del aire en alta actividad",
-            )
-            st.plotly_chart(polish(fig_air_uy, 390), use_container_width=True, config=PLOT_CONFIG)
-        else:
-            st.info("No hay calidad de aire asociada para Uruguay en alta actividad.")
-
-    st.subheader("Comparación ambiental regional")
-    st.caption("Argentina y Brasil se muestran como contexto secundario, sin reemplazar la lectura principal uruguaya.")
-
-    left_env, right_env = st.columns([1.1, 1])
-    with left_env:
-        st.subheader("Actividad y precipitación mensual CHIRPS")
-        st.caption("Comparación visual entre focos registrados y precipitación promedio mensual disponible.")
-        if not rain.empty:
-            rain_plot = rain.assign(periodo=pd.to_datetime(dict(year=rain["anio"], month=rain["mes"], day=1)))
-            rain_agg = rain_plot.groupby("periodo", as_index=False).agg(
-                focos=("focos", "sum"),
-                precipitacion_mm_promedio=("precipitacion_mm_promedio", "mean"),
-            )
-            fig_rain = go.Figure()
-            fig_rain.add_trace(go.Bar(
-                x=rain_agg["periodo"], y=rain_agg["focos"], name="Focos", marker_color="#2563EB"
-            ))
-            fig_rain.add_trace(go.Scatter(
-                x=rain_agg["periodo"], y=rain_agg["precipitacion_mm_promedio"], name="Precipitación promedio", yaxis="y2",
-                mode="lines+markers", line=dict(color="#F59E0B", width=3), marker=dict(size=7, color="#F59E0B")
-            ))
-            fig_rain.update_layout(
-                yaxis=dict(title="Focos"),
-                yaxis2=dict(title="Precipitación mm", overlaying="y", side="right"),
-                title="Focos y precipitación mensual",
-            )
-            st.plotly_chart(polish(fig_rain, 410), use_container_width=True, config=PLOT_CONFIG)
-        else:
-            st.info("No hay datos de precipitación para los filtros seleccionados.")
-
-    with right_env:
-        st.subheader("Focos por cobertura vegetal MODIS")
-        st.caption("Distribución de focos según las categorías de cobertura vegetal disponibles en la vista.")
-        if not cover.empty:
-            fig_cover = px.bar(
-                cover.sort_values("focos", ascending=True),
-                x="focos",
-                y="cobertura",
-                color="pais_codigo",
-                orientation="h",
-                color_discrete_map=COLOR_PAIS,
-                labels={"focos": "Focos", "cobertura": "Cobertura", "pais_codigo": "País"},
-                title="Focos por cobertura vegetal",
-                hover_data={"frp_promedio_mw": ":.2f"},
-            )
-            st.plotly_chart(polish(fig_cover, 410), use_container_width=True, config=PLOT_CONFIG)
-        else:
-            st.info("No hay datos de cobertura vegetal para los filtros seleccionados.")
-
-    st.subheader("Focos, temperatura y humedad")
-    st.caption("Últimos registros disponibles en la vista de incendios y clima para los filtros aplicados.")
-    if not climate.empty:
-        climate_plot = climate.copy()
-        climate_plot["fecha"] = pd.to_datetime(climate_plot["fecha"])
-
-        cc1, cc2 = st.columns([1.05, 1])
-        with cc1:
-            fig_climate = px.scatter(
-                climate_plot,
-                x="temperatura_media_c",
-                y="humedad_media_pct",
-                size="focos",
-                color="pais_codigo",
-                color_discrete_map=COLOR_PAIS,
-                hover_data={"fecha": True, "focos": True, "frp_promedio_mw": ":.2f"},
-                labels={
-                    "temperatura_media_c": "Temperatura media (°C)",
-                    "humedad_media_pct": "Humedad media (%)",
-                    "pais_codigo": "País",
-                    "focos": "Focos",
-                },
-                title="Temperatura, humedad y focos",
-            )
-            st.plotly_chart(polish(fig_climate, 420), use_container_width=True, config=PLOT_CONFIG)
-
-        with cc2:
-            climate_time = climate_plot.sort_values("fecha").groupby("fecha", as_index=False).agg(
-                focos=("focos", "sum"),
-                temperatura_media_c=("temperatura_media_c", "mean"),
-                humedad_media_pct=("humedad_media_pct", "mean"),
-            )
-            fig_temp = go.Figure()
-            fig_temp.add_trace(go.Scatter(
-                x=climate_time["fecha"],
-                y=climate_time["temperatura_media_c"],
-                mode="lines+markers",
-                name="Temperatura media",
-                line=dict(color="#F59E0B", width=3),
-            ))
-            fig_temp.add_trace(go.Scatter(
-                x=climate_time["fecha"],
-                y=climate_time["humedad_media_pct"],
-                mode="lines+markers",
-                name="Humedad media",
-                yaxis="y2",
-                line=dict(color="#22D3EE", width=3),
-            ))
-            fig_temp.update_layout(
-                title="Variables climáticas en registros recientes",
-                yaxis=dict(title="Temperatura media (°C)"),
-                yaxis2=dict(title="Humedad media (%)", overlaying="y", side="right"),
-            )
-            st.plotly_chart(polish(fig_temp, 420), use_container_width=True, config=PLOT_CONFIG)
-
-    st.subheader("Focos por rango de humedad relativa")
-    st.caption("Clasificación de humedad media: baja, media y alta, sin imputar valores faltantes.")
-    humidity_ranges = query_optional(
-        """WITH clasificado AS (
-               SELECT pais_codigo, focos, frp_promedio_mw,
-                      CASE
-                          WHEN humedad_media_pct < 30 THEN 'Baja (<30%%)'
-                          WHEN humedad_media_pct >= 30 AND humedad_media_pct < 60 THEN 'Media (30%%–59%%)'
-                          WHEN humedad_media_pct >= 60 THEN 'Alta (≥60%%)'
-                      END AS rango_humedad
-               FROM dw.v_incendios_clima
-               WHERE pais_codigo = ANY(%s)
-                 AND EXTRACT(YEAR FROM fecha) BETWEEN %s AND %s
-                 AND humedad_media_pct IS NOT NULL
+    quality_summary = numeric_cols(quality_summary, ["altas", "modificaciones", "descartes_auditoria", "rechazos_detallados"])
+    st.subheader("Secciones F, I y J — Calidad del aire y calidad del pipeline")
+    add_question("5. ¿Qué diferencias se observan en PM2.5 y PM10 durante mayor actividad de focos?")
+    air_activity = query_optional(
+        """WITH daily AS (
+              SELECT u.pais_codigo, fe.fecha,
+                     COUNT(*)::bigint AS focos,
+                     AVG(a.pm25) AS pm25,
+                     AVG(a.pm10) AS pm10
+              FROM dw.fact_incendio f
+              JOIN dw.dim_fecha fe ON f.fecha_id = fe.fecha_id
+              JOIN dw.dim_ubicacion u ON f.ubicacion_id = u.ubicacion_id
+              LEFT JOIN dw.dim_calidad_aire a ON a.calidad_aire_id = f.calidad_aire_id
+              WHERE u.pais_codigo = ANY(%s)
+                AND fe.anio BETWEEN %s AND %s
+              GROUP BY u.pais_codigo, fe.fecha
+           ),
+           thresholds AS (
+              SELECT pais_codigo, percentile_cont(0.75) WITHIN GROUP (ORDER BY focos) AS p75_focos
+              FROM daily
+              GROUP BY pais_codigo
            )
-           SELECT pais_codigo, rango_humedad,
-                  SUM(focos)::bigint AS focos,
-                  AVG(frp_promedio_mw) AS frp_promedio_mw
-           FROM clasificado
-           GROUP BY pais_codigo, rango_humedad
-           ORDER BY pais_codigo,
-                    CASE rango_humedad
-                        WHEN 'Baja (<30%%)' THEN 1
-                        WHEN 'Media (30%%–59%%)' THEN 2
-                        WHEN 'Alta (≥60%%)' THEN 3
-                        ELSE 4
-                    END""",
-        params,
-        missing_message="No existe la vista dw.v_incendios_clima para calcular rangos de humedad.",
+           SELECT d.pais_codigo,
+                  CASE WHEN d.focos >= t.p75_focos THEN 'Alta actividad' ELSE 'Baja/media actividad' END AS actividad,
+                  COUNT(*)::bigint AS dias,
+                  COUNT(d.pm25)::bigint AS dias_pm25_validos,
+                  COUNT(d.pm10)::bigint AS dias_pm10_validos,
+                  ROUND(AVG(d.pm25)::numeric, 2) AS pm25_promedio,
+                  ROUND(AVG(d.pm10)::numeric, 2) AS pm10_promedio
+           FROM daily d
+           JOIN thresholds t ON t.pais_codigo = d.pais_codigo
+           GROUP BY d.pais_codigo, CASE WHEN d.focos >= t.p75_focos THEN 'Alta actividad' ELSE 'Baja/media actividad' END
+           ORDER BY d.pais_codigo, actividad""",
+        regional_params,
     )
-    humidity_ranges = numeric_cols(humidity_ranges, ["focos", "frp_promedio_mw"])
-    if not humidity_ranges.empty:
-        fig_humidity = px.bar(
-            humidity_ranges,
-            x="rango_humedad",
-            y="focos",
-            color="pais_codigo",
+    air_activity = numeric_cols(
+        air_activity,
+        ["dias", "dias_pm25_validos", "dias_pm10_validos", "pm25_promedio", "pm10_promedio"],
+    )
+    if not air_activity.empty and (air_activity["dias_pm25_validos"].sum() + air_activity["dias_pm10_validos"].sum()) > 0:
+        air_long = air_activity.melt(
+            id_vars=["pais_codigo", "actividad", "dias"],
+            value_vars=["pm25_promedio", "pm10_promedio"],
+            var_name="contaminante",
+            value_name="valor_promedio",
+        ).dropna(subset=["valor_promedio"])
+        fig_air = px.bar(
+            air_long,
+            x="actividad",
+            y="valor_promedio",
+            color="contaminante",
             barmode="group",
-            color_discrete_map=COLOR_PAIS,
-            labels={"rango_humedad": "Rango de humedad relativa", "focos": "Focos", "pais_codigo": "País"},
-            title="Focos por rango de humedad relativa",
-            hover_data={"frp_promedio_mw": ":.2f"},
+            facet_col="pais_codigo",
+            labels={"actividad": "Actividad de focos", "valor_promedio": "Promedio", "contaminante": "Variable"},
+            title="PM2.5 y PM10 por nivel de actividad de focos",
         )
-        st.plotly_chart(polish(fig_humidity, 410), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(humidity_ranges, width="stretch", hide_index=True)
+        st.plotly_chart(polish(fig_air, 430), use_container_width=True, config=PLOT_CONFIG)
+        st.dataframe(air_activity, width="stretch", hide_index=True)
     else:
-        st.info("No hay datos de humedad relativa disponibles para los filtros seleccionados.")
+        st.info("No hay cobertura válida de PM2.5/PM10 para comparar alta y baja actividad sin imputar datos.")
 
-    st.subheader("Auditoría de asociación espacial ambiental")
-    st.caption(
-        "Trazabilidad de las asociaciones nearest neighbor entre focos FIRMS y variables ambientales, "
-        "cuando el pipeline registra la corrida."
-    )
-    spatial_audit = query_optional(
-        """SELECT variable, metodo, umbral_km, total_hechos, asociados, sin_asociar,
-                  distancia_maxima_km, ejecutado_en
-           FROM audit.asociacion_espacial_runs
-           ORDER BY ejecutado_en DESC, variable""",
-        missing_message="No existe auditoría de asociación espacial en esta base.",
-    )
-    spatial_audit = numeric_cols(
-        spatial_audit,
-        ["umbral_km", "total_hechos", "asociados", "sin_asociar", "distancia_maxima_km"],
-    )
-    if not spatial_audit.empty:
-        spatial_audit["ejecutado_en"] = pd.to_datetime(spatial_audit["ejecutado_en"], errors="coerce")
-        spatial_long = spatial_audit.melt(
-            id_vars=["variable"],
-            value_vars=["asociados", "sin_asociar"],
-            var_name="estado",
-            value_name="hechos",
-        )
-        fig_spatial = px.bar(
-            spatial_long,
-            x="variable",
-            y="hechos",
-            color="estado",
-            barmode="group",
-            color_discrete_sequence=COLOR_SEQUENCE,
-            labels={"variable": "Variable ambiental", "hechos": "Hechos", "estado": "Estado"},
-            title="Cobertura de asociación espacial",
-        )
-        st.plotly_chart(polish(fig_spatial, 390), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(spatial_audit, width="stretch", hide_index=True)
-    else:
-        st.info("No hay corridas de asociación espacial registradas para mostrar.")
-
-    st.subheader("Disponibilidad de variables ambientales independientes")
-    st.caption(
-        "Resumen de registros ambientales cargados en tablas del DW, sin reemplazar nulos ni inferir datos ausentes."
-    )
-    env_inventory = query_optional(
-        """SELECT 'clima' AS componente, fuente, COUNT(*)::bigint AS registros
-             FROM dw.dim_clima GROUP BY fuente
-           UNION ALL
-           SELECT 'precipitacion' AS componente, fuente, COUNT(*)::bigint AS registros
-             FROM dw.dim_precipitacion GROUP BY fuente
-           UNION ALL
-           SELECT 'cobertura_vegetal' AS componente, fuente, COUNT(*)::bigint AS registros
-             FROM dw.dim_cobertura_vegetal GROUP BY fuente
-           UNION ALL
-           SELECT 'calidad_aire' AS componente, COALESCE(fuente, 'sin_fuente') AS fuente,
-                  COUNT(*)::bigint AS registros
-             FROM dw.dim_calidad_aire GROUP BY COALESCE(fuente, 'sin_fuente')
-           ORDER BY componente, fuente""",
-        missing_message="No existen las tablas ambientales esperadas en el DW.",
-    )
-    env_inventory = numeric_cols(env_inventory, ["registros"])
-    if not env_inventory.empty:
-        fig_env = px.bar(
-            env_inventory,
-            x="componente",
-            y="registros",
-            color="fuente",
-            color_discrete_sequence=COLOR_SEQUENCE,
-            labels={"componente": "Componente", "registros": "Registros", "fuente": "Fuente"},
-            title="Registros ambientales disponibles por componente",
-        )
-        st.plotly_chart(polish(fig_env, 390), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(env_inventory, width="stretch", hide_index=True)
-    else:
-        st.info("No hay registros ambientales independientes cargados para mostrar.")
-
-    st.dataframe(climate, width="stretch", hide_index=True)
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Calidad y CDC
-# ─────────────────────────────────────────────────────────────────────────────
-with tracking:
-    
-    st.subheader("Calidad del aire y trazabilidad del pipeline")
-    
-    st.markdown(
-        """
-        <div class="section-note">
-            Esta sección muestra registros vinculados a calidad del aire en días de alta actividad y la
-            trazabilidad operativa del pipeline ETL/CDC. Es una vista de control y evidencia del proceso.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    air = query(
-        """SELECT pais_codigo, fecha, focos, pm25, pm10, estado_dato
-           FROM dw.v_calidad_aire_alta_actividad
-           WHERE pais_codigo = ANY(%s) ORDER BY fecha DESC LIMIT 30""",
-        (selected,),
-    )
-    runs = query(
-        """SELECT fuente, estado, iniciado_en, finalizado_en, duracion_segundos,
-                  filas_leidas, filas_insertadas, filas_actualizadas, filas_rechazadas
-           FROM dw.v_calidad_pipeline LIMIT 30"""
-    )
-    air = numeric_cols(air, ["focos", "pm25", "pm10"])
-    runs = numeric_cols(runs, ["duracion_segundos", "filas_leidas", "filas_insertadas", "filas_actualizadas", "filas_rechazadas"])
-
-    st.info(
-        "Calidad del aire usa CAMS/Open-Meteo Air Quality cuando hay PM2.5/PM10 validado; "
-        "queda nula si no existe dato compatible."
-    )
-    st.caption(
-        f"Descartes/filtrados registrados en auditoría: {fmt_int(quality.descartes_auditoria)}. "
-        "No equivalen a errores: incluyen filas fuera del alcance geográfico o temporal."
-    )
-
-    st.subheader("Cobertura de datos CAMS / Air Quality por período")
-    st.caption(
-        "Porcentaje de registros de alta actividad con PM2.5/PM10 disponible. "
-        "Los valores nulos no se imputan ni se reemplazan por cero."
-    )
+    add_question("9. ¿Qué porcentaje de cobertura de datos tiene calidad del aire por período?")
     air_coverage = query_optional(
         """SELECT pais_codigo,
                   EXTRACT(YEAR FROM fecha)::int AS anio,
@@ -1294,175 +697,49 @@ with tracking:
            FROM dw.v_calidad_aire_alta_actividad
            WHERE pais_codigo = ANY(%s)
              AND EXTRACT(YEAR FROM fecha) BETWEEN %s AND %s
-           GROUP BY pais_codigo, anio, mes
+           GROUP BY pais_codigo, EXTRACT(YEAR FROM fecha), EXTRACT(MONTH FROM fecha)
            ORDER BY anio, mes, pais_codigo""",
-        params,
-        missing_message=(
-            "No existe la vista dw.v_calidad_aire_alta_actividad para calcular cobertura CAMS/Air Quality."
-        ),
+        regional_params,
     )
     air_coverage = numeric_cols(
         air_coverage,
-        [
-            "anio", "mes", "registros_periodo", "registros_pm25_validos",
-            "registros_pm10_validos", "cobertura_pm25_pct", "cobertura_pm10_pct",
-        ],
+        ["anio", "mes", "registros_periodo", "registros_pm25_validos", "registros_pm10_validos", "cobertura_pm25_pct", "cobertura_pm10_pct"],
     )
     if not air_coverage.empty:
-        air_coverage["periodo"] = pd.to_datetime(
-            dict(year=air_coverage["anio"], month=air_coverage["mes"], day=1)
-        )
-        coverage_long = air_coverage.melt(
-            id_vars=["pais_codigo", "anio", "mes", "periodo", "registros_periodo"],
+        air_coverage["periodo"] = pd.to_datetime(dict(year=air_coverage["anio"], month=air_coverage["mes"], day=1))
+        cov_long = air_coverage.melt(
+            id_vars=["pais_codigo", "periodo"],
             value_vars=["cobertura_pm25_pct", "cobertura_pm10_pct"],
             var_name="variable",
             value_name="cobertura_pct",
         )
-        coverage_long["variable"] = coverage_long["variable"].map(
-            {"cobertura_pm25_pct": "PM2.5", "cobertura_pm10_pct": "PM10"}
-        )
-        fig_coverage = px.line(
-            coverage_long,
+        fig_cov = px.line(
+            cov_long,
             x="periodo",
             y="cobertura_pct",
             color="variable",
             line_dash="pais_codigo",
             markers=True,
-            labels={
-                "periodo": "Período",
-                "cobertura_pct": "Cobertura (%)",
-                "variable": "Variable",
-                "pais_codigo": "País",
-            },
-            title="Cobertura porcentual de PM2.5/PM10 por período",
-            hover_data={"registros_periodo": True, "anio": True, "mes": True},
+            labels={"periodo": "Período", "cobertura_pct": "Cobertura %", "variable": "Variable"},
+            title="Cobertura CAMS/Open-Meteo Air Quality por período",
         )
-        fig_coverage.update_yaxes(range=[0, 100])
-        st.plotly_chart(polish(fig_coverage, 410), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(air_coverage, width="stretch", hide_index=True)
+        fig_cov.update_yaxes(range=[0, 100])
+        st.plotly_chart(polish(fig_cov, 410), use_container_width=True, config=PLOT_CONFIG)
     else:
-        st.info("No hay datos CAMS/Open-Meteo Air Quality para los filtros seleccionados.")
+        st.info("No hay períodos con calidad de aire disponible en la vista analítica.")
 
-    left_q, right_q = st.columns([1.15, 1])
-    with left_q:
-        st.subheader("Registros de calidad del aire")
-        st.caption("Últimos registros disponibles de PM2.5 y PM10 asociados a días de alta actividad.")
-        if not air.empty:
-            fig_air = px.scatter(
-                air,
-                x="pm10",
-                y="pm25",
-                size="focos",
-                color="pais_codigo",
-                color_discrete_map=COLOR_PAIS,
-                hover_data={"fecha": True, "estado_dato": True, "focos": True},
-                labels={"pm10": "PM10", "pm25": "PM2.5", "pais_codigo": "País", "focos": "Focos"},
-                title="PM10 y PM2.5 en registros disponibles",
-            )
-            st.plotly_chart(polish(fig_air, 390), use_container_width=True, config=PLOT_CONFIG)
-        else:
-            st.info("No hay registros de calidad del aire para los filtros seleccionados.")
-
-    with right_q:
-        st.subheader("Resultado del pipeline")
-        st.caption("Resumen visual de filas leídas, insertadas, actualizadas y rechazadas por fuente.")
-        if not runs.empty:
-            run_plot = runs.groupby("fuente", as_index=False).agg(
-                filas_leidas=("filas_leidas", "sum"),
-                filas_insertadas=("filas_insertadas", "sum"),
-                filas_actualizadas=("filas_actualizadas", "sum"),
-                filas_rechazadas=("filas_rechazadas", "sum"),
-            )
-            run_long = run_plot.melt(id_vars="fuente", var_name="métrica", value_name="filas")
-            fig_runs = px.bar(
-                run_long,
-                x="fuente",
-                y="filas",
-                color="métrica",
-                barmode="group",
-                color_discrete_sequence=["#2563EB", "#22D3EE", "#34D399", "#F59E0B"],
-                labels={"fuente": "Fuente", "filas": "Filas", "métrica": "Métrica"},
-                title="Trazabilidad ETL/CDC por fuente",
-            )
-            st.plotly_chart(polish(fig_runs, 390), use_container_width=True, config=PLOT_CONFIG)
-        else:
-            st.info("No hay registros del pipeline para mostrar.")
-
-    st.subheader("Tabla de calidad del aire")
-    st.dataframe(air, width="stretch", hide_index=True)
-
-    st.subheader("Trazabilidad del pipeline")
-    st.dataframe(runs, width="stretch", hide_index=True)
-
-    st.subheader("Resumen de calidad del pipeline")
-    st.caption("Detalle operativo de la vista de resumen de calidad usada por los KPIs superiores.")
-    quality_summary = query_optional(
-        "SELECT * FROM dw.v_resumen_calidad_pipeline",
-        missing_message="La vista dw.v_resumen_calidad_pipeline no existe en esta base.",
-    )
-    quality_numeric = [
-        "altas", "modificaciones", "descartes_auditoria", "rechazos_detallados",
-        "filas_leidas", "filas_insertadas", "filas_actualizadas", "filas_rechazadas",
-    ]
-    quality_summary = numeric_cols(quality_summary, quality_numeric)
-    if not quality_summary.empty:
-        available_numeric = [col for col in quality_numeric if col in quality_summary.columns]
-        if available_numeric:
-            category = "fuente" if "fuente" in quality_summary.columns else quality_summary.columns[0]
-            fig_quality = px.bar(
-                quality_summary,
-                x=category,
-                y=available_numeric,
-                barmode="group",
-                color_discrete_sequence=COLOR_SEQUENCE,
-                title="Resumen operativo por fuente",
-            )
-            st.plotly_chart(polish(fig_quality, 390), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(quality_summary, width="stretch", hide_index=True)
-    else:
-        st.info("La vista de resumen de calidad no tiene filas para mostrar.")
-
-    st.subheader("Eventos CDC registrados")
-    st.caption("Distingue altas, modificaciones, registros sin cambio y rechazos cuando existen eventos auditados.")
-    cdc_events = query_optional(
-        """SELECT fuente, tipo_evento, COUNT(*)::bigint AS eventos,
-                  MAX(registrado_en) AS ultimo_evento
-           FROM audit.cdc_eventos
-           GROUP BY fuente, tipo_evento
-           ORDER BY fuente, tipo_evento""",
-        missing_message="No existe la tabla audit.cdc_eventos en esta base.",
-    )
-    cdc_events = numeric_cols(cdc_events, ["eventos"])
-    if not cdc_events.empty:
-        cdc_events["ultimo_evento"] = pd.to_datetime(cdc_events["ultimo_evento"], errors="coerce")
-        fig_cdc = px.bar(
-            cdc_events,
-            x="fuente",
-            y="eventos",
-            color="tipo_evento",
-            barmode="group",
-            color_discrete_sequence=COLOR_SEQUENCE,
-            labels={"fuente": "Fuente", "eventos": "Eventos", "tipo_evento": "Tipo de evento"},
-            title="Eventos CDC por fuente",
-        )
-        st.plotly_chart(polish(fig_cdc, 390), use_container_width=True, config=PLOT_CONFIG)
-        st.dataframe(cdc_events, width="stretch", hide_index=True)
-    else:
-        st.info("No hay eventos CDC registrados para mostrar.")
-
-    st.subheader("Rechazos ETL detallados")
-    st.caption("Registros aislados por reglas de calidad, conservando motivo y payload original.")
+    add_question("10. ¿Qué registros deben ser rechazados o tratados por problemas de calidad ETL?")
     rejects = query_optional(
         """SELECT fuente, motivo, COUNT(*)::bigint AS rechazos,
                   MAX(rechazado_en) AS ultimo_rechazo
            FROM staging.rechazos_etl
            GROUP BY fuente, motivo
-           ORDER BY rechazos DESC, fuente, motivo""",
+           ORDER BY rechazos DESC, fuente, motivo
+           LIMIT 30""",
         missing_message="No existe la tabla staging.rechazos_etl en esta base.",
     )
     rejects = numeric_cols(rejects, ["rechazos"])
     if not rejects.empty:
-        rejects["ultimo_rechazo"] = pd.to_datetime(rejects["ultimo_rechazo"], errors="coerce")
         fig_rejects = px.bar(
             rejects,
             x="fuente",
@@ -1472,7 +749,15 @@ with tracking:
             labels={"fuente": "Fuente", "rechazos": "Rechazos", "motivo": "Motivo"},
             title="Rechazos ETL por fuente y motivo",
         )
-        st.plotly_chart(polish(fig_rejects, 390), use_container_width=True, config=PLOT_CONFIG)
+        st.plotly_chart(polish(fig_rejects, 410), use_container_width=True, config=PLOT_CONFIG)
         st.dataframe(rejects, width="stretch", hide_index=True)
     else:
         st.info("No hay rechazos ETL registrados para mostrar.")
+
+    if not quality_summary.empty:
+        q = quality_summary.iloc[0]
+        q1, q2, q3, q4 = st.columns(4)
+        q1.metric("Altas CDC", fmt_int(q.altas))
+        q2.metric("Modificaciones CDC", fmt_int(q.modificaciones))
+        q3.metric("Descartes auditoría", fmt_int(q.descartes_auditoria))
+        q4.metric("Rechazos detallados", fmt_int(q.rechazos_detallados))
