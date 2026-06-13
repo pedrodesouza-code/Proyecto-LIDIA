@@ -341,6 +341,23 @@ def test_region_administrativa_usa_postgis_sin_bounding_boxes():
     assert "--download-ide-uy" in script
 
 
+def test_vista_zona_espacial_no_fabrica_departamentos():
+    root = Path(__file__).parents[1]
+    views = (root / "sql" / "ddl" / "04_vistas.sql").read_text(encoding="utf-8")
+    dashboard = (root / "dashboard" / "streamlit_app.py").read_text(encoding="utf-8")
+
+    assert "dw.v_focos_zona_espacial" in views
+    assert "dw.v_focos_zona_espacial_ury" in views
+    assert "ROUND(u.latitud::numeric, 1) AS latitud_grilla" in views
+    assert "ROUND(u.longitud::numeric, 1) AS longitud_grilla" in views
+    assert "zona_espacial" in views
+    assert "COALESCE(u.region, u.ubicacion" not in views
+    assert "Zonas geográficas con mayor concentración de focos" in dashboard
+    assert "No representan departamentos administrativos" in dashboard
+    assert "Celdas espaciales FIRMS, no departamentos" in dashboard
+    assert "Focos FIRMS por departamento" in dashboard
+
+
 def test_docker_local_usa_postgis_para_regiones():
     root = Path(__file__).parents[1]
     compose = (root / "docker-compose.yml").read_text(encoding="utf-8")

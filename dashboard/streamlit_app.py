@@ -511,6 +511,67 @@ with activity:
     else:
         st.info("No hay datos mensuales de Uruguay para el período seleccionado.")
 
+    st.subheader("Zonas geográficas con mayor concentración de focos")
+    st.caption(
+        "Las zonas espaciales se calculan a partir de una grilla generada con las coordenadas de FIRMS. "
+        "No representan departamentos administrativos. El análisis departamental requiere una capa poligonal válida."
+    )
+    zona_ury = query_optional(
+        """SELECT zona_espacial, latitud_grilla, longitud_grilla, cantidad_focos, frp_promedio_mw
+           FROM dw.v_focos_zona_espacial
+           WHERE pais_codigo = 'URY'
+           ORDER BY cantidad_focos DESC
+           LIMIT 20""",
+        missing_message=(
+            "La vista `dw.v_focos_zona_espacial` aún no está disponible. "
+            "Ejecute `sql/ddl/04_vistas.sql` para habilitar el análisis por grilla espacial."
+        ),
+    )
+    zona_ury = numeric_cols(zona_ury, ["latitud_grilla", "longitud_grilla", "cantidad_focos", "frp_promedio_mw"])
+    if not zona_ury.empty:
+        left_zone, right_zone = st.columns([1.25, 1])
+        with left_zone:
+            fig_zona = px.bar(
+                zona_ury.sort_values("cantidad_focos", ascending=True),
+                x="cantidad_focos",
+                y="zona_espacial",
+                orientation="h",
+                labels={"cantidad_focos": "Focos", "zona_espacial": "Zona geográfica"},
+                title="Uruguay: top zonas geográficas por focos FIRMS",
+                hover_data={
+                    "latitud_grilla": ":.1f",
+                    "longitud_grilla": ":.1f",
+                    "frp_promedio_mw": ":.2f",
+                },
+            )
+            fig_zona.update_traces(marker_color=COLOR_PAIS["URY"])
+            st.plotly_chart(polish(fig_zona, 460), use_container_width=True, config=PLOT_CONFIG)
+        with right_zone:
+            if {"latitud_grilla", "longitud_grilla"}.issubset(zona_ury.columns):
+                map_zona = zona_ury.rename(columns={"latitud_grilla": "lat", "longitud_grilla": "lon"})
+                fig_zona_map = px.scatter_mapbox(
+                    map_zona,
+                    lat="lat",
+                    lon="lon",
+                    size="cantidad_focos",
+                    color="cantidad_focos",
+                    hover_name="zona_espacial",
+                    hover_data={"frp_promedio_mw": ":.2f", "lat": ":.1f", "lon": ":.1f"},
+                    color_continuous_scale=COLOR_SCALE_BLUE,
+                    zoom=5.4,
+                    height=460,
+                    title="Celdas espaciales FIRMS, no departamentos",
+                )
+                fig_zona_map.update_layout(
+                    mapbox_style="carto-positron",
+                    margin=dict(l=0, r=0, t=45, b=0),
+                    paper_bgcolor="rgba(0,0,0,0)",
+                )
+                st.plotly_chart(fig_zona_map, use_container_width=True, config=PLOT_CONFIG)
+        st.dataframe(zona_ury, width="stretch", hide_index=True)
+    else:
+        st.info("No hay zonas geográficas FIRMS disponibles para Uruguay con el período seleccionado.")
+
     uy_region = query(
         """SELECT u.pais_codigo,
                   NULLIF(TRIM(u.region), '') AS region,
@@ -528,15 +589,15 @@ with activity:
         (period[0], period[1]),
     )
     uy_region = numeric_cols(uy_region, ["cantidad_focos", "frp_promedio_mw"])
-    st.subheader("Uruguay: análisis territorial por región administrativa")
+    st.subheader("Uruguay: departamentos reales, si están disponibles")
     if not uy_region.empty:
         fig_uy_region = px.bar(
             uy_region.sort_values("cantidad_focos", ascending=True),
             x="cantidad_focos",
             y="region",
             orientation="h",
-            labels={"cantidad_focos": "Focos", "region": "Región administrativa"},
-            title="Uruguay: focos por región administrativa informada",
+            labels={"cantidad_focos": "Focos", "region": "Departamento"},
+            title="Focos FIRMS por departamento",
             hover_data={"frp_promedio_mw": ":.2f"},
         )
         fig_uy_region.update_traces(marker_color=COLOR_PAIS["URY"])
@@ -544,9 +605,8 @@ with activity:
         st.dataframe(uy_region, width="stretch", hide_index=True)
     else:
         st.info(
-            "No hay región administrativa disponible para los focos FIRMS con las fuentes actuales. "
-            "FIRMS aporta coordenadas puntuales, pero no departamento. Para evitar asignaciones no trazables, "
-            "el análisis departamental de incendios queda pendiente hasta incorporar límites administrativos válidos."
+            "El análisis de focos FIRMS por departamento queda pendiente hasta cargar una capa poligonal válida "
+            "de departamentos de Uruguay. Mientras tanto, use la sección de zonas geográficas por grilla espacial."
         )
 
     inumet_departamentos = query(

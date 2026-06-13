@@ -16,6 +16,32 @@ FROM dw.fact_incendio i
 JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
 GROUP BY u.pais_codigo, NULLIF(TRIM(u.region), '')::VARCHAR;
 
+CREATE OR REPLACE VIEW dw.v_focos_zona_espacial AS
+SELECT
+    u.pais_codigo,
+    ROUND(u.latitud::numeric, 1) AS latitud_grilla,
+    ROUND(u.longitud::numeric, 1) AS longitud_grilla,
+    CONCAT(
+        u.pais_codigo,
+        '_LAT_', ROUND(u.latitud::numeric, 1),
+        '_LON_', ROUND(u.longitud::numeric, 1)
+    ) AS zona_espacial,
+    COUNT(*)::bigint AS cantidad_focos,
+    ROUND(AVG(i.frp_mw), 2) AS frp_promedio_mw
+FROM dw.fact_incendio i
+JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+WHERE u.latitud IS NOT NULL
+  AND u.longitud IS NOT NULL
+GROUP BY
+    u.pais_codigo,
+    ROUND(u.latitud::numeric, 1),
+    ROUND(u.longitud::numeric, 1);
+
+CREATE OR REPLACE VIEW dw.v_focos_zona_espacial_ury AS
+SELECT *
+FROM dw.v_focos_zona_espacial
+WHERE pais_codigo = 'URY';
+
 CREATE OR REPLACE VIEW dw.v_incendios_clima AS
 SELECT u.pais_codigo, fch.fecha, COUNT(*)::bigint AS focos,
        ROUND(AVG(i.frp_mw), 3) AS frp_promedio_mw,
@@ -70,6 +96,7 @@ SELECT
 FROM audit.etl_runs;
 
 GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
+    dw.v_focos_zona_espacial, dw.v_focos_zona_espacial_ury,
     dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
     dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline,
     dw.v_resumen_calidad_pipeline TO lidia_dashboard;

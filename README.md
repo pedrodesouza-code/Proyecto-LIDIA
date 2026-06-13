@@ -154,6 +154,13 @@ un volumen PostgreSQL ya existente puede ser necesario ejecutar manualmente
 `sql/ddl/06_regiones_administrativas.sql`; no se deben borrar volumenes de datos
 solo para activar esta evidencia.
 
+Pregunta espacial defendible del EC3: **Que zonas geograficas de Uruguay
+presentan mayor concentracion de focos de calor y, cuando exista una capa
+administrativa valida, como se distribuyen por departamento?** Mientras no haya
+poligonos administrativos, el dashboard usa `dw.v_focos_zona_espacial`, una
+grilla construida desde latitud/longitud FIRMS. Esa grilla no representa
+departamentos.
+
 ## ETL Y CDC
 
 ```bash

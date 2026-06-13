@@ -1,0 +1,101 @@
+=== DDL vista zona espacial ===
+15-FROM dw.fact_incendio i
+16-JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+17-GROUP BY u.pais_codigo, NULLIF(TRIM(u.region), '')::VARCHAR;
+18-
+19:CREATE OR REPLACE VIEW dw.v_focos_zona_espacial AS
+20-SELECT
+21-    u.pais_codigo,
+22-    ROUND(u.latitud::numeric, 1) AS latitud_grilla,
+23-    ROUND(u.longitud::numeric, 1) AS longitud_grilla,
+24-    CONCAT(
+25-        u.pais_codigo,
+26-        '_LAT_', ROUND(u.latitud::numeric, 1),
+27-        '_LON_', ROUND(u.longitud::numeric, 1)
+28-    ) AS zona_espacial,
+29-    COUNT(*)::bigint AS cantidad_focos,
+30-    ROUND(AVG(i.frp_mw), 2) AS frp_promedio_mw
+31-FROM dw.fact_incendio i
+32-JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+33-WHERE u.latitud IS NOT NULL
+34-  AND u.longitud IS NOT NULL
+35-GROUP BY
+36-    u.pais_codigo,
+37-    ROUND(u.latitud::numeric, 1),
+38-    ROUND(u.longitud::numeric, 1);
+39-
+40:CREATE OR REPLACE VIEW dw.v_focos_zona_espacial_ury AS
+41-SELECT *
+42:FROM dw.v_focos_zona_espacial
+43-WHERE pais_codigo = 'URY';
+44-
+45-CREATE OR REPLACE VIEW dw.v_incendios_clima AS
+46-SELECT u.pais_codigo, fch.fecha, COUNT(*)::bigint AS focos,
+47-       ROUND(AVG(i.frp_mw), 3) AS frp_promedio_mw,
+48-       ROUND(AVG(c.temperatura_c), 2) AS temperatura_media_c,
+49-       ROUND(AVG(c.humedad_pct), 2) AS humedad_media_pct
+50-FROM dw.fact_incendio i
+51-JOIN dw.dim_fecha fch ON fch.fecha_id = i.fecha_id
+52-JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+53-LEFT JOIN dw.dim_clima c ON c.clima_id = i.clima_id
+54-GROUP BY u.pais_codigo, fch.fecha;
+55-
+56-CREATE OR REPLACE VIEW dw.v_incendios_precipitacion AS
+57-SELECT u.pais_codigo, fch.anio, fch.mes, COUNT(*)::bigint AS focos,
+58-       ROUND(AVG(p.precipitacion_mm), 3) AS precipitacion_mm_promedio
+59-FROM dw.fact_incendio i
+60-JOIN dw.dim_fecha fch ON fch.fecha_id = i.fecha_id
+61-JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+62-LEFT JOIN dw.dim_precipitacion p ON p.precipitacion_id = i.precipitacion_id
+63-GROUP BY u.pais_codigo, fch.anio, fch.mes;
+64-
+65-CREATE OR REPLACE VIEW dw.v_incendios_cobertura AS
+66-SELECT u.pais_codigo, COALESCE(c.descripcion_cobertura, 'Sin dato MODIS') AS cobertura,
+67-       COUNT(*)::bigint AS focos, ROUND(AVG(i.frp_mw), 3) AS frp_promedio_mw
+68-FROM dw.fact_incendio i
+69-JOIN dw.dim_ubicacion u ON u.ubicacion_id = i.ubicacion_id
+70-LEFT JOIN dw.dim_cobertura_vegetal c ON c.cobertura_id = i.cobertura_id
+71-GROUP BY u.pais_codigo, COALESCE(c.descripcion_cobertura, 'Sin dato MODIS');
+72-
+73-CREATE OR REPLACE VIEW dw.v_calidad_aire_alta_actividad AS
+--
+95-    (SELECT COUNT(*)::bigint FROM staging.rechazos_etl) AS rechazos_detallados
+96-FROM audit.etl_runs;
+97-
+98-GRANT SELECT ON dw.v_incendios_pais_periodo, dw.v_incendios_region,
+99:    dw.v_focos_zona_espacial, dw.v_focos_zona_espacial_ury,
+100-    dw.v_incendios_clima, dw.v_incendios_precipitacion, dw.v_incendios_cobertura,
+101-    dw.v_calidad_aire_alta_actividad, dw.v_calidad_pipeline,
+102-    dw.v_resumen_calidad_pipeline TO lidia_dashboard;
+
+=== Dashboard texto zona espacial ===
+510-            st.plotly_chart(polish(fig_uy_frp, 390), use_container_width=True, config=PLOT_CONFIG)
+511-    else:
+512-        st.info("No hay datos mensuales de Uruguay para el período seleccionado.")
+513-
+514:    st.subheader("Zonas geográficas con mayor concentración de focos")
+515-    st.caption(
+516-        "Las zonas espaciales se calculan a partir de una grilla generada con las coordenadas de FIRMS. "
+517:        "No representan departamentos administrativos. El análisis departamental requiere una capa poligonal válida."
+518-    )
+519-    zona_ury = query_optional(
+520-        """SELECT zona_espacial, latitud_grilla, longitud_grilla, cantidad_focos, frp_promedio_mw
+521-           FROM dw.v_focos_zona_espacial
+522-           WHERE pais_codigo = 'URY'
+523-           ORDER BY cantidad_focos DESC
+524-           LIMIT 20""",
+525-        missing_message=(
+--
+596-            x="cantidad_focos",
+597-            y="region",
+598-            orientation="h",
+599-            labels={"cantidad_focos": "Focos", "region": "Departamento"},
+600:            title="Focos FIRMS por departamento",
+601-            hover_data={"frp_promedio_mw": ":.2f"},
+602-        )
+603-        fig_uy_region.update_traces(marker_color=COLOR_PAIS["URY"])
+604-        st.plotly_chart(polish(fig_uy_region, 430), use_container_width=True, config=PLOT_CONFIG)
+605-        st.dataframe(uy_region, width="stretch", hide_index=True)
+606-    else:
+607-        st.info(
+608-            "El análisis de focos FIRMS por departamento queda pendiente hasta cargar una capa poligonal válida "
