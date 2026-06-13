@@ -315,7 +315,7 @@ def test_region_se_puebla_solo_desde_departamento_trazable():
 
     assert "MIN(NULLIF(TRIM(departamento), '')) AS region" in loader
     assert "SET region=COALESCE(EXCLUDED.region, dw.dim_ubicacion.region)" in loader
-    assert "NULLIF(TRIM(u.region), '') AS region" in views
+    assert "NULLIF(TRIM(u.region), '')::VARCHAR AS region" in views
     assert "COALESCE(u.region, u.ubicacion" not in views
     assert "idx_ubicacion_pais_region" in indexes
 
