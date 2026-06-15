@@ -1,0 +1,4 @@
+inicio_background_carga_completa
+{"timestamp": "2026-06-15T21:05:48.797348+00:00", "message": "inicio_carga_completa", "comando": "python3 -m etl.main --source ALL"}
+{"timestamp": "2026-06-15T21:05:58.738803+00:00", "message": "conteos_postgres", "momento": "antes", "conteos": {"dw.fact_incendio": 2774831, "staging.stg_firms": 2774849, "staging.stg_meteo": 2403337, "staging.stg_chirps": 2598, "staging.stg_modis": 275, "staging.stg_calidad_aire": 936564, "staging.rechazos_etl": 32104, "audit.etl_runs": 256}}
+{"timestamp": "2026-06-15T21:12:02.591052+00:00", "message": "carga_completa_interrumpida_controladamente", "pid": 15078, "estado": "terminated_process_group", "motivo": "ventana interactiva agotada; no se inventa tiempo total"}

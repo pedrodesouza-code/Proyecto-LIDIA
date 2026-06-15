@@ -1,0 +1,9 @@
+timestamp=2026-06-15T21:12:22Z
+accion=backup_postgres
+host=10.200.245.40
+port=15434
+database=proyecto_lidia
+user=grp03
+output=/app/Proyecto-LIDIA/backups/proyecto_lidia.dump
+estado=OK
+restore_documentado_no_ejecutado=pg_restore -h <host> -p <puerto> -U <user> -d proyecto_lidia --clean backups/proyecto_lidia.dump

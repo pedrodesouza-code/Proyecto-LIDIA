@@ -8,8 +8,8 @@ reales locales; Open-Meteo historico se obtiene mediante API.
 Los datos no se versionan.
 
 ```bash
-python -m etl.main --source FIRMS
-python -m etl.main --source ALL
+python3 -m etl.main --source FIRMS
+python3 -m etl.main --source ALL
 ```
 
 Cada lote valida país, campos críticos, fechas y rangos. Las filas inválidas se
@@ -19,6 +19,8 @@ persisten en `staging.rechazos_etl`. `natural_key` identifica la observación y
 
 `INUMET` rechaza registros fuera de Uruguay. `brillo_termico` de FIRMS se
 conserva como medición satelital y no se utiliza como temperatura del aire.
+El extractor FIRMS puede procesar el histórico por particiones/anios para no
+cargar millones de registros en memoria dentro de Jupyter/UTEC.
 
 ## Carga Real Integrada
 
@@ -41,9 +43,9 @@ mismo pais y mes dentro del umbral configurado. Los registros fuera del alcance
 se persisten como rechazos.
 
 `METEO` consume datos historicos horarios 2018-2025 desde Open-Meteo Archive
-API. `CAMS`/Open-Meteo Air Quality queda preparado para PM2.5 y PM10; si no hay
-archivo validado configurado, el extractor devuelve un lote vacio y no inventa
-datos. `MODIS` se carga desde una exportacion anual real configurada en
+API. `CAMS`/Open-Meteo Air Quality normaliza PM2.5 y PM10 desde archivo validado
+o API configurada; si no existe fuente real configurada, el extractor devuelve
+un lote vacio y no inventa datos. `MODIS` se carga desde una exportacion anual real configurada en
 `MODIS_FILE`. `INUMET` une los CSV horarios reales configurados en
 `INUMET_TEMPERATURA_FILE` e `INUMET_HUMEDAD_FILE`, y siempre se restringe a
 Uruguay.
@@ -55,3 +57,17 @@ cercana al horario FIRMS), mismo anio/mes para CHIRPS y mismo anio para MODIS.
 Los umbrales quedan explicitados en `SPATIAL_THRESHOLDS_KM`: 100 km para
 `METEO`, `CHIRPS`, `MODIS` y `CAMS`, y 150 km para `INUMET`. Si no existe
 candidato dentro de la regla, la clave foranea permanece nula.
+
+## Evidencia Y Validacion
+
+La validacion vigente del repositorio se ejecuta con:
+
+```bash
+python3 -m compileall -q .
+python3 -m pytest -q tests
+```
+
+La evidencia reciente registra 43 pruebas aprobadas. Los logs operativos deben
+tomarse de `evidencia/logs/` solo cuando correspondan a la corrida que se decida
+presentar; logs viejos de smoke o diagnósticos intermedios no deben citarse como
+resultado final si contradicen la implementación actual.

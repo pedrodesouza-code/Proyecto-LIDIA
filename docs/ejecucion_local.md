@@ -69,6 +69,11 @@ python3 -m pytest -q tests
 Los scripts usan `python3` por defecto. Si el entorno tiene otro binario,
 definir `PYTHON_BIN`, por ejemplo `PYTHON_BIN=python`.
 
+La cantidad oficial de pruebas del estado actual es **43 tests**. Si un entorno
+recolecta una cantidad distinta, revisar checkpoints de Jupyter
+(`.ipynb_checkpoints`), logs antiguos o archivos de test duplicados antes de
+comparar resultados.
+
 ## Sharding MongoDB Local
 
 El compose principal no se modifica. La evidencia local de sharding se activa con:
@@ -167,6 +172,17 @@ Logs principales:
 - `evidencia/logs/carga_completa_postgres_conteos.log`
 - `evidencia/logs/carga_completa_mongo_conteos.log`
 
+Para el dashboard, la evidencia de optimizacion se genera con:
+
+```bash
+python3 scripts/auditar_dashboard_performance.py
+```
+
+Ese script mide consultas representativas. Las consultas regionales de focos y
+precipitación usan `dw.mv_dashboard_focos_pais_periodo` y
+`dw.mv_dashboard_incendios_precipitacion`, que deben existir en PostgreSQL luego
+de aplicar `sql/ddl/04_vistas.sql`.
+
 ## Diferencia Entre Caminos
 
 Camino A, reconstruccion reproducible:
@@ -186,3 +202,17 @@ bash scripts/local_validate_state.sh
 ```
 
 El camino A depende de los archivos reales en `data/processed/`. El camino B replica el estado ya materializado en Jupyter/UTEC.
+
+## Backup Y Recuperacion
+
+Procedimiento documentado:
+
+- PostgreSQL: usar `pg_dump` contra la base `proyecto_lidia`, excluyendo
+  credenciales de los logs.
+- MongoDB: usar `mongodump` cuando esté disponible o exportación JSONL
+  controlada de colecciones documentales.
+- Configuración: respaldar ejemplos versionables y conservar `.env` reales
+  fuera de Git.
+
+Solo debe afirmarse que un backup fue ejecutado cuando exista log o snapshot
+generado en `backups/` o `evidencia/logs/`.

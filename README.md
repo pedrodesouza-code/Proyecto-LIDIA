@@ -198,16 +198,51 @@ CHIRPS, MODIS e INUMET. Los conteos verificables estan en
 `evidencia/logs/metricas_carga_fuentes_final.md` y en los logs de carga local
 `evidencia/logs/carga_completa_postgres_conteos.log`.
 
-## Tests Y Dashboard
+## Tests, Dashboard Y Trazabilidad Analitica
 
 ```bash
-python -m pytest -q tests -p no:cacheprovider
+python3 -m compileall -q .
+python3 -m pytest -q tests
 streamlit run dashboard/streamlit_app.py
 ```
 
-El dashboard consulta vistas `dw` y presenta ocho KPIs, series temporales,
-comparacion por pais/region y cruces con clima, precipitacion y cobertura.
-Tambien expone metricas de carga, CDC y rechazos.
+La evidencia vigente del repositorio registra **43 tests aprobados**. Los tests
+verifican normalizacion, calidad de datos, restricciones de pais, INUMET solo
+Uruguay, tratamiento de `brillo_termico`, CDC, idempotencia, asociacion
+Haversine, preparacion de datasets y coherencia del dashboard.
+
+El dashboard consulta exclusivamente PostgreSQL y organiza la lectura en torno
+a diez preguntas analiticas. Uruguay queda como foco principal; Argentina y
+Brasil se mantienen como contexto comparativo. Las secciones consultan vistas
+del esquema `dw`, incluyendo:
+
+- `dw.mv_dashboard_focos_pais_periodo`, resumen materializado para focos por
+  pais, anio y mes.
+- `dw.mv_dashboard_incendios_precipitacion`, resumen materializado para
+  precipitación CHIRPS y focos.
+- `dw.v_incendios_clima`, para temperatura y humedad meteorologica real.
+- `dw.v_incendios_cobertura`, para cobertura vegetal MODIS.
+- `dw.v_calidad_aire_alta_actividad`, para PM2.5/PM10 cuando hay cobertura
+  valida.
+- `dw.v_focos_zona_espacial_ury`, grilla espacial FIRMS de Uruguay.
+- `staging.rechazos_etl`, `audit.etl_runs` y `audit.cdc_eventos`, para calidad
+  de pipeline, CDC y rechazos.
+
+Las celdas espaciales del dashboard no representan departamentos
+administrativos. El analisis departamental formal queda pendiente hasta cargar
+una capa oficial `Polygon`/`MultiPolygon` valida y ejecutar la actualizacion
+PostGIS documentada.
+
+La optimizacion del dashboard se mide con:
+
+```bash
+python3 scripts/auditar_dashboard_performance.py
+```
+
+Las vistas materializadas evitan recalcular uniones sobre millones de focos en
+cada interaccion. Si se recargan datos historicos, corresponde volver a ejecutar
+`sql/ddl/04_vistas.sql` o refrescar/recrear dichas vistas antes de presentar
+metricas finales.
 
 ## Docker Y Servidor UTEC
 
@@ -215,6 +250,11 @@ Para validacion local se provee `docker/docker-compose.yml`.
 El servidor institucional debe usar servicios autorizados; este aporte no
 asume Docker ni sharding disponibles. El procedimiento de backup/recuperacion
 esta documentado en `docker/README.md`.
+
+El sharding MongoDB incluido en `docker-compose.sharding.yml` y
+`scripts/aplicar_sharding_mongo_compose.sh` es evidencia academica local para
+D8. No se declara como despliegue productivo ni como componente obligatorio del
+servidor UTEC/Jupyter.
 
 ## Ejecucion Local Equivalente A Jupyter
 

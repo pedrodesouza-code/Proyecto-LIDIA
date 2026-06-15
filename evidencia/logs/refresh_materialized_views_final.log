@@ -1,0 +1,8 @@
+{"timestamp": "2026-06-15T21:01:20.417106+00:00", "message": "inicio_refresh_materialized_views", "views": ["dw.mv_dashboard_focos_pais_periodo", "dw.mv_dashboard_incendios_precipitacion"]}
+{"timestamp": "2026-06-15T21:01:20.426521+00:00", "message": "query_inicio", "query": "REFRESH MATERIALIZED VIEW dw.mv_dashboard_focos_pais_periodo"}
+{"timestamp": "2026-06-15T21:01:30.550185+00:00", "message": "query_fin", "query": "REFRESH MATERIALIZED VIEW dw.mv_dashboard_focos_pais_periodo", "duracion_segundos": 10.1236}
+{"timestamp": "2026-06-15T21:01:30.550368+00:00", "message": "query_inicio", "query": "REFRESH MATERIALIZED VIEW dw.mv_dashboard_incendios_precipitacion"}
+{"timestamp": "2026-06-15T21:01:39.336299+00:00", "message": "query_fin", "query": "REFRESH MATERIALIZED VIEW dw.mv_dashboard_incendios_precipitacion", "duracion_segundos": 8.7859}
+{"timestamp": "2026-06-15T21:01:39.338098+00:00", "message": "conteo_materialized_view", "objeto": "dw.mv_dashboard_focos_pais_periodo", "filas": 254}
+{"timestamp": "2026-06-15T21:01:39.338184+00:00", "message": "conteo_materialized_view", "objeto": "dw.mv_dashboard_incendios_precipitacion", "filas": 254}
+{"timestamp": "2026-06-15T21:01:39.340786+00:00", "message": "fin_refresh_materialized_views", "estado": "OK", "duracion_total_segundos": 18.9237, "exit_code": 0}

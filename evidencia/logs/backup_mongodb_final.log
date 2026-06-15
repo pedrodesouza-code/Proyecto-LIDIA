@@ -1,0 +1,5 @@
+timestamp=2026-06-15T21:14:04Z
+accion=backup_mongodb
+output=/app/Proyecto-LIDIA/backups/mongo_lidia
+uri=***OCULTO***
+scripts/backup_mongodb_final.sh: line 31: mongodump: command not found
