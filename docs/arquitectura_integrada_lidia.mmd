@@ -1,0 +1,73 @@
+flowchart LR
+  subgraph Fuentes[Fuentes de datos]
+    FIRMS[NASA FIRMS
+focos de calor]
+    METEO[Open-Meteo historico / METEO]
+    CAMS[Open-Meteo Air Quality / CAMS
+PM2.5 y PM10]
+    CHIRPS[CHIRPS
+precipitacion]
+    MODIS[MODIS
+cobertura vegetal]
+    INUMET[INUMET
+solo Uruguay]
+  end
+  subgraph ETL[ETL Python]
+    EXTRACT[etl/extract/]
+    NORMALIZE[etl/transform/normalize.py]
+    LOADPG[etl/load/postgres.py]
+    LOADMONGO[etl/load/mongo.py]
+    MAIN[etl/main.py]
+  end
+  subgraph PG[PostgreSQL Data Warehouse]
+    STAGING[staging]
+    DW[dw
+fact_incendio y dimensiones]
+    AUDIT[audit
+etl_runs y cdc_eventos]
+    VIEWS[vistas y materialized views
+para dashboard]
+  end
+  subgraph MONGO[MongoDB documental]
+    META[ingesta_metadata]
+    RECH[rechazos_etl]
+    LOGS[pipeline_logs]
+    SNAP[snapshots_firms]
+    RAW[raw_payloads]
+  end
+  subgraph BI[Streamlit]
+    DASH[dashboard/streamlit_app.py
+consulta vistas dw]
+  end
+  subgraph CTRL[Evidencia y control]
+    EV[evidencia/logs/]
+    TESTS[tests automaticos]
+    CDC[CDC]
+    BCK[backup PostgreSQL]
+    PERF[rendimiento]
+  end
+  subgraph ENV[Entornos]
+    JUP[Jupyter/UTEC
+datos reales]
+    DOCKER[Local Docker
+reproducibilidad academica]
+  end
+  FIRMS --> EXTRACT
+  METEO --> EXTRACT
+  CAMS --> EXTRACT
+  CHIRPS --> EXTRACT
+  MODIS --> EXTRACT
+  INUMET --> EXTRACT
+  EXTRACT --> NORMALIZE --> MAIN
+  MAIN --> LOADPG --> STAGING --> DW --> VIEWS --> DASH
+  LOADPG --> AUDIT
+  MAIN --> LOADMONGO --> MONGO
+  AUDIT --> EV
+  MONGO --> EV
+  DASH --> EV
+  TESTS --> EV
+  CDC --> AUDIT
+  BCK --> EV
+  PERF --> EV
+  JUP --> MAIN
+  DOCKER --> MAIN
