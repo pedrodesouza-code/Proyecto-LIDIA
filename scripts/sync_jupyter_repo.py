@@ -135,23 +135,30 @@ def main() -> None:
     s = session()
     uploaded = []
     unchanged = []
+    failed = []
     for rel in SYNC_PATHS:
         local = REPO_ROOT / rel
         if not local.exists():
             continue
         lsha = sha256_bytes(local.read_bytes())
-        rsha = remote_sha(s, rel)
-        if lsha == rsha:
-            unchanged.append(rel)
-            continue
-        upload_file(s, rel)
-        uploaded.append(rel)
+        try:
+            rsha = remote_sha(s, rel)
+            if lsha == rsha:
+                unchanged.append(rel)
+                continue
+            upload_file(s, rel)
+            uploaded.append(rel)
+        except Exception as exc:  # pragma: no cover - operational sync report
+            failed.append(f"{rel}: {exc}")
 
     deleted = []
     for rel in DELETE_PATHS:
-        result = delete_path(s, rel)
-        if result == "deleted":
-            deleted.append(rel)
+        try:
+            result = delete_path(s, rel)
+            if result == "deleted":
+                deleted.append(rel)
+        except Exception as exc:  # pragma: no cover - operational sync report
+            failed.append(f"{rel}: {exc}")
 
     print("uploaded", len(uploaded))
     for rel in uploaded:
@@ -160,6 +167,9 @@ def main() -> None:
     print("deleted", len(deleted))
     for rel in deleted:
         print("DEL", rel)
+    print("failed", len(failed))
+    for rel in failed:
+        print("FAIL", rel)
 
 
 if __name__ == "__main__":
