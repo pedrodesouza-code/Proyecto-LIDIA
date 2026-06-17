@@ -1,0 +1,40 @@
+EVIDENCIA DE IDEMPOTENCIA
+
+Fecha de prueba:
+2026-06-16
+
+Entorno:
+Repositorio local Proyecto-LIDIA.
+
+Objetivo:
+Validar que ejecutar el proceso sobre los mismos datos no genera duplicados por natural_key.
+
+Archivos usados como evidencia:
+- evidencia/logs/validacion_idempotencia.txt
+- evidencia/logs/evidencia_tests_cdc_idempotencia_fecha.txt
+- tests/test_idempotencia.py
+
+Consulta SQL asociada:
+SELECT COUNT(*) AS duplicados_natural_key
+FROM (
+    SELECT natural_key
+    FROM dw.fact_incendio
+    GROUP BY natural_key
+    HAVING COUNT(*) > 1
+) d;
+
+Resultado observado en evidencia/logs/validacion_idempotencia.txt:
+- staging.stg_firms: 0 duplicados
+- staging.stg_chirps: 0 duplicados
+- staging.stg_meteo: 0 duplicados
+- staging.stg_modis: 0 duplicados
+- dw.fact_incendio: 0 duplicados
+
+Resultado observado en evidencia/logs/evidencia_tests_cdc_idempotencia_fecha.txt:
+- 40 pruebas automatizadas pasaron correctamente.
+
+Interpretacion:
+La idempotencia se valida porque las claves naturales se mantienen estables y no aparecen duplicados en staging ni en la tabla de hechos dw.fact_incendio.
+
+Conclusion:
+La evidencia muestra que el pipeline es reejecutable sin duplicar registros por natural_key.

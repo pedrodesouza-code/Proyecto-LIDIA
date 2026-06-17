@@ -1,0 +1,33 @@
+EVIDENCIA DE CDC
+
+Fecha de prueba:
+2026-06-16
+
+Entorno:
+Repositorio local Proyecto-LIDIA.
+
+Objetivo:
+Validar que el pipeline registra eventos de Change Data Capture usando claves naturales y hashes de registro.
+
+Archivos usados como evidencia:
+- evidencia/logs/validacion_cdc.txt
+- evidencia/logs/D4_README_EVIDENCIAS.md
+- tests/test_cdc.py
+
+Consulta SQL asociada:
+SELECT tipo_evento, COUNT(*) AS cantidad
+FROM audit.cdc_eventos
+GROUP BY tipo_evento
+ORDER BY tipo_evento;
+
+Resultado observado en evidencia/logs/validacion_cdc.txt:
+- alta: 864 eventos
+- modificacion: 133 eventos
+- rechazo: 704 eventos
+- sin_cambio: 1 evento
+
+Interpretacion:
+El CDC se basa en natural_key y record_hash. Cuando una natural_key no existe, el evento se registra como alta. Cuando existe y el record_hash cambia, se registra como modificacion. Cuando existe y el record_hash se mantiene igual, se registra como sin_cambio. Los rechazos se registran como eventos auditables.
+
+Conclusion:
+La evidencia muestra eventos de alta, modificacion, rechazo y sin_cambio, por lo que el criterio de CDC queda documentado con resultados cuantitativos.

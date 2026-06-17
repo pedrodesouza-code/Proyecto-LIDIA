@@ -1,0 +1,52 @@
+EVIDENCIA DE FECHA FUERA DE RANGO
+
+Fecha de prueba:
+2026-06-16
+
+Entorno:
+Repositorio local Proyecto-LIDIA.
+
+Objetivo:
+Validar que los datasets principales respetan el periodo analitico 2018-2025.
+
+Archivos usados como evidencia:
+- tests/test_dataset_preparation.py
+- scripts/preparar_datasets_2018_2025.py
+- evidencia/logs/evidencia_tests_cdc_idempotencia_fecha.txt
+
+Prueba automatizada asociada:
+test_preparador_filtra_periodo_y_paises
+
+Caso probado:
+El test crea registros con fechas:
+- 2017-12-01
+- 2018-01-01
+- 2025-12-31
+- 2026-01-01
+
+Resultado esperado:
+Solo deben permanecer registros dentro del rango 2018-01-01 a 2025-12-31.
+
+Resultado observado:
+El test valida que el dataset procesado conserva:
+- 2018-01-01
+- 2025-12-31
+
+Y excluye:
+- 2017-12-01
+- 2026-01-01
+
+Consulta SQL de control recomendada sobre el DW:
+SELECT COUNT(*) AS registros_fuera_periodo
+FROM dw.fact_incendio i
+JOIN dw.dim_fecha f ON f.fecha_id = i.fecha_id
+WHERE f.anio NOT BETWEEN 2018 AND 2025;
+
+Resultado esperado de la consulta:
+registros_fuera_periodo = 0
+
+Interpretacion:
+El control temporal se aplica durante la preparacion de datasets principales. La evidencia automatizada confirma que los registros fuera del periodo 2018-2025 quedan excluidos antes de la carga analitica.
+
+Conclusion:
+La evidencia demuestra que el proceso de preparacion respeta el periodo definido para el proyecto y que la validacion puede reforzarse con el control SQL final sobre dw.fact_incendio y dw.dim_fecha.
