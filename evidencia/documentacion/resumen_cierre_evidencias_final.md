@@ -23,10 +23,10 @@ Archivo editable corregido:
 
 - `/home/pepo/Descargas/Entregable Final.docx`
 
-Backup creado:
+Backups locales creados:
 
-- `/home/pepo/Descargas/Entregable Final_backup_codex_cierre_20260615_155240.docx`
-- `/home/pepo/Descargas/Entregable Final_backup_codex_jupyter_evidencias_20260615_181531.docx`
+- `Entregable Final_backup_cierre_20260615_155240.docx`
+- `Entregable Final_backup_jupyter_evidencias_20260615_181531.docx`
 
 Correcciones aplicadas:
 
