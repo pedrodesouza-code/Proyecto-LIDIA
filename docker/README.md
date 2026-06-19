@@ -4,7 +4,6 @@ Este `compose` levanta PostgreSQL, MongoDB y Streamlit para validacion local.
 Copiar `.env.example` a `.env` local y cambiar passwords antes de iniciarlo.
 
 ```bash
-cd implementation/docker
 docker compose up -d postgres mongo
 docker compose up -d streamlit
 ```
