@@ -131,7 +131,7 @@ def summarize(frame: pd.DataFrame) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Prepara CHIRPS 2025 y consolida 2018-2025.")
     parser.add_argument("--history", default=str(PROCESSED_DIR / "chirps_2018_2025.parquet"))
-    parser.add_argument("--source-history", default=str(PROCESSED_DIR / "chirps_sa.parquet"))
+    parser.add_argument("--source-history", default=str(PROCESSED_DIR / "chirps_2018_2025.parquet"))
     parser.add_argument("--output-2025", default=str(PROCESSED_DIR / "chirps_2025.parquet"))
     parser.add_argument("--output", default=str(PROCESSED_DIR / "chirps_2018_2025.parquet"))
     parser.add_argument("--log", default=str(LOG_DIR / "preparacion_chirps_2025.log"))

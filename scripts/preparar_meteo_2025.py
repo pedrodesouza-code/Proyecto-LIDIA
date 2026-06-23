@@ -126,7 +126,7 @@ def main() -> int:
     parser.add_argument("--sleep-seconds", default=os.getenv("METEO_API_SLEEP_SECONDS", "0"))
     parser.add_argument("--output-2025", default=str(PROCESSED_DIR / "meteo_2025.parquet"))
     parser.add_argument("--history", default=str(PROCESSED_DIR / "meteo_2018_2025.parquet"))
-    parser.add_argument("--fallback-history", default=str(PROCESSED_DIR / "meteo_procesado_todos.parquet"))
+    parser.add_argument("--fallback-history", default=str(PROCESSED_DIR / "meteo_2018_2025.parquet"))
     parser.add_argument("--log", default=str(LOG_DIR / "preparacion_meteo_2025.log"))
     args = parser.parse_args()
 

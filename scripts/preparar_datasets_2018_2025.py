@@ -210,10 +210,9 @@ def firms_candidates() -> list[Path]:
         candidates.append(explicit)
     candidates.extend(
         [
+            DATA_DIR / "firms_2018_2025.parquet",
             ROOT / "data" / "raw" / "firms" / "firms_shapefile_2018_2025.parquet",
             DATA_DIR / "firms_shapefile_2018_2025.parquet",
-            DATA_DIR / "firms_procesado.parquet",
-            DATA_DIR / "firms_nrt_procesado.parquet",
         ]
     )
     candidates.extend(Path("/home/pepo").glob("**/*firms*2018*2025*.parquet"))
@@ -344,19 +343,19 @@ def prepare_all(update_env: bool = True) -> list[PreparationResult]:
         ),
         prepare_source(
             "CAMS",
-            find_existing([DATA_DIR / "cams_procesado_todos.parquet"]),
+            find_existing([DATA_DIR / "cams_2018_2025.parquet"]),
             DATA_DIR / "cams_2018_2025.parquet",
             ["fecha", "fecha_hora_utc", "date", "time"],
         ),
         prepare_source(
             "CHIRPS",
-            find_existing([DATA_DIR / "chirps_sa.parquet"]),
+            find_existing([DATA_DIR / "chirps_2018_2025.parquet"]),
             DATA_DIR / "chirps_2018_2025.parquet",
             ["fecha", "date", "anio"],
         ),
         prepare_source(
             "METEO",
-            find_existing([DATA_DIR / "meteo_procesado_todos.parquet"]),
+            find_existing([DATA_DIR / "meteo_2018_2025.parquet"]),
             DATA_DIR / "meteo_2018_2025.parquet",
             ["fecha", "fecha_hora_utc", "date", "time"],
         ),
@@ -368,7 +367,7 @@ def prepare_all(update_env: bool = True) -> list[PreparationResult]:
         ),
         prepare_source(
             "MODIS",
-            find_existing([DATA_DIR / "modis_lc.parquet"]),
+            find_existing([DATA_DIR / "modis_2018_2025.parquet"]),
             DATA_DIR / "modis_2018_2025.parquet",
             ["anio", "year"],
         ),

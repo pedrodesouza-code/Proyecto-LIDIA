@@ -42,8 +42,8 @@ for required in docker-compose.yml "$ENV_FILE" etl/main.py sql/ddl/00_schemas.sq
   fi
 done
 
-if [[ ! -f "data/processed/firms_nrt_procesado.parquet" ]]; then
-  echo "[EC3-local] ERROR: falta data/processed/firms_nrt_procesado.parquet"
+if [[ ! -f "data/processed/firms_2018_2025.parquet" ]]; then
+  echo "[EC3-local] ERROR: falta data/processed/firms_2018_2025.parquet"
   echo "[EC3-local] Copie el archivo FIRMS real a ese path o configure FIRMS_FILE en config/.env."
   exit 1
 fi

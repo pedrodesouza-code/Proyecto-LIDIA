@@ -18,7 +18,7 @@ SOURCE_CANDIDATES = [
     Path("/home/pepo/Datos completos/MODIS/modis_lc_type1_lidia_ury_arg_bra.csv"),
     Path("/home/pepo/Datos completos/MODIS/modis_arg_bra_2018_2021_zenodo.csv"),
     Path("/home/pepo/Datos completos/MODIS/modis_todos.csv"),
-    PROCESSED_DIR / "modis_lc.parquet",
+    PROCESSED_DIR / "modis_2018_2025.parquet",
 ]
 
 LC_DESCRIPTIONS = {
