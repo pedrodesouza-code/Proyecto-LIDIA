@@ -1,4 +1,4 @@
-# Proyecto LIDIA - Aporte EC3 Pedro UTEC
+# Proyecto LIDIA
 
 Implementacion reproducible para analizar incendios forestales y sus
 condiciones ambientales en **Uruguay, Argentina y Brasil** durante
